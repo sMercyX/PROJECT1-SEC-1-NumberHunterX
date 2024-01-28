@@ -1,22 +1,71 @@
 <script setup>
 import { ref } from "vue"
-const solution = [
-  "a1",
-  "b1",
-  "c1",
-  "d1",
-  "b2",
-  "d2",
-  "e2",
-  "b3",
-  "d3",
-  "b4",
-  "d4",
-  "b5",
-  "c5",
-  "d5",
-  "e5",
+const level = [
+  {
+    solution: [
+      "a1",
+      "b1",
+      "c1",
+      "d1",
+      "b2",
+      "d2",
+      "e2",
+      "b3",
+      "d3",
+      "b4",
+      "d4",
+      "b5",
+      "c5",
+      "d5",
+      "e5",
+    ],
+    hintsCol: [1, 5, `1\n1`, 5, `1\n1`],
+    hintsRow: [4, "1 2", "1 1", "1 1", 4],
+  },
+  {
+    solution: [
+      "c1",
+      "d1",
+      "e1",
+      "a2",
+      "c2",
+      "d2",
+      "e2",
+      "a3",
+      "e3",
+      "a4",
+      "b4",
+      "e4",
+      "a5",
+    ],
+    hintsCol: [4, 1, 2, 2, 4],
+    hintsRow: [3, "1 3", "1 1", "2 1", 1],
+  },
 ]
+
+// let currentLevel = 0
+const currentLevel = ref(0)
+const solution = level[currentLevel.value].solution
+const hintsCol = level[currentLevel.value].hintsCol
+const hintsRow = level[currentLevel.value].hintsRow
+
+// const solution = [
+//   "a1",
+//   "b1",
+//   "c1",
+//   "d1",
+//   "b2",
+//   "d2",
+//   "e2",
+//   "b3",
+//   "d3",
+//   "b4",
+//   "d4",
+//   "b5",
+//   "c5",
+//   "d5",
+//   "e5",
+// ]
 const failed = ref(0)
 const checked = []
 
@@ -96,6 +145,12 @@ function resetGame() {
   win.value = false
   time.value = 0
   clearInterval(interval.value)
+
+  const allBlocks = document.querySelectorAll(".block")
+  allBlocks.forEach((block) => {
+    block.style.backgroundColor = "white"
+    block.style.cursor = "pointer"
+  })
 }
 
 function checkWin() {
@@ -113,6 +168,16 @@ function formatTime(time) {
   const seconds = `0${time % 60}`.slice(-2)
   return `${minutes} : ${seconds}`
 }
+
+function nextLevel() {
+  currentLevel.value++
+  if (currentLevel.value <= level.length) {
+    solution.value = level[currentLevel.value].solution
+    hintsCol.value = level[currentLevel.value].hintsCol
+    hintsRow.value = level[currentLevel.value].hintsRow
+    resetGame()
+  }
+}
 </script>
 
 <template>
@@ -124,18 +189,24 @@ function formatTime(time) {
   <br />
   <div id="playZone" class="flex justify-center">
     <div id="hintsCol" class="bg-gray-500">
-      <div id="hintC">1</div>
+      <!-- <div id="hintC">1</div>
       <div id="hintC">5</div>
       <div id="hintC">1<br />1</div>
       <div id="hintC">5</div>
-      <div id="hintC">1<br />1</div>
+      <div id="hintC">1<br />1</div> -->
+      <div v-for="(hint, index) in hintsCol" :key="index" id="hintC">
+        {{ hint }}
+      </div>
     </div>
     <div id="hintsRow" class="bg-gray-500">
-      <div id="hintR">4</div>
+      <!-- <div id="hintR">4</div>
       <div id="hintR">1&nbsp2</div>
       <div id="hintR">1&nbsp1</div>
       <div id="hintR">1&nbsp1</div>
-      <div id="hintR">4</div>
+      <div id="hintR">4</div> -->
+      <div v-for="(hint, index) in hintsRow" :key="index" id="hintR">
+        {{ hint }}
+      </div>
     </div>
     <div id="board">
       <div class="block" id="a1" @click="check" @click.right="mark"></div>
@@ -189,6 +260,15 @@ function formatTime(time) {
       class="px-3 py-1 bg-red-600 rounded-lg text-white"
     >
       Reset
+    </button>
+  </div>
+
+  <div class="flex justify-end pt-10">
+    <button
+      @click="nextLevel"
+      class="px-3 py-1 text-white bg-blue-900 text-lg rounded-lg"
+    >
+      Next Level
     </button>
   </div>
 
