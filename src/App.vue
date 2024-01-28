@@ -1,247 +1,189 @@
 <script setup>
-import { ref } from 'vue'
-
-const refreshPage = () => {
-  location.reload() // Reloads the current page
-}
-
-const missed = ref(0)
-//style
-const blockStyle = 'hanjie-cell'
-const noneBorder = 'row-number'
-const halfBlock = 'hanjie-cell-half'
-const correct = 'MediumSeaGreen'
-const unCorrect = '#f87171'
-
-//block stores row and column of table
-const blocks = []
-//rows stores row name of table
-const rows = ['t', '0', '1', '2', '3', '4', '5']
-//columns stores column name of table
-const columns = ['0', 'a', 'b', 'c', 'd', 'e', '99']
-
-//to stores row and column to blocks
-rows.forEach((ele) => {
-  blocks.push({ row: ele, column: [...columns] }) //use spread to easy copy data without reference
-})
-console.log(blocks) //log to show result of block
-
-//result of above
-// blocks = [
-//   {
-//     row: '0',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-//   {
-//     row: '1',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-//   {
-//     row: '2',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-//   {
-//     row: '3',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-//   {
-//     row: '4',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-//   {
-//     row: '5',
-//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
-//   },
-// ]
-
-//correctBlock stores block that when click its will change to correct color
-const correctBlock = [
-  'a1',
-  'b1',
-  'e1',
-  'a2',
-  'b2',
-  'c3',
-  'a4',
-  'b4',
-  'c4',
-  'a5',
-  'b5',
-  'c5',
-  'd5',
+import { computed, hasInjectionContext, ref } from "vue"
+const level = [
+  "c1",
+  "b2",
+  "c2",
+  "d2",
+  "a3",
+  "b3",
+  "c3",
+  "d3",
+  "e3",
+  "c4",
+  "a5",
+  "b5",
+  "c5",
+  "d5",
+  "e5",
 ]
 
-//checkHeaderStyle is use for checking that block is header or not to custom style
-const checkHeaderStyle = (id) => {
-  if (id.includes('0')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('t')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('99')) return `${blockStyle} ${noneBorder}`
-  return blockStyle
-}
-const checkTR = (id) => {
-  if (id.includes('0'))
-    return `
-  height: 30px;`
-  if (id.includes('t'))
-    return `
-  height: 30px;`
-}
+// unused
+// const rowHints = ref([[4], [1, 2], [1, 1], [1, 1], [4]]);
+// const colHints = ref([[], [1], [5], [1, 1], [5], [1]]);
 
-//headerNums stores id and result of block of table head
-const headerNums = [
-  {
-    id: 'at',
-    result: '2',
-  },
-  {
-    id: 'bt',
-    result: '2',
-  },
-  {
-    id: 'a0',
-    result: '2',
-  },
-  {
-    id: 'b0',
-    result: '2',
-  },
-  {
-    id: 'c0',
-    result: '3',
-  },
-  {
-    id: 'd0',
-    result: '1',
-  },
-  {
-    id: 'e0',
-    result: '1',
-  },
-  {
-    id: '01',
-    result: '2  1',
-  },
-  {
-    id: '02',
-    result: '2',
-  },
-  {
-    id: '03',
-    result: '1',
-  },
-  {
-    id: '04',
-    result: '3',
-  },
-  {
-    id: '05',
-    result: '4',
-  },
-]
+const failed = ref(0)
+const checked = []
 
-const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to find result
-  return index >= 0 ? headerNums[index].result : ''
-}
+const win = ref(false)
 
-//addClickers is use to adding click to only block that should be (block that have a line)
-const addClickers = (id) => {
-  if (!id.includes('0') && !id.includes('99')&& !id.includes('t')) {
-    console.log(id)
-    const blockColor = correctBlock.includes(id) ? correct : unCorrect
-    const targetBlock = document.getElementById(id)
-    targetBlock.style.backgroundColor = blockColor
-    if (blockColor == unCorrect) {
-      targetBlock.textContent = 'x'
-      missed.value++
-    }
+function mark(event) {
+  event.preventDefault()
+  let targetTile = event.target //tile clicked
+  let targetTileId = targetTile.id //clicked tile id
+  let targetClasses = targetTile.className.split(" ") //split class into array
+  if (checked.includes(targetTileId)) {
+    //if already checked, return
+    return
   }
+  if (targetClasses.includes("marked")) {
+    //remove marked class from the tile
+    let markToRm = targetClasses.findIndex((tileClass) => {
+      return tileClass === "marked"
+    })
+    targetClasses.splice(markToRm, 1)
+    targetTile.className = targetClasses.join(" ")
+    targetTile.style.backgroundColor = "white"
+    return
+  }
+  targetClasses.push("marked")
+  targetTile.className = targetClasses.join(" ")
+  targetTile.style.backgroundColor = "grey"
 }
+
+function check(event) {
+  const clickedTile = event.target
+  const clickedTileId = clickedTile.id
+  let targetClasses = clickedTile.className.split(" ")
+
+  if (checked.includes(clickedTileId) || targetClasses.includes("marked")) {
+    //check if already checked or marked by player
+    return
+  }
+
+  checked.push(clickedTileId)
+  if (level.includes(clickedTileId)) {
+    clickedTile.style.backgroundColor = "green"
+    clickedTile.style.cursor = "default"
+  } else {
+    failed.value++
+    clickedTile.style.backgroundColor = "red"
+    clickedTile.style.cursor = "not-allowed"
+  }
+
+  checkWin()
+}
+
+function checkWin() {
+  let winTemp = true
+  level.forEach((mustCheckCell) => {
+    if (!checked.includes(mustCheckCell)) {
+      winTemp = false
+    }
+  })
+  console.log(winTemp)
+  win.value = winTemp
+}
+
+function endGame() {}
+
+// ------------------------------------------
+
+const Time = ref(10)
+
+const TimeInterval = setInterval(() => {
+  Time.value--
+  if (Time.value == -1) {
+    clearInterval(TimeInterval)
+  }
+}, 1000)
+
+const isTimeUp = () => {
+  return Time.value <= 0
+}
+
+const hintCount = ref(2)
+
+let randomBox = ref([])
+
+const hintClicked = () => {
+  if (hintCount.value > 0) {
+    hintCount.value -= 1
+    const arrayRandom = level[Math.floor(Math.random() * level.length)]
+    randomBox.value.push(arrayRandom)
+    
+  }
+
+}
+
+
+// -------------------------------------------
 </script>
 
 <template>
-  <div class="container p-10 m-auto">
-    <div class="header pb-2 flex justify-center">
-      <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
-    </div>
-    <button
-      class="btn btn-outline btn-primary"
-      type="reset"
-      @click="refreshPage()"
+  <div>
+    <!-- Grid inspired by https://github.com/JosephCoburn/nonogram-puzzle -->
+    <div
+      id="playGrid"
+      class="container mx-auto mt-10 text-center flex justify-center"
     >
-      RESET
-    </button>
-    <div class="join flex justify-center">
-      <table class="hanjie-table">
-        <tr
-          v-for="block in blocks"
-          :key="block.row"
-          :id="block.row"
-          :style="checkTR(block.row)"
-        >
-          <td
-            :class="checkHeaderStyle(col + block.row)"
-            v-for="col in block.column"
-            :key="col + block.row"
-            :id="col + block.row"
-            @click="addClickers(col + block.row)"
-          >
-            {{ checkHeader(col + block.row) }}
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <div class="btm-text flex justify-center content-around">
-      <div class="collapse">
-        <input type="checkbox" />
-        <div class="collapse-title text-xl font-medium justify-start">
-          Hint :
-        </div>
-        <div class="collapse-content hidden-hint">
-          <p>hide hint</p>
+      <div id="colHints">
+        <div>1<br />1</div>
+        <div>2<br />1</div>
+        <div>5</div>
+        <div>2<br />1</div>
+        <div>1<br />1</div>
+      </div>
+      <div id="rowHints" class="">
+        <div>1</div>
+        <div>3</div>
+        <div>5</div>
+        <div>1</div>
+        <div>5</div>
+        <!-- <div>1&nbsp1</div> -->
+      </div>
+      <div id="playTable">
+        <div v-for="i in 5" class="flex">
+          <div
+            v-for="char in ['a', 'b', 'c', 'd', 'e']"
+            class="block"
+            :id="char + i"
+            :key="char + i"
+            @click="check"
+            @click.right="mark"
+          ></div>
         </div>
       </div>
-
-      <div class="text-xl font-medium justify-items-end">
-        Miss : {{ missed }}
-      </div>
     </div>
+    <div class="container mx-auto mt-2 text-center">
+      <div>
+        Missed: {{ failed }} <br />
+        Timer: {{ !isTimeUp() ? Time : "Time's up" }}
+      </div>
 
-    <div class="join pagination flex justify-center">
-      <button class="join-item btn">«</button>
-      <button class="join-item btn">Level 1</button>
-      <button class="join-item btn">»</button>
+      <div v-if="win">Course Cleared!</div>
+      <div v-if="isTimeUp()">Game Over!</div>
+
+      <button
+        
+        class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 mt-2 border border-blue-500 hover:border-transparent rounded"
+        @click="hintClicked"
+      >
+        {{ hintCount }} Hint
+      </button>
+
+      <p>Hint Choose: {{ randomBox }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
-.hanjie {
-  border-collapse: collapse;
-  margin: 20px;
-}
-
-.hanjie-cell {
-  width: 70px;
-  height: 70px;
-  border: 1px solid #000;
+.borderCells {
+  text-wrap: nowrap;
   text-align: center;
 }
-.hanjie-cell-half {
-  width: 70px;
-  height: 30px;
-  border: 1px solid #000;
+.blocks {
+  border: solid black 1px;
   text-align: center;
-  padding-bottom: 10px;
-}
-.filled {
-  background-color: #000;
-}
-
-.col-number,
-.row-number,
-.none {
-  border: none;
 }
 </style>
