@@ -45,9 +45,9 @@ const level = [
 
 // let currentLevel = 0
 const currentLevel = ref(0)
-const solution = level[currentLevel.value].solution
-const hintsCol = level[currentLevel.value].hintsCol
-const hintsRow = level[currentLevel.value].hintsRow
+const solution = ref(level[currentLevel.value].solution)
+const hintsCol = ref(level[currentLevel.value].hintsCol)
+const hintsRow = ref(level[currentLevel.value].hintsRow)
 
 // const solution = [
 //   "a1",
@@ -90,7 +90,7 @@ function check(event) {
   }
 
   checked.push(boxId)
-  if (solution.includes(boxId)) {
+  if (solution.value.includes(boxId)) {
     clickedBox.style.backgroundColor = "green"
     clickedBox.style.cursor = "default"
   } else {
@@ -155,7 +155,7 @@ function resetGame() {
 
 function checkWin() {
   let winTemp = true
-  solution.forEach((checkCell) => {
+  solution.value.forEach((checkCell) => {
     if (!checked.includes(checkCell)) {
       winTemp = false
     }
@@ -171,11 +171,14 @@ function formatTime(time) {
 
 function nextLevel() {
   currentLevel.value++
-  if (currentLevel.value <= level.length) {
+  if (currentLevel.value < level.length) {
     solution.value = level[currentLevel.value].solution
     hintsCol.value = level[currentLevel.value].hintsCol
     hintsRow.value = level[currentLevel.value].hintsRow
     resetGame()
+  }else{
+    alert("You have completed all levels")
+    resetGame
   }
 }
 </script>
@@ -194,7 +197,7 @@ function nextLevel() {
       <div id="hintC">1<br />1</div>
       <div id="hintC">5</div>
       <div id="hintC">1<br />1</div> -->
-      <div v-for="(hint, index) in hintsCol" :key="index" id="hintC">
+      <div v-for="(hint , index ) in hintsCol" :key="index" id="hintC">
         {{ hint }}
       </div>
     </div>
@@ -204,7 +207,7 @@ function nextLevel() {
       <div id="hintR">1&nbsp1</div>
       <div id="hintR">1&nbsp1</div>
       <div id="hintR">4</div> -->
-      <div v-for="(hint, index) in hintsRow" :key="index" id="hintR">
+      <div v-for="( hint , index ) in hintsRow" :key="index" id="hintR">
         {{ hint }}
       </div>
     </div>
