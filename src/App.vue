@@ -1,283 +1,397 @@
 <script setup>
-import { ref } from "vue"
-const level = [
-  {
-    solution: [
-      "a1",
-      "b1",
-      "c1",
-      "d1",
-      "b2",
-      "d2",
-      "e2",
-      "b3",
-      "d3",
-      "b4",
-      "d4",
-      "b5",
-      "c5",
-      "d5",
-      "e5",
-    ],
-    hintsCol: [1, 5, `1\n1`, 5, `1\n1`],
-    hintsRow: [4, "1 2", "1 1", "1 1", 4],
-  },
-  {
-    solution: [
-      "c1",
-      "d1",
-      "e1",
-      "a2",
-      "c2",
-      "d2",
-      "e2",
-      "a3",
-      "e3",
-      "a4",
-      "b4",
-      "e4",
-      "a5",
-    ],
-    hintsCol: [4, 1, 2, 2, 4],
-    hintsRow: [3, "1 3", "1 1", "2 1", 1],
-  },
-]
+import { ref } from "vue";
 
-// let currentLevel = 0
-const currentLevel = ref(0)
-const solution = ref(level[currentLevel.value].solution)
-const hintsCol = ref(level[currentLevel.value].hintsCol)
-const hintsRow = ref(level[currentLevel.value].hintsRow)
-
-// const solution = [
-//   "a1",
-//   "b1",
-//   "c1",
-//   "d1",
-//   "b2",
-//   "d2",
-//   "e2",
-//   "b3",
-//   "d3",
-//   "b4",
-//   "d4",
-//   "b5",
-//   "c5",
-//   "d5",
-//   "e5",
-// ]
-const failed = ref(0)
-const checked = []
-
-const win = ref(false)
-
-const time = ref(0)
+const refreshPage = () => {
+  location.reload(); // Reloads the current page
+};
 
 const start = ref(false)
 
-const interval = ref(null)
+const missed = ref(0);
+const hintsLeft = ref(3);
 
-function check(event) {
-  if (!start.value) {
-    return
+//style
+const blockStyle = "hanjie-cell";
+const noneBorder = "row-number";
+const halfBlock = "hanjie-cell-half";
+const correct = "MediumSeaGreen";
+const unCorrect = "#f87171";
+
+//block stores row and column of table
+const blocks = [];
+//rows stores row name of table
+const rows = ["t", "0", "1", "2", "3", "4", "5"];
+//columns stores column name of table
+const columns = ["0", "a", "b", "c", "d", "e", "99"];
+//checked blocks array
+const checked = [];
+const win = ref(false)
+const mins = ref(0);
+const secs = ref(0);
+
+//to stores row and column to blocks
+rows.forEach((ele) => {
+  blocks.push({ row: ele, column: [...columns] }); //use spread to easy copy data without reference
+});
+
+//result of above
+// blocks = [
+//   {
+//     row: '0',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+//   {
+//     row: '1',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+//   {
+//     row: '2',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+//   {
+//     row: '3',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+//   {
+//     row: '4',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+//   {
+//     row: '5',
+//     column: ['0', 'a', 'b', 'c', 'd', 'e', '99'],
+//   },
+// ]
+
+//correctBlock stores block that when click its will change to correct color
+const correctBlock = [
+  "a1",
+  "b1",
+  "e1",
+  "a2",
+  "b2",
+  "c3",
+  "a4",
+  "b4",
+  "c4",
+  "a5",
+  "b5",
+  "c5",
+  "d5",
+];
+
+const hints = ref([]);
+let hintable = ref(true);
+
+function checkHintable() {
+
+  let checkedCorrect = checked.filter((tile) => {
+    return correctBlock.includes(tile);
+  });
+  let hintAndChecked = hints.value.concat(checkedCorrect);
+  if (hintAndChecked.length >= correctBlock.length) {
+    hintable.value = false;
   }
-  const clickedBox = event.target
-  const boxId = clickedBox.id
-  const boxClass = clickedBox.className.split(" ")
-
-  if (checked.includes(boxId) || boxClass.includes("marked")) {
-    return
-  }
-
-  checked.push(boxId)
-  if (solution.value.includes(boxId)) {
-    clickedBox.style.backgroundColor = "green"
-    clickedBox.style.cursor = "default"
-  } else {
-    failed.value++
-    clickedBox.style.backgroundColor = "red"
-    clickedBox.style.cursor = "not-allowed"
-  }
-
-  checkWin()
 }
 
-function mark(event) {
-  if (!start.value) {
+const genHint = () => {
+  if (!start.value){
     return
   }
-  event.preventDefault()
-  const targetBox = event.target
-  const targetId = targetBox.id
-  let targetClass = targetBox.className.split(" ")
-  if (checked.includes(targetId)) {
-    return
+  let randomIndex;
+  if (hintsLeft.value <= 0 || !hintable.value) {
+    return;
   }
-  if (targetClass.includes("marked")) {
-    const markToRm = targetClass.findIndex((box) => {
-      return box === "marked"
-    })
-    targetClass.splice(markToRm, 1)
-    targetBox.className = targetClass.join(" ")
-    targetBox.style.backgroundColor = "white"
-    return
+  while (true) {
+    randomIndex = Math.floor(Math.random() * correctBlock.length);
+    if (
+      !checked.includes(correctBlock[randomIndex]) &&
+      !hints.value.includes(correctBlock[randomIndex])
+    ) {
+      hintsLeft.value--;
+      hints.value.push(correctBlock[randomIndex]);
+      checkHintable();
+      return;
+    }
   }
-  targetClass.push("marked")
-  targetBox.className = targetClass.join(" ")
-  targetBox.style.backgroundColor = "grey"
-}
+};
 
-function startGame() {
+function startGame(){
   start.value = true
+  timer(true)
+}
 
-  interval.value = setInterval(() => {
-    time.value++
-    if (win.value) {
-      clearInterval(interval.value)
+let timerInterval;
+
+// onMounted(() => {
+//   timer(true);
+// });
+
+function timer(op) {
+  if (op) {
+    timerInterval = setInterval(() => {
+      if (secs.value >= 59) {
+        mins.value++;
+        secs.value = 0
+        return;
+      } else {
+        secs.value++;
+      }
+    }, 1000);
+  } else {
+    if (timerInterval === undefined) {
+      return;
+    } else {
+      clearInterval(timerInterval)
     }
-  }, 1000)
-}
-
-function resetGame() {
-  start.value = false
-  checked.splice(0, checked.length)
-  failed.value = 0
-  win.value = false
-  time.value = 0
-  clearInterval(interval.value)
-
-  const allBlocks = document.querySelectorAll(".block")
-  allBlocks.forEach((block) => {
-    block.style.backgroundColor = "white"
-    block.style.cursor = "pointer"
-  })
-}
-
-function checkWin() {
-  let winTemp = true
-  solution.value.forEach((checkCell) => {
-    if (!checked.includes(checkCell)) {
-      winTemp = false
-    }
-  })
-  win.value = winTemp
-}
-
-function formatTime(time) {
-  const minutes = `0${Math.floor(time / 60)}`.slice(-2)
-  const seconds = `0${time % 60}`.slice(-2)
-  return `${minutes} : ${seconds}`
-}
-
-function nextLevel() {
-  currentLevel.value++
-  if (currentLevel.value < level.length) {
-    solution.value = level[currentLevel.value].solution
-    hintsCol.value = level[currentLevel.value].hintsCol
-    hintsRow.value = level[currentLevel.value].hintsRow
-    resetGame()
-  }else{
-    alert("You have completed all levels")
-    resetGame
   }
+}
+
+//checkHeaderStyle is use for checking that block is header or not to custom style
+const checkHeaderStyle = (id) => {
+  if (id.includes("0")) return `${halfBlock} ${noneBorder}`;
+  if (id.includes("t")) return `${halfBlock} ${noneBorder}`;
+  if (id.includes("99")) return `${blockStyle} ${noneBorder}`;
+  return blockStyle;
+};
+const checkTR = (id) => {
+  if (id.includes("0"))
+    return `
+  height: 30px;`;
+  if (id.includes("t"))
+    return `
+  height: 30px;`;
+};
+
+//headerNums stores id and result of block of table head
+const headerNums = [
+  {
+    id: "at",
+    result: "2",
+  },
+  {
+    id: "bt",
+    result: "2",
+  },
+  {
+    id: "a0",
+    result: "2",
+  },
+  {
+    id: "b0",
+    result: "2",
+  },
+  {
+    id: "c0",
+    result: "3",
+  },
+  {
+    id: "d0",
+    result: "1",
+  },
+  {
+    id: "e0",
+    result: "1",
+  },
+  {
+    id: "01",
+    result: "2  1",
+  },
+  {
+    id: "02",
+    result: "2",
+  },
+  {
+    id: "03",
+    result: "1",
+  },
+  {
+    id: "04",
+    result: "3",
+  },
+  {
+    id: "05",
+    result: "4",
+  },
+];
+
+const checkHeader = (id) => {
+  const index = headerNums.findIndex((num) => num.id === id); //checking id in array of header numbers to find result
+  return index >= 0 ? headerNums[index].result : "";
+};
+
+//addClickers is use to adding click to only block that should be (block that have a line)
+const addClickers = (event) => {
+  if (!start.value){
+    return
+  }
+  let targetTile = event.target; //tile clicked
+  let id = targetTile.id; //clicked tile id
+  let targetClasses = targetTile.className.split(" "); //split class into array
+  if (checked.includes(id) || targetClasses.includes("marked")) {
+    return;
+  }
+  if (!id.includes("0") && !id.includes("99") && !id.includes("t")) {
+    const blockColor = correctBlock.includes(id) ? correct : unCorrect;
+    const targetBlock = document.getElementById(id);
+    targetBlock.style.backgroundColor = blockColor;
+    if (blockColor === unCorrect) {
+      targetBlock.textContent = "x";
+      missed.value++;
+    }
+    checked.push(id);
+    if (blockColor === correct) {
+      checkHintable();
+    }
+    if(checkWin()){
+      timer(false)
+    }
+  }
+};
+
+function mark(event){
+  if (!start.value){
+    return
+  }
+  event.preventDefault();
+  let targetTile = event.target; //tile clicked
+  let targetTileId = targetTile.id; //clicked tile id
+  let targetClasses = targetTile.className.split(" "); //split class into array
+  if (checked.includes(targetTileId)) {
+    //if already checked, return
+    return;
+  }
+  if (targetClasses.includes("marked")) {
+    //remove marked class from the tile
+    let markToRm = targetClasses.findIndex((tileClass) => {
+      return tileClass === "marked";
+    });
+    targetClasses.splice(markToRm, 1);
+    targetTile.className = targetClasses.join(" ");
+    targetTile.style.backgroundColor = "white";
+    return;
+  }
+  targetClasses.push("marked");
+  targetTile.className = targetClasses.join(" ");
+  targetTile.style.backgroundColor = "grey";
+}
+
+function checkWin(){
+  let winTemp = true;
+  correctBlock.forEach((mustCheckCell) => {
+    if (!checked.includes(mustCheckCell)) {
+      winTemp = false;
+    }
+  });
+  // console.log(winTemp);
+  win.value = winTemp;
+  return winTemp;
 }
 </script>
 
 <template>
-  <div class="flex justify-center">
-    <h1 class="text-3xl font-semibold">Number Hunter X</h1>
-  </div>
-  <br />
-  <hr />
-  <br />
-  <div id="playZone" class="flex justify-center">
-    <div id="hintsCol" class="bg-gray-500">
-      <!-- <div id="hintC">1</div>
-      <div id="hintC">5</div>
-      <div id="hintC">1<br />1</div>
-      <div id="hintC">5</div>
-      <div id="hintC">1<br />1</div> -->
-      <div v-for="(hint , index ) in hintsCol" :key="index" id="hintC">
-        {{ hint }}
-      </div>
+  <div class="container p-10 m-auto">
+    <div class="header pb-2 flex justify-center">
+      <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
     </div>
-    <div id="hintsRow" class="bg-gray-500">
-      <!-- <div id="hintR">4</div>
-      <div id="hintR">1&nbsp2</div>
-      <div id="hintR">1&nbsp1</div>
-      <div id="hintR">1&nbsp1</div>
-      <div id="hintR">4</div> -->
-      <div v-for="( hint , index ) in hintsRow" :key="index" id="hintR">
-        {{ hint }}
-      </div>
-    </div>
-    <div id="board">
-      <div class="block" id="a1" @click="check" @click.right="mark"></div>
-      <div class="block" id="b1" @click="check" @click.right="mark"></div>
-      <div class="block" id="c1" @click="check" @click.right="mark"></div>
-      <div class="block" id="d1" @click="check" @click.right="mark"></div>
-      <div class="block" id="e1" @click="check" @click.right="mark"></div>
-
-      <div class="block" id="a2" @click="check" @click.right="mark"></div>
-      <div class="block" id="b2" @click="check" @click.right="mark"></div>
-      <div class="block" id="c2" @click="check" @click.right="mark"></div>
-      <div class="block" id="d2" @click="check" @click.right="mark"></div>
-      <div class="block" id="e2" @click="check" @click.right="mark"></div>
-
-      <div class="block" id="a3" @click="check" @click.right="mark"></div>
-      <div class="block" id="b3" @click="check" @click.right="mark"></div>
-      <div class="block" id="c3" @click="check" @click.right="mark"></div>
-      <div class="block" id="d3" @click="check" @click.right="mark"></div>
-      <div class="block" id="e3" @click="check" @click.right="mark"></div>
-
-      <div class="block" id="a4" @click="check" @click.right="mark"></div>
-      <div class="block" id="b4" @click="check" @click.right="mark"></div>
-      <div class="block" id="c4" @click="check" @click.right="mark"></div>
-      <div class="block" id="d4" @click="check" @click.right="mark"></div>
-      <div class="block" id="e4" @click="check" @click.right="mark"></div>
-
-      <div class="block" id="a5" @click="check" @click.right="mark"></div>
-      <div class="block" id="b5" @click="check" @click.right="mark"></div>
-      <div class="block" id="c5" @click="check" @click.right="mark"></div>
-      <div class="block" id="d5" @click="check" @click.right="mark"></div>
-      <div class="block" id="e5" @click="check" @click.right="mark"></div>
-    </div>
-  </div>
-  <div class="flex justify-center text-xl">
-    Missed: <span class="text-red-500">{{ failed }}</span>
-  </div>
-  <div class="flex justify-center text-xl">
-    Time:<span>{{ formatTime(time) }}</span>
-  </div>
-  <div class="flex justify-center space-x-5">
     <button
       v-if="!start"
-      class="px-3 py-1 bg-green-600 rounded-lg text-white"
-      @click="startGame"
-    >
-      Start
+      class="btn btn-outline btn-primary"
+      type="button"
+      @click="startGame()">
+      START
     </button>
     <button
-      v-else
-      @click="resetGame"
-      class="px-3 py-1 bg-red-600 rounded-lg text-white"
+      v-if="start"
+      class="btn btn-outline btn-primary"
+      type="reset"
+      @click="refreshPage()"
     >
-      Reset
+      RESET
     </button>
-  </div>
+    <div class="join flex justify-center">
+      <table class="hanjie-table">
+        <tr
+          v-for="block in blocks"
+          :key="block.row"
+          :id="block.row"
+          :style="checkTR(block.row)"
+        >
+          <td
+            :class="checkHeaderStyle(col + block.row)"
+            v-for="col in block.column"
+            :key="col + block.row"
+            :id="col + block.row"
+            @click="addClickers"
+            @click.right="mark"
+          >
+            {{ checkHeader(col + block.row) }}
+          </td>
+        </tr>
+      </table>
+    </div>
 
-  <div class="flex justify-end pt-10">
-    <button
-      @click="nextLevel"
-      class="px-3 py-1 text-white bg-blue-900 text-lg rounded-lg"
-    >
-      Next Level
-    </button>
-  </div>
+    <div class="btm-text flex justify-center content-around">
+      <div class="collapse">
+        <div class="text-xl font-medium justify-start">
+          Hint Left: {{ hintsLeft }}
+          <button
+            :class="hintsLeft > 0 && hintable ? 'bg-rose-500' : 'bg-slate-600'"
+            :disabled="hintsLeft > 0 ? false : true"
+            @click="genHint"
+          >
+            get Hint
+          </button>
+        </div>
+        <div v-if="hints.length > 0" class="justify-center">
+          <b v-for="(hint, index) in hints" :key="hint"
+            >{{ hint }}<b v-if="index < hints.length - 1">, </b></b
+          >
+        </div>
+      </div>
 
-  <div v-if="win" class="flex justify-center text-2xl text-green-600">
-    !!!!Success!!!!
+      <div class="text-xl font-medium justify-items-end">
+        Miss : {{ missed }}
+      </div>
+    </div>
+
+    <div>Time: <span v-if="mins < 10">0</span>{{ mins }} : <span v-if="secs<10">0</span>{{ secs }}</div>
+
+    <div class="join pagination flex justify-center">
+      <button class="join-item btn">«</button>
+      <button class="join-item btn">Level 1</button>
+      <button class="join-item btn">»</button>
+    </div>
+
+    <div v-if="win">Stage cleared!!!</div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.hanjie {
+  border-collapse: collapse;
+  margin: 20px;
+}
+
+.hanjie-cell {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #000;
+  text-align: center;
+}
+.hanjie-cell-half {
+  width: 70px;
+  height: 30px;
+  border: 1px solid #000;
+  text-align: center;
+  padding-bottom: 10px;
+}
+.filled {
+  background-color: #000;
+}
+
+.col-number,
+.row-number,
+.none {
+  border: none;
+}
+</style>
