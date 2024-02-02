@@ -30,24 +30,24 @@ member
 </ul>
 
 Week 1 Progress:
-[x] Proof of Concept
-[x] Basic UX-UI design
-[x] Base game concept
+- [x] Proof of Concept
+- [x] Basic UX-UI design
+- [x] Base game concept
 
 Week 2 Progress:
-[x] Basic UX-UI Implementation
-[x] Adapting codebase to use Vue directives
+- [x] Basic UX-UI Implementation
+- [x] Adapting codebase to use Vue directives
 
 Week 3 Progress:
-[x] Hinting System
-[x] Timer
-[x] Tutorial Modal
-[x] Changing Level mechanic
+- [x] Hinting System
+- [x] Timer
+- [x] Tutorial Modal
+- [x] Changing Level mechanic
 
 Next steps:
-[] Implementing Main Menu
-[] Full UX-UI CSS 
-[] Saving system using local storage
+- [ ] Implementing Main Menu
+- [ ] Full UX-UI CSS 
+- [ ] Saving system using local storage
 
 
 
