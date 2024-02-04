@@ -1,9 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
-
-const refreshPage = () => {
-  location.reload(); // Reloads the current page
-};
+import { onMounted, ref, nextTick, render } from "vue";
 
 const missed = ref(0);
 const hintsLeft = ref(3);
@@ -107,11 +103,6 @@ function timer(op) {
   }
 }
 
-const countTime = () => {
-
-}
-
-
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
@@ -199,7 +190,7 @@ const addClickers = (event) => {
     const targetBlock = document.getElementById(id);
     targetBlock.style.backgroundColor = blockColor;
     if (blockColor === unCorrect) {
-      targetBlock.textContent = "x";
+      //targetBlock.textContent = "x";
       missed.value++;
     }
     checked.push(id);
@@ -250,6 +241,23 @@ function checkWin() {
 
 const show = ref(false)
 
+const resetGame = () => {
+  missed.value = 0;
+  hintsLeft.value = 3;
+  blocks.forEach(block => {
+    block.column.forEach(col => {
+      const id = col + block.row;
+      document.getElementById(id).style.backgroundColor = "";
+    });
+  });
+  checked.length = 0;
+  win.value = false;
+  mins.value = 0;
+  secs.value = 0;
+  hints.value = [];
+  hintable.value = true;
+}
+
 </script>
 
 <template>
@@ -261,24 +269,39 @@ const show = ref(false)
   <div class="tutorial flex " v-show="!show">
     <div class="tutorials px-4 py-2 m-2 center">
       <h1 class="text-center  text-2xl font-bold">tutorials</h1>
-      <h2> I think should have some picture </h2> <br><br><br><br>
-      <h2 class="p-20">Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit, temporibus, cum harum natus ea
-        dicta sequi
-        accusantium ducimus voluptas deserunt eaque, earum eos. Similique, architecto. Ullam debitis error ipsa unde?
-        Numquam doloribus dolorem aspernatur libero eligendi ab molestias, dolor rem sunt suscipit nihil, totam, ut nulla
-        quae commodi! Quod a vero tempore atque! Perspiciatis, eum nisi quas nihil tempore totam!</h2>
+      <div class="text-center">
+        <h2> I think should have some picture </h2> <br><br><br><br>
+        <h3>The basics</h3>
+        <div>
+          <p>
+            Your goal is to paint all the correct tiles in the grid. Each row and
+            column contains a set of numbers indicating length of the correct
+            tiles.
+          </p>
+          <p>
+            For example; 2 3, means there are 5 correct tiles in the row column in
+            total one with the length of two and another three, both are placed
+            apart.
+          </p>
+          <b>The game ends once you reveal all the correct tiles. Good luck and
+            Happy Hunting
+          </b>
+          <span class="italic">ps. Next pages details tips and techniques, study it if you wish
+            become the elite nonogrammer!</span>
+        </div>
+      </div>
     </div>
     <button @click="show = !show" class="btn btn-success text-white">
-      Start </button>
+      Play Game </button>
   </div>
 
   <div class="container p-10 m-auto w-full" v-show="show">
     <section class="flex items-center justify-between">
-      <button class="btn btn-outline btn-primary flex " type="reset" @click="refreshPage()">
+      <button class="btn btn-outline btn-primary flex " type="button" @click="resetGame">
         RESET
       </button>
       <div class="flex">
-        Time :
+        Time: <span v-if="mins < 10">0</span>{{ mins }} : <span v-if="secs < 10">0</span>{{ secs }}
       </div>
     </section>
 
