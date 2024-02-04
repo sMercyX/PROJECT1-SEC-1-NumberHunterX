@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 
-const refreshPage = () => {
-  location.reload() // Reloads the current page
-}
+// const refreshPage = () => {
+//   location.reload() // Reloads the current page
+// }
 
 const start = ref(false)
 
@@ -192,7 +192,6 @@ const level = [
   },
 ]
 
-//current level
 const currentLevel = ref(1)
 
 //correctBlock stores block that when click its will change to correct color
@@ -211,27 +210,50 @@ function checkHintable() {
   }
 }
 
+// function restartGame(){
+//   // start.value = false
+//   // checked.splice(0, checked.length)
+//   // missed.value = 0
+//   // win.value = false
+//   // mins.value = 0
+//   // secs.value = 0
+//   // clearInterval(timerInterval)1
+//   currentLevel.value = 1
+// }
+
+function restartGame(){
+  resetGame()
+  currentLevel.value = 1
+  correctBlock.value = level[currentLevel.value - 1].correctBlock
+  headerNums.value = level[currentLevel.value - 1].headerNums
+  checked.splice(0, checked.length)
+  resetBlockStyles()
+  startGame()
+}
+
 const genHint = () => {
+  console.log('ooo')
   if (!start.value) {
-    return
+    return;
   }
-  let randomIndex
+  let randomIndex;
   if (hintsLeft.value <= 0 || !hintable.value) {
-    return
+    return;
   }
   while (true) {
-    randomIndex = Math.floor(Math.random() * correctBlock.value.length)
+    randomIndex = Math.floor(Math.random() * correctBlock.value.length);
     if (
-      !checked.includes(correctBlock[randomIndex]) &&
-      !hints.value.includes(correctBlock[randomIndex])
+      !checked.includes(level[currentLevel.value -1].correctBlock[randomIndex]) &&
+      !hints.value.includes(level[currentLevel.value - 1].correctBlock[randomIndex])
     ) {
-      hintsLeft.value--
-      hints.value.push(correctBlock[randomIndex])
-      checkHintable()
-      return
+      hintsLeft.value--;
+      hints.value.push(level[currentLevel.value - 1].correctBlock[randomIndex]);
+      checkHintable();
+      return;
     }
   }
-}
+};
+
 
 function startGame() {
   start.value = true
@@ -241,45 +263,42 @@ function startGame() {
 function resetGame() {
   start.value = false
   checked.splice(0, checked.length)
-  missed.value = 0
   win.value = false
-  mins.value = 0
-  secs.value = 0
   clearInterval(timerInterval)
 }
 
-//reset block style
 const resetBlockStyles = () => {
   const allBlocks = document.querySelectorAll(".hanjie-cell")
   allBlocks.forEach((block) => {
-    block.style.backgroundColor = "white"
+    block.style.backgroundColor = ""
     block.style.cursor = "pointer"
     block.textContent = ''
   });
 };
 
-//previous level
-function prevLevel() {
-  currentLevel.value--
-  if (currentLevel.value - 1 >= 0) {
-    correctBlock.value = level[currentLevel.value - 1].correctBlock
-    headerNums.value = level[currentLevel.value - 1].headerNums
-    resetGame()
-    resetBlockStyles()
-  } else {
-    alert('You are at the first level!')
-    resetGame()
-  }
-}
+// function prevLevel() {
+//   currentLevel.value-- 
+//   if (currentLevel.value - 1 >= 0) {
+//     correctBlock.value = level[currentLevel.value - 1].correctBlock
+//     headerNums.value = level[currentLevel.value - 1].headerNums
+//     checked.splice(0, checked.length)
+//     resetBlockStyles()
+//   } else {
+//     alert('You are at the first level!')
+//     resetGame()
+//     currentLevel.value = 1
+//   }
+// }
 
-// next level
 function nextLevel() {
   currentLevel.value++
   if (currentLevel.value - 1 < level.length) {
     correctBlock.value = level[currentLevel.value - 1].correctBlock
     headerNums.value = level[currentLevel.value - 1].headerNums
+    
     resetGame()
     resetBlockStyles()
+    startGame()
   } else {
     alert('Congratulation! You have finished all levels!')
     resetGame()
@@ -401,6 +420,9 @@ function checkWin() {
   })
   // console.log(winTemp);
   win.value = winTemp
+  if (winTemp &&  currentLevel.value - 1 === level.length){
+    timer(false)
+  }
   return winTemp
 }
 </script>
@@ -422,9 +444,9 @@ function checkWin() {
       v-if="start"
       class="btn btn-outline btn-primary"
       type="reset"
-      @click="refreshPage()"
+      @click="restartGame()"
     >
-      RESET
+      RESTART
     </button>
     <div class="join flex justify-center">
       <table class="hanjie-table">
@@ -478,9 +500,9 @@ function checkWin() {
     </div>
 
     <div class="join pagination flex justify-center">
-      <button class="join-item btn" @click="prevLevel">«</button>
+      <!-- <button class="join-item btn" @click="prevLevel">«</button> -->
       <button class="join-item btn">Level {{ currentLevel }}</button>
-      <button class="join-item btn" @click="nextLevel">»</button>
+      <button v-if="win" class="join-item btn" @click="nextLevel">»</button>
     </div>
 
     <div v-if="win">Stage cleared!!!</div>
