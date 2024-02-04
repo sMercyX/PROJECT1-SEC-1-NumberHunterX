@@ -149,7 +149,7 @@ function checkHintable() {
   })
   // let hintAndChecked = hints.value.concat(checkedCorrect)
   // console.log(hintAndChecked)
-  // if (checked.length >= correctBlock.length) {
+  // if (hintAndChecked.length >= correctBlock.length) {
   //   hintable.value = false
   // }
   if (hintsLeft.value <= 0) {
@@ -182,7 +182,7 @@ const genHint = () => {
       let press4U = toRaw(playCellElements.value).find(
         (cellDom) => cellDom.id === correctBlock[randomIndex]
       )
-      press4U.dispatchEvent(new Event('click'))
+      press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
       // checkWin()
       return
@@ -320,7 +320,6 @@ function checkWin() {
         class="btn btn-outline btn-primary"
         type="button"
         @click="startGame()"
-        
       >
         <img src="./assets/play-button.png" class="h-7" />
         Start
@@ -384,9 +383,9 @@ function checkWin() {
           Get hint
         </button>
         <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
-          <b v-for="(hint, index) in hints" :key="hint"
+          <!-- <b v-for="(hint, index) in hints" :key="hint"
             >{{ hint }} <b v-if="index < hints.length - 1">, </b></b
-          >
+          > -->
         </div>
       </div>
       <!--Miss-->

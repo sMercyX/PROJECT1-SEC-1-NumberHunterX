@@ -199,54 +199,51 @@
   {
     "puzzle": 4,
     "correctBlock": [
-      "a2",
-      "a4",
+      "a1",
       "b1",
-      "b3",
-      "b5",
-      "c2",
-      "c4",
-      "d2",
-      "d4",
+      "d1",
       "e1",
-      "e3",
-      "e5"
+      "a2",
+      "b2",
+      "d2",
+      "e2",
+      "a4",
+      "e4",
+      "b5",
+      "c5",
+      "d5"
     ],
     "headerNums": [
       {
         "id": "at",
-        "result": "1"
-      },
-      {
-        "id": "bt",
-        "result": "1"
-      },
-      {
-        "id": "ct",
-        "result": "1"
-      },
-      {
-        "id": "dt",
-        "result": "1"
-      },
-      {
-        "id": "et",
-        "result": "1"
+        "result": "2"
       },
       {
         "id": "a0",
         "result": "1"
       },
       {
-        "id": "b0",
+        "id": "bt",
         "result": "2"
+      },
+      {
+        "id": "b0",
+        "result": "1"
       },
       {
         "id": "c0",
         "result": "1"
       },
       {
+        "id": "dt",
+        "result": "2"
+      },
+      {
         "id": "d0",
+        "result": "1"
+      },
+      {
+        "id": "et",
         "result": "2"
       },
       {
@@ -255,15 +252,11 @@
       },
       {
         "id": "01",
-        "result": "1 1"
+        "result": "2 2"
       },
       {
         "id": "02",
-        "result": "1 1 1"
-      },
-      {
-        "id": "03",
-        "result": "1 1"
+        "result": "2 2"
       },
       {
         "id": "04",
@@ -271,7 +264,7 @@
       },
       {
         "id": "05",
-        "result": "1 1 1"
+        "result": "3"
       }
     ]
   },
