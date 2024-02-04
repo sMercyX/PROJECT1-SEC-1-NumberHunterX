@@ -29,8 +29,8 @@ const columns = ['0', 'a', 'b', 'c', 'd', 'e', '99']
 const checked = []
 const win = ref(false)
 ///times
-const mins = ref(0)
-const secs = ref(0)
+let mins = ref(0)
+let secs = ref(0)
 //levels
 const currentLv = ref(0)
 //to stores row and column to blocks
@@ -94,6 +94,30 @@ function resetGame() {
   hints.value = []
 }
 
+let save
+let bestTime = ref({})
+function setBestTime() {
+  let min = Math.floor(save / 60)
+  let sec = save % 60
+  bestTime = { min, sec }
+}
+function getSave() {
+  save = localStorage.getItem('save')
+  if (save === null) {
+    save = 'never play'
+  } else {
+    save = JSON.parse(save)
+    setBestTime()
+  }
+
+  console.log(save)
+}
+
+const show = ref(false)
+function GamePage() {
+  show.value = !show.value
+  getSave()
+}
 function nextLevel() {
   currentLv.value++
   if (currentLv.value < level.length) {
@@ -103,7 +127,18 @@ function nextLevel() {
     win.value = false
   } else {
     alert('Congratulation! You have finished all levels!')
+    const lastTime = mins.value * 60 + secs.value
+    if (save === 'never play') {
+      save = lastTime
+    } else if (save > lastTime) {
+      save = lastTime
+    }
+    localStorage.setItem('save', JSON.stringify(save))
+    getSave()
     currentLv.value = 0
+    mins.value = 0
+    secs.value = 0
+    clearInterval(timerInterval)
     resetBlockStyles()
     resetGame()
   }
@@ -208,6 +243,9 @@ const addClickers = (event) => {
 
 function mark(event) {
   event.preventDefault()
+  if (!start.value || win.value) {
+    return
+  }
   let targetTile = event.target //tile clicked
   let targetTileId = targetTile.id //clicked tile id
   let targetClasses = targetTile.className.split(' ') //split class into array
@@ -247,8 +285,6 @@ function checkWin() {
   win.value = winTemp
   return winTemp
 }
-
-const show = ref(false)
 </script>
 
 <template>
@@ -272,7 +308,7 @@ const show = ref(false)
         totam!
       </h2>
     </div>
-    <button @click="show = !show" class="btn btn-success text-white">
+    <button @click="GamePage" class="btn btn-success text-white">
       Play Game
     </button>
   </div>
@@ -289,8 +325,16 @@ const show = ref(false)
         Start
       </button>
       <div v-show="start">
-        Time : <span v-if="mins < 10">0</span>{{ mins }} :
-        <span v-if="secs < 10">0</span>{{ secs }}
+        <div id="bestTimePlayed">
+          Best Time :
+          <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+          <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+        </div>
+        <div id="timer">
+          Time :
+          <span v-if="mins < 10">0</span>{{ mins }} :
+          <span v-if="secs < 10">0</span>{{ secs }}
+        </div>
       </div>
       <button v-if="win" class="join-item btn" @click="nextLevel">
         NEXT LEVEL
@@ -387,5 +431,9 @@ const show = ref(false)
 .row-number,
 .none {
   border: none;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 </style>
