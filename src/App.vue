@@ -292,114 +292,118 @@ function checkWin() {
     <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
 
-  <!--main tutorial-->
-  <div class="tutorial flex" v-show="!show">
-    <div class="tutorials px-4 py-2 m-2 center">
-      <h1 class="text-center text-2xl font-bold">tutorials</h1>
-      <h2>I think should have some picture</h2>
-      <br /><br /><br /><br />
-      <h2 class="p-20">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit,
-        temporibus, cum harum natus ea dicta sequi accusantium ducimus voluptas
-        deserunt eaque, earum eos. Similique, architecto. Ullam debitis error
-        ipsa unde? Numquam doloribus dolorem aspernatur libero eligendi ab
-        molestias, dolor rem sunt suscipit nihil, totam, ut nulla quae commodi!
-        Quod a vero tempore atque! Perspiciatis, eum nisi quas nihil tempore
-        totam!
-      </h2>
-    </div>
-    <button @click="GamePage" class="btn btn-success text-white">
-      Play Game
-    </button>
-  </div>
-
-  <div class="container p-10 m-auto w-full" v-show="show">
-    <section class="flex items-center justify-between">
-      <button
-        v-if="!start"
-        class="btn btn-outline btn-primary"
-        type="button"
-        @click="startGame()"
-      >
-        <img src="./assets/play-button.png" class="h-7" />
-        Start
-      </button>
-      <div v-show="start">
-        <div id="bestTimePlayed">
-          Best Time :
-          <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-          <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
-        </div>
-        <div id="timer">
-          Time :
-          <span v-if="mins < 10">0</span>{{ mins }} :
-          <span v-if="secs < 10">0</span>{{ secs }}
-        </div>
+  <section id="tutorialPage">
+    <!--main tutorial-->
+    <div class="tutorial flex" v-show="!show">
+      <div class="tutorials px-4 py-2 m-2 center">
+        <h1 class="text-center text-2xl font-bold">tutorials</h1>
+        <h2>I think should have some picture</h2>
+        <br /><br /><br /><br />
+        <h2 class="p-20">
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit,
+          temporibus, cum harum natus ea dicta sequi accusantium ducimus
+          voluptas deserunt eaque, earum eos. Similique, architecto. Ullam
+          debitis error ipsa unde? Numquam doloribus dolorem aspernatur libero
+          eligendi ab molestias, dolor rem sunt suscipit nihil, totam, ut nulla
+          quae commodi! Quod a vero tempore atque! Perspiciatis, eum nisi quas
+          nihil tempore totam!
+        </h2>
       </div>
-      <button v-if="win" class="join-item btn" @click="nextLevel">
-        NEXT LEVEL
+      <button @click="GamePage" class="btn btn-success text-white">
+        Play Game
       </button>
-    </section>
-
-    <!--Table-->
-    <div class="join flex justify-center">
-      <table class="hanjie-table">
-        <tr
-          v-for="block in blocks"
-          :key="block.row"
-          :id="block.row"
-          :style="checkTR(block.row)"
-        >
-          <td
-            ref="playCellElements"
-            :class="checkHeaderStyle(col + block.row)"
-            v-for="col in block.column"
-            :key="col + block.row"
-            :id="col + block.row"
-            @click="addClickers"
-            @click.right="mark"
-          >
-            {{ checkHeader(col + block.row) }}
-          </td>
-        </tr>
-      </table>
     </div>
+  </section>
 
-    <div class="flex justify-between m-5">
-      <!-- Hint -->
-      <div class="hint order-1 flex flex-row">
-        <div class="btn btn-warning m-1 cursor-not-allowed">
-          Hint left : {{ hintsLeft }}
-        </div>
+  <section id="gamePage">
+    <div class="container p-10 m-auto w-full" v-show="show">
+      <section class="flex items-center justify-between">
         <button
-          :class="
-            hintsLeft > 0 && hintable
-              ? 'btn btn-outline btn-accent m-1'
-              : 'btn btn-active btn-ghost cursor-not-allowed m-1'
-          "
-          :disable="hintsLeft > 0 ? false : true"
-          @click="genHint"
+          v-if="!start"
+          class="btn btn-outline btn-primary"
+          type="button"
+          @click="startGame()"
         >
-          Get hint
+          <img src="./assets/play-button.png" class="h-7" />
+          Start
         </button>
-        <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
-          <!-- <b v-for="(hint, index) in hints" :key="hint"
+        <div v-show="start">
+          <div id="bestTimePlayed">
+            Best Time :
+            <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+            <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+          </div>
+          <div id="timer">
+            Time :
+            <span v-if="mins < 10">0</span>{{ mins }} :
+            <span v-if="secs < 10">0</span>{{ secs }}
+          </div>
+        </div>
+        <button v-if="win" class="join-item btn" @click="nextLevel">
+          NEXT LEVEL
+        </button>
+      </section>
+
+      <!--Table-->
+      <div class="join flex justify-center">
+        <table class="hanjie-table">
+          <tr
+            v-for="block in blocks"
+            :key="block.row"
+            :id="block.row"
+            :style="checkTR(block.row)"
+          >
+            <td
+              ref="playCellElements"
+              :class="checkHeaderStyle(col + block.row)"
+              v-for="col in block.column"
+              :key="col + block.row"
+              :id="col + block.row"
+              @click="addClickers"
+              @click.right="mark"
+            >
+              {{ checkHeader(col + block.row) }}
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="flex justify-between m-5">
+        <!-- Hint -->
+        <div class="hint order-1 flex flex-row">
+          <div class="btn btn-warning m-1 cursor-not-allowed">
+            Hint left : {{ hintsLeft }}
+          </div>
+          <button
+            :class="
+              hintsLeft > 0 && hintable
+                ? 'btn btn-outline btn-accent m-1'
+                : 'btn btn-active btn-ghost cursor-not-allowed m-1'
+            "
+            :disable="hintsLeft > 0 ? false : true"
+            @click="genHint"
+          >
+            Get hint
+          </button>
+          <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
+            <!-- <b v-for="(hint, index) in hints" :key="hint"
             >{{ hint }} <b v-if="index < hints.length - 1">, </b></b
           > -->
+          </div>
+        </div>
+        <!--Miss-->
+        <div class="missed order-last">
+          <div class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</div>
         </div>
       </div>
-      <!--Miss-->
-      <div class="missed order-last">
-        <div class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</div>
+
+      <div class="join pagination flex justify-center">
+        <button class="join-item btn">«</button>
+        <button class="join-item btn">Level {{ currentLv }}</button>
+        <button v-if="win" @click="nextLevel" class="join-item btn">»</button>
       </div>
     </div>
-
-    <div class="join pagination flex justify-center">
-      <button class="join-item btn">«</button>
-      <button class="join-item btn">Level {{ currentLv }}</button>
-      <button v-if="win" @click="nextLevel" class="join-item btn">»</button>
-    </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
