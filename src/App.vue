@@ -177,6 +177,14 @@ const checkHeader = (id) => {
   return index >= 0 ? headerNums[index].result : "";
 };
 
+// add
+const checkMissed = () => {
+  if (missed.value >= 6) {
+    alert('You have missed to many times , please start new game')
+    resetGame();
+  }
+}
+
 //addClickers is use to adding click to only block that should be (block that have a line)
 const addClickers = (event) => {
   let targetTile = event.target; //tile clicked
@@ -192,6 +200,8 @@ const addClickers = (event) => {
     if (blockColor === unCorrect) {
       //targetBlock.textContent = "x";
       missed.value++;
+      checkMissed()
+      
     }
     checked.push(id);
     if (blockColor === correct) {
@@ -199,6 +209,7 @@ const addClickers = (event) => {
     }
     if (checkWin()) {
       timer(false)
+    
     }
   }
 };
@@ -224,7 +235,7 @@ function mark(event) {
   }
   targetClasses.push("marked");
   targetTile.className = targetClasses.join(" ");
-  targetTile.style.backgroundColor = "grey";
+  targetTile.style.backgroundColor = "grey"
 }
 
 function checkWin() {
@@ -238,6 +249,7 @@ function checkWin() {
   win.value = winTemp;
   return winTemp;
 }
+
 
 const show = ref(false)
 
@@ -291,10 +303,12 @@ const resetGame = () => {
         </div>
       </div>
     </div>
+
     <button @click="show = !show" class="btn btn-success text-white">
       Play Game </button>
   </div>
 
+  <!--page 2-->
   <div class="container p-10 m-auto w-full" v-show="show">
     <section class="flex items-center justify-between">
       <button class="btn btn-outline btn-primary flex " type="button" @click="resetGame">
