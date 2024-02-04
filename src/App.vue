@@ -1,52 +1,39 @@
 <script setup>
-import { onMounted, ref, nextTick, render } from "vue";
+import { onMounted, ref } from "vue";
 
+const start = ref(false)
 const missed = ref(0);
 const hintsLeft = ref(3);
-
-//style
 const blockStyle = "hanjie-cell";
 const noneBorder = "row-number";
 const halfBlock = "hanjie-cell-half";
 const correct = "MediumSeaGreen";
 const unCorrect = "#f87171";
-
-//block stores row and column of table
 const blocks = [];
-//rows stores row name of table
 const rows = ["t", "0", "1", "2", "3", "4", "5"];
-//columns stores column name of table
 const columns = ["0", "a", "b", "c", "d", "e", "99"];
-//checked blocks array
 const checked = [];
 const win = ref(false)
 const mins = ref(0);
 const secs = ref(0);
+const hints = ref([]);
+let hintable = ref(true)
+const show = ref(false)
+let timerInterval;
+// level
+const currentLv = ref(0)
 
-//to stores row and column to blocks
 rows.forEach((ele) => {
   blocks.push({ row: ele, column: [...columns] }); //use spread to easy copy data without reference
 });
 
-//correctBlock stores block that when click its will change to correct color
-const correctBlock = [
-  "a1",
-  "b1",
-  "e1",
-  "a2",
-  "b2",
-  "c3",
-  "a4",
-  "b4",
-  "c4",
-  "a5",
-  "b5",
-  "c5",
-  "d5",
-];
+import level from './level.json'
 
-const hints = ref([]);
-let hintable = ref(true);
+//correctBlock stores block that when click its will change to correct color
+let correctBlock = level[currentLv.value].correctBlock
+//headerNums stores id and result of block of table head
+let headerNums = level[currentLv.value].headerNums
+
 
 function checkHintable() {
   let checkedCorrect = checked.filter((tile) => {
@@ -77,7 +64,7 @@ const genHint = () => {
   }
 };
 
-let timerInterval;
+
 
 onMounted(() => {
   timer(true);
@@ -121,65 +108,17 @@ const checkTR = (id) => {
 };
 
 //headerNums stores id and result of block of table head
-const headerNums = [
-  {
-    id: "at",
-    result: "2",
-  },
-  {
-    id: "bt",
-    result: "2",
-  },
-  {
-    id: "a0",
-    result: "2",
-  },
-  {
-    id: "b0",
-    result: "2",
-  },
-  {
-    id: "c0",
-    result: "3",
-  },
-  {
-    id: "d0",
-    result: "1",
-  },
-  {
-    id: "e0",
-    result: "1",
-  },
-  {
-    id: "01",
-    result: "2  1",
-  },
-  {
-    id: "02",
-    result: "2",
-  },
-  {
-    id: "03",
-    result: "1",
-  },
-  {
-    id: "04",
-    result: "3",
-  },
-  {
-    id: "05",
-    result: "4",
-  },
-];
+
 
 const checkHeader = (id) => {
   const index = headerNums.findIndex((num) => num.id === id); //checking id in array of header numbers to find result
   return index >= 0 ? headerNums[index].result : "";
 };
 
-// add
+
 const checkMissed = () => {
   if (missed.value >= 6) {
+    // maybe change later
     alert('You have missed to many times , please start new game')
     resetGame();
   }
@@ -201,7 +140,7 @@ const addClickers = (event) => {
       //targetBlock.textContent = "x";
       missed.value++;
       checkMissed()
-      
+
     }
     checked.push(id);
     if (blockColor === correct) {
@@ -209,7 +148,7 @@ const addClickers = (event) => {
     }
     if (checkWin()) {
       timer(false)
-    
+
     }
   }
 };
@@ -251,15 +190,14 @@ function checkWin() {
 }
 
 
-const show = ref(false)
-
 const resetGame = () => {
   missed.value = 0;
   hintsLeft.value = 3;
+  // must have fix
   blocks.forEach(block => {
     block.column.forEach(col => {
       const id = col + block.row;
-      document.getElementById(id).style.backgroundColor = "";
+      document.getElementById(id).style.backgroundColor = ""
     });
   });
   checked.length = 0;
@@ -268,6 +206,8 @@ const resetGame = () => {
   secs.value = 0;
   hints.value = [];
   hintable.value = true;
+  correctBlock = level[currentLv.value].correctBlock
+  headerNums = level[currentLv.value].headerNums
 }
 
 </script>
@@ -310,12 +250,36 @@ const resetGame = () => {
 
   <!--page 2-->
   <div class="container p-10 m-auto w-full" v-show="show">
+
     <section class="flex items-center justify-between">
-      <button class="btn btn-outline btn-primary flex " type="button" @click="resetGame">
-        RESET
-      </button>
-      <div class="flex">
-        Time: <span v-if="mins < 10">0</span>{{ mins }} : <span v-if="secs < 10">0</span>{{ secs }}
+      <div class="left">
+        <div class="tutorial">
+          <label for="my_modal_6" class="btn">How to Play</label>
+          <input type="checkbox" id="my_modal_6" class="modal-toggle" />
+          <div class="modal" role="dialog">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg">tutorial !!</h3>
+              <p class="py-4">This modal works with a hidden checkbox! Lorem, ipsum dolor sit amet consectetur adipisicing
+                elit. Culpa repudiandae aspernatur officia delectus dolorem unde sapiente quidem deserunt dolorum dolores
+                neque reiciendis molestias tempora quasi aliquam magnam, optio id sint.
+                Fugiat ab expedita necessitatibus eveniet, doloremque animi a? Perferendis fuga ab totam minima in,
+                cupiditate quos, reprehenderit esse dolore dicta doloremque id molestiae? Inventore, libero reiciendis
+                minus ipsa quo aliquid.</p>
+              <div class="modal-action">
+                <label for="my_modal_6" class="btn">Close!</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-primary flex " type="button" @click="resetGame">
+          RESET
+        </button>
+      </div>
+
+      <div class="right">
+        <div class="flex">
+          Time: <span v-if="mins < 10">0</span>{{ mins }} : <span v-if="secs < 10">0</span>{{ secs }}
+        </div>
       </div>
     </section>
 
