@@ -320,6 +320,7 @@ function checkWin() {
         class="btn btn-outline btn-primary"
         type="button"
         @click="startGame()"
+        
       >
         <img src="./assets/play-button.png" class="h-7" />
         Start
