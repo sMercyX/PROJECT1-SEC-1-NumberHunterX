@@ -167,8 +167,12 @@
         "result": "5"
       },
       {
+        "id": "et",
+        "result": "3"
+      },
+      {
         "id": "e0",
-        "result": "3 1"
+        "result": "1"
       },
       {
         "id": "01",
@@ -210,24 +214,44 @@
     ],
     "headerNums": [
       {
+        "id": "at",
+        "result": "1"
+      },
+      {
+        "id": "bt",
+        "result": "1"
+      },
+      {
+        "id": "ct",
+        "result": "1"
+      },
+      {
+        "id": "dt",
+        "result": "1"
+      },
+      {
+        "id": "et",
+        "result": "1"
+      },
+      {
         "id": "a0",
-        "result": "1 1"
+        "result": "1"
       },
       {
         "id": "b0",
-        "result": "1 2"
+        "result": "2"
       },
       {
         "id": "c0",
-        "result": "1 1"
+        "result": "1"
       },
       {
         "id": "d0",
-        "result": "1 2"
+        "result": "2"
       },
       {
         "id": "e0",
-        "result": "1 1"
+        "result": "1"
       },
       {
         "id": "01",
@@ -277,8 +301,12 @@
         "result": "1"
       },
       {
+        "id": "bt",
+        "result": "3"
+      },
+      {
         "id": "b0",
-        "result": "3 1"
+        "result": "1"
       },
       {
         "id": "c0",
@@ -289,8 +317,12 @@
         "result": "5"
       },
       {
+        "id": "et",
+        "result": "2"
+      },
+      {
         "id": "e0",
-        "result": "2 1"
+        "result": "1"
       },
       {
         "id": "01",
