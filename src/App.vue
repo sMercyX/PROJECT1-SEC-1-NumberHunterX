@@ -135,6 +135,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
+  hintsLeft.value = 300
   resetNewBestTime()
   getSave()
 }
@@ -152,6 +153,7 @@ function nextLevel() {
     win.value = false
   } else {
     // alert('Congratulation! You have finished all levels!')
+    checkNewBestTime()
     if (save === 'never play') {
       save = milliSecs.value
     } else if (save > milliSecs.value) {
@@ -161,7 +163,6 @@ function nextLevel() {
     lastSec.value = secs.value
     localStorage.setItem('save', JSON.stringify(save))
     getSave()
-    checkNewBestTime()
     resetBlockStyles()
     resetValue()
     resetGame()
@@ -382,11 +383,10 @@ function checkWin() {
             <img src="./assets/play-button.png" class="h-7" />
             Start
           </button>
-
-          <button v-if="win" class="join-item btn" @click="nextLevel">
-            NEXT LEVEL
-          </button>
         </div>
+        <button v-if="win" class="join-item btn" @click="nextLevel">
+          NEXT LEVEL
+        </button>
       </section>
 
       <!--Table-->
@@ -443,25 +443,45 @@ function checkWin() {
       </div>
 
       <div class="join pagination flex justify-center">
-        <button class="join-item btn">Level {{ currentLv }}</button>
+        <button class="join-item btn">Level {{ currentLv + 1 }}</button>
       </div>
     </div>
   </section>
 
   <section id="modal">
     <div class="tutorial" v-show="show == 3">
-      <div id="">
-        Best Time :
-        <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-        <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+      <div id="" class="min-h-screen">
+        <div class="hero-content text-center">
+          <div class="max-w-md">
+            <h1 class="text-3xl font-bold py-8">Something</h1>
+            <p class="">
+              Best Time :
+              <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+              <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+            </p>
+            <p>
+              Time Used :
+              <span v-if="lastMin < 10">0</span>{{ lastMin }} :
+              <span v-if="lastSec < 10">0</span>{{ lastSec }}
+            </p>
+            <div v-show="newBestTime">
+              <p>CONGRADULATION!!!!</p>
+              YOU ARE THE NEW RECORD
+            </div>
+            <div v-show="!newBestTime">
+              <h3>BE FASTER</h3>
+              <button
+                class="btn btn-outline btn-primary"
+                type="button"
+                @click="gamePage()"
+              >
+                <img src="./assets/play-button.png" class="h-7" />
+                Try again
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="">
-        Last Time :
-        <span v-if="lastMin < 10">0</span>{{ lastMin }} :
-        <span v-if="lastSec < 10">0</span>{{ lastSec }}
-      </div>
-      <div v-show="newBestTime">YOU ARE WINNER</div>
-      <div v-show="!newBestTime">YOU ARE LOSER</div>
     </div>
   </section>
 </template>
