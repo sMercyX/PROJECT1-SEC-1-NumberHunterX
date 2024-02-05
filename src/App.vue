@@ -130,7 +130,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 300
+  hintsLeft.value = 3
   resetNewBestTime()
   getSave()
 }
