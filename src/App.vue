@@ -402,9 +402,6 @@ function checkWin() {
       <div class="flex justify-between m-5">
         <!-- Hint -->
         <div class="hint order-1 flex flex-row">
-          <div class="btn btn-warning m-1 cursor-not-allowed">
-            Hint left : {{ hintsLeft }}
-          </div>
           <button
             :class="
               hintsLeft > 0 && hintable
@@ -414,7 +411,7 @@ function checkWin() {
             :disable="hintsLeft > 0 ? false : true"
             @click="genHint"
           >
-            Get hint
+            Get hint {{ hintsLeft }}
           </button>
           <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
             <!-- <b v-for="(hint, index) in hints" :key="hint"
@@ -429,8 +426,7 @@ function checkWin() {
       </div>
 
       <div class="join pagination flex justify-center">
-        <button class="join-item btn">«</button>
-        <button class="join-item btn">Level {{ currentLv }}</button>
+        <button class="join-item btn">Level {{ currentLv + 1 }}</button>
         <button v-if="win" @click="nextLevel" class="join-item btn">»</button>
       </div>
     </div>
