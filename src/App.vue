@@ -114,12 +114,9 @@ function setBestTime() {
 }
 function getSave() {
   save = localStorage.getItem('save')
-  if (save === null) {
-    save = 'never play'
-  } else {
-    save = JSON.parse(save)
-    setBestTime()
-  }
+
+  save = JSON.parse(save)
+  setBestTime()
 }
 
 let currentTime = ref(0)
@@ -150,11 +147,6 @@ function nextLevel() {
   } else {
     // alert('Congratulation! You have finished all levels!')
     checkNewBestTime()
-    if (save === 'never play') {
-      save = milliSecs.value
-    } else if (save > milliSecs.value) {
-      save = milliSecs.value
-    }
     lastMin.value = mins.value
     lastSec.value = secs.value
     localStorage.setItem('save', JSON.stringify(save))
@@ -165,10 +157,12 @@ function nextLevel() {
     modalPage()
   }
 }
+console.log(save)
 let newBestTime = ref(false)
 function checkNewBestTime() {
-  if (save == undefined || milliSecs.value < save) {
+  if (save === undefined || milliSecs.value < save) {
     newBestTime.value = true
+    save = milliSecs.value
   } else newBestTime.value = false
 }
 function resetNewBestTime() {
