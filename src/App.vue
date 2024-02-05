@@ -131,9 +131,11 @@ function getSave() {
 }
 
 let show = ref(0)
+function homePage() {
+  show.value = 0
+}
 function tutorialPage() {
   show.value = 1
-  resetNewBestTime()
 }
 function gamePage() {
   show.value = 2
@@ -318,17 +320,14 @@ function checkWin() {
     <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
   <section id="homePage" class="flex justify-center">
-    <!-- <div v-show="show == 0"> -->
-    <button @click="tutorialPage" class="btn btn-success text-white">
-      Tutorial
-    </button>
-    <button @click="gamePage" class="btn btn-success text-white">
-      Play Game
-    </button>
-    <button @click="modalPage" class="btn btn-success text-white">
-      Modal page
-    </button>
-    <!-- </div> -->
+    <div v-show="show == 0">
+      <button @click="tutorialPage" class="btn btn-success text-white">
+        Tutorial
+      </button>
+      <button @click="gamePage" class="btn btn-success text-white">
+        Play Game
+      </button>
+    </div>
   </section>
   <section id="tutorialPage">
     <!--main tutorial-->
@@ -346,6 +345,14 @@ function checkWin() {
           quae commodi! Quod a vero tempore atque! Perspiciatis, eum nisi quas
           nihil tempore totam!
         </h2>
+        <button
+          class="btn btn-outline btn-primary"
+          type="button"
+          @click="homePage"
+        >
+          <img src="./assets/Home_icon_green.png" class="h-7" />
+          BACK HOME
+        </button>
       </div>
     </div>
   </section>
@@ -452,14 +459,22 @@ function checkWin() {
             </p>
             <div v-show="newBestTime">
               <p>CONGRADULATION!!!!</p>
-              YOU ARE THE NEW RECORD
-            </div>
-            <div v-show="!newBestTime">
-              <h3>BE FASTER</h3>
+              <p>YOU ARE THE NEW RECORD</p>
               <button
                 class="btn btn-outline btn-primary"
                 type="button"
-                @click="gamePage()"
+                @click="homePage"
+              >
+                <img src="./assets/Home_icon_green.png" class="h-7" />
+                BACK HOME
+              </button>
+            </div>
+            <div v-show="!newBestTime">
+              <h3 class="text-2xl">BE FASTER</h3>
+              <button
+                class="btn btn-outline btn-primary"
+                type="button"
+                @click="gamePage"
               >
                 <img src="./assets/play-button.png" class="h-7" />
                 Try again
