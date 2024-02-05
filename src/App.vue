@@ -31,6 +31,7 @@ const win = ref(false)
 ///times
 let mins = ref(0)
 let secs = ref(0)
+let milliSecs = ref(0)
 //levels
 const currentLv = ref(0)
 //to stores row and column to blocks
@@ -59,6 +60,7 @@ function startGame() {
 function timer(op) {
   if (op) {
     timerInterval = setInterval(() => {
+      milliSecs.value++
       if (secs.value >= 59) {
         mins.value++
         secs.value = 0
@@ -77,11 +79,10 @@ function timer(op) {
 }
 //reset block style
 const resetBlockStyles = () => {
-  const allBlocks = document.querySelectorAll('.hanjie-cell')
-  allBlocks.forEach((block) => {
-    block.style.backgroundColor = 'rgba(251,247,245,255)'
-    // block.style.cursor = 'pointer'
-    block.textContent = ''
+  // console.log(checked)
+  checked.forEach((id) => {
+    toRawBlock(id).style.backgroundColor = 'rgba(251,247,245,255)'
+    toRawBlock(id).textContent = ''
   })
 }
 function resetGame() {
@@ -93,13 +94,27 @@ function resetGame() {
   headerNums = level[currentLv.value].headerNums
   hints.value = []
 }
+function resetValue() {
+  currentLv.value = 0
+  mins.value = 0
+  secs.value = 0
+  milliSecs.value = 0
+  clearInterval(timerInterval)
+}
 
 let save
 let bestTime = ref({})
+function calTimeToMin(time) {
+  let min = Math.floor(time / 60)
+  let sec = time % 60
+  return { min, sec }
+}
+// function calTimeToMilliSec(min, sec) {
+//   let allTime = min * 60 + sec
+//   return allTime
+// }
 function setBestTime() {
-  let min = Math.floor(save / 60)
-  let sec = save % 60
-  bestTime = { min, sec }
+  bestTime = calTimeToMin(save)
 }
 function getSave() {
   save = localStorage.getItem('save')
@@ -109,39 +124,58 @@ function getSave() {
     save = JSON.parse(save)
     setBestTime()
   }
-
   console.log(save)
 }
 
-const show = ref(false)
-function GamePage() {
-  show.value = !show.value
+let currentTime = ref(0)
+let show = ref(0)
+function tutorialPage() {
+  show.value = 1
+  resetNewBestTime()
+}
+function gamePage() {
+  show.value = 2
+  resetNewBestTime()
   getSave()
 }
+function modalPage() {
+  show.value = 3
+}
+let lastMin = ref(0)
+let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
   if (currentLv.value < level.length) {
-    resetGame()
     resetBlockStyles()
+    resetGame()
     startGame()
     win.value = false
   } else {
-    alert('Congratulation! You have finished all levels!')
-    const lastTime = mins.value * 60 + secs.value
+    // alert('Congratulation! You have finished all levels!')
     if (save === 'never play') {
-      save = lastTime
-    } else if (save > lastTime) {
-      save = lastTime
+      save = milliSecs.value
+    } else if (save > milliSecs.value) {
+      save = milliSecs.value
     }
+    lastMin.value = mins.value
+    lastSec.value = secs.value
     localStorage.setItem('save', JSON.stringify(save))
     getSave()
-    currentLv.value = 0
-    mins.value = 0
-    secs.value = 0
-    clearInterval(timerInterval)
+    checkNewBestTime()
     resetBlockStyles()
+    resetValue()
     resetGame()
+    modalPage()
   }
+}
+let newBestTime = ref(false)
+function checkNewBestTime() {
+  if (milliSecs.value < save) {
+    newBestTime.value = true
+  }
+}
+function resetNewBestTime() {
+  newBestTime.value = false
 }
 function checkHintable() {
   let checkedCorrect = checked.filter((tile) => {
@@ -179,15 +213,16 @@ const genHint = () => {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
       console.log(checked)
-      let press4U = toRaw(playCellElements.value).find(
-        (cellDom) => cellDom.id === correctBlock[randomIndex]
-      )
+      let press4U = toRawBlock(correctBlock[randomIndex])
       press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
       // checkWin()
       return
     }
   }
+}
+function toRawBlock(index) {
+  return toRaw(playCellElements.value).find((cellDom) => cellDom.id === index)
 }
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
@@ -291,10 +326,22 @@ function checkWin() {
   <div class="header pb-2 flex justify-center py-3">
     <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
-
+  <section id="homePage" class="flex justify-center">
+    <!-- <div v-show="show == 0"> -->
+    <button @click="tutorialPage" class="btn btn-success text-white">
+      Tutorial
+    </button>
+    <button @click="gamePage" class="btn btn-success text-white">
+      Play Game
+    </button>
+    <button @click="modalPage" class="btn btn-success text-white">
+      Modal page
+    </button>
+    <!-- </div> -->
+  </section>
   <section id="tutorialPage">
     <!--main tutorial-->
-    <div class="tutorial flex" v-show="!show">
+    <div class="tutorial flex" v-show="show == 1">
       <div class="tutorials px-4 py-2 m-2 center">
         <h1 class="text-center text-2xl font-bold">tutorials</h1>
         <h2>I think should have some picture</h2>
@@ -309,39 +356,37 @@ function checkWin() {
           nihil tempore totam!
         </h2>
       </div>
-      <button @click="GamePage" class="btn btn-success text-white">
-        Play Game
-      </button>
     </div>
   </section>
 
   <section id="gamePage">
-    <div class="container p-10 m-auto w-full" v-show="show">
+    <div class="container p-10 m-auto w-full" v-show="show == 2">
       <section class="flex items-center justify-between">
-        <button
-          v-if="!start"
-          class="btn btn-outline btn-primary"
-          type="button"
-          @click="startGame()"
-        >
-          <img src="./assets/play-button.png" class="h-7" />
-          Start
-        </button>
-        <div v-show="start">
+        <div>
           <div id="bestTimePlayed">
             Best Time :
             <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
             <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
           </div>
-          <div id="timer">
+          <div id="timer" v-show="start">
             Time :
             <span v-if="mins < 10">0</span>{{ mins }} :
             <span v-if="secs < 10">0</span>{{ secs }}
           </div>
+          <button
+            v-if="!start"
+            class="btn btn-outline btn-primary"
+            type="button"
+            @click="startGame()"
+          >
+            <img src="./assets/play-button.png" class="h-7" />
+            Start
+          </button>
+
+          <button v-if="win" class="join-item btn" @click="nextLevel">
+            NEXT LEVEL
+          </button>
         </div>
-        <button v-if="win" class="join-item btn" @click="nextLevel">
-          NEXT LEVEL
-        </button>
       </section>
 
       <!--Table-->
@@ -398,10 +443,25 @@ function checkWin() {
       </div>
 
       <div class="join pagination flex justify-center">
-        <button class="join-item btn">«</button>
         <button class="join-item btn">Level {{ currentLv }}</button>
-        <button v-if="win" @click="nextLevel" class="join-item btn">»</button>
       </div>
+    </div>
+  </section>
+
+  <section id="modal">
+    <div class="tutorial" v-show="show == 3">
+      <div id="">
+        Best Time :
+        <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+        <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+      </div>
+      <div id="">
+        Last Time :
+        <span v-if="lastMin < 10">0</span>{{ lastMin }} :
+        <span v-if="lastSec < 10">0</span>{{ lastSec }}
+      </div>
+      <div v-show="newBestTime">YOU ARE WINNER</div>
+      <div v-show="!newBestTime">YOU ARE LOSER</div>
     </div>
   </section>
 </template>
