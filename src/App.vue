@@ -141,6 +141,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
+  hintsLeft.value=3
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
