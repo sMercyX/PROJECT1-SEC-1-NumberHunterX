@@ -7,7 +7,7 @@ const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(300)
+const hintsLeft = ref(3)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
