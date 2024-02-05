@@ -7,7 +7,7 @@ const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(3)
+const hintsLeft = ref(300)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -31,7 +31,7 @@ const win = ref(false)
 ///times
 let mins = ref(0)
 let secs = ref(0)
-let milliSecs = ref(0)
+let timeUsed = ref(0)
 //levels
 const currentLv = ref(0)
 //to stores row and column to blocks
@@ -50,6 +50,7 @@ let headerNums = level[currentLv.value].headerNums
 let timerInterval
 
 function startGame() {
+  //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
   start.value = true
   timer(true)
   if (hintsLeft.value >= 0) {
@@ -60,8 +61,9 @@ function startGame() {
 function timer(op) {
   if (op) {
     timerInterval = setInterval(() => {
-      milliSecs.value++
+      timeUsed.value++
       if (secs.value >= 59) {
+        //แปลงหน่วยวิให้เป็นหน่วยนาที
         mins.value++
         secs.value = 0
         return
@@ -77,6 +79,11 @@ function timer(op) {
     }
   }
 }
+
+function toRawBlock(id) {
+  return toRaw(playCellElements.value).find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
+}
+
 //reset block style
 const resetBlockStyles = () => {
   checked.forEach((id) => {
@@ -97,7 +104,7 @@ function resetValue() {
   currentLv.value = 0
   mins.value = 0
   secs.value = 0
-  milliSecs.value = 0
+  timeUsed.value = 0
   clearInterval(timerInterval)
 }
 
@@ -110,16 +117,19 @@ function calTimeToMin(time) {
 }
 
 function setBestTime() {
-  bestTime = calTimeToMin(save)
+  bestTime.value = calTimeToMin(save)
 }
 function getSave() {
-  save = localStorage.getItem('saveBestPlayedTime')
-
-  save = JSON.parse(save)
-  setBestTime()
+  save = localStorage.getItem('save')
+  if (save === null || save === undefined) {
+    save = 0
+    setBestTime()
+  } else {
+    save = JSON.parse(save)
+    setBestTime()
+  }
 }
 
-let currentTime = ref(0)
 let show = ref(0)
 function tutorialPage() {
   show.value = 1
@@ -127,7 +137,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   resetNewBestTime()
   getSave()
 }
@@ -138,7 +148,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
@@ -149,7 +159,7 @@ function nextLevel() {
     checkNewBestTime()
     lastMin.value = mins.value
     lastSec.value = secs.value
-    localStorage.setItem('saveBestPlayedTime', JSON.stringify(save))
+    localStorage.setItem('save', JSON.stringify(save))
     getSave()
     resetBlockStyles()
     resetValue()
@@ -157,12 +167,11 @@ function nextLevel() {
     modalPage()
   }
 }
-console.log(save)
 let newBestTime = ref(false)
 function checkNewBestTime() {
-  if (save === undefined || milliSecs.value < save) {
+  if (save === 0 || timeUsed.value < save) {
     newBestTime.value = true
-    save = milliSecs.value
+    save = timeUsed.value
   } else newBestTime.value = false
 }
 function resetNewBestTime() {
@@ -207,9 +216,6 @@ const genHint = () => {
       return
     }
   }
-}
-function toRawBlock(index) {
-  return toRaw(playCellElements.value).find((cellDom) => cellDom.id === index)
 }
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
@@ -403,9 +409,6 @@ function checkWin() {
       <div class="flex justify-between m-5">
         <!-- Hint -->
         <div class="hint order-1 flex flex-row">
-          <div class="btn btn-warning m-1 cursor-not-allowed">
-            Hint left : {{ hintsLeft }}
-          </div>
           <button
             :class="
               hintsLeft > 0 && hintable
@@ -415,7 +418,7 @@ function checkWin() {
             :disable="hintsLeft > 0 ? false : true"
             @click="genHint"
           >
-            Get hint
+            Get hint: {{ hintsLeft }}
           </button>
           <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
         </div>
