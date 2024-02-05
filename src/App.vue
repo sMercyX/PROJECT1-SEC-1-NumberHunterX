@@ -113,7 +113,7 @@ function setBestTime() {
   bestTime = calTimeToMin(save)
 }
 function getSave() {
-  save = localStorage.getItem('save')
+  save = localStorage.getItem('saveBestPlayedTime')
 
   save = JSON.parse(save)
   setBestTime()
@@ -149,7 +149,7 @@ function nextLevel() {
     checkNewBestTime()
     lastMin.value = mins.value
     lastSec.value = secs.value
-    localStorage.setItem('save', JSON.stringify(save))
+    localStorage.setItem('saveBestPlayedTime', JSON.stringify(save))
     getSave()
     resetBlockStyles()
     resetValue()
