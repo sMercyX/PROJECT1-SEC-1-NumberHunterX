@@ -79,7 +79,6 @@ function timer(op) {
 }
 //reset block style
 const resetBlockStyles = () => {
-  // console.log(checked)
   checked.forEach((id) => {
     toRawBlock(id).style.backgroundColor = 'rgba(251,247,245,255)'
     toRawBlock(id).textContent = ''
@@ -109,10 +108,7 @@ function calTimeToMin(time) {
   let sec = time % 60
   return { min, sec }
 }
-// function calTimeToMilliSec(min, sec) {
-//   let allTime = min * 60 + sec
-//   return allTime
-// }
+
 function setBestTime() {
   bestTime = calTimeToMin(save)
 }
@@ -124,7 +120,6 @@ function getSave() {
     save = JSON.parse(save)
     setBestTime()
   }
-  console.log(save)
 }
 
 let currentTime = ref(0)
@@ -183,7 +178,7 @@ function checkHintable() {
     return correctBlock.includes(tile)
   })
   // let hintAndChecked = hints.value.concat(checkedCorrect)
-  // console.log(hintAndChecked)
+  // .log(hintAndChecked)
   // if (hintAndChecked.length >= correctBlock.length) {
   //   hintable.value = false
   // }
@@ -195,10 +190,7 @@ function checkHintable() {
   }
 }
 
-//timer
-// setInterval(() => {
-//   timer.value = timer.value+1
-// }, 1000)
+
 const playCellElements = ref(null)
 const genHint = () => {
   let randomIndex
@@ -213,7 +205,7 @@ const genHint = () => {
     ) {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
-      console.log(checked)
+      
       let press4U = toRawBlock(correctBlock[randomIndex])
       press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
@@ -317,7 +309,6 @@ function checkWin() {
       winTemp = false
     }
   })
-  console.log(winTemp)
   win.value = winTemp
   return winTemp
 }
@@ -431,9 +422,7 @@ function checkWin() {
             Get hint
           </button>
           <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
-            <!-- <b v-for="(hint, index) in hints" :key="hint"
-            >{{ hint }} <b v-if="index < hints.length - 1">, </b></b
-          > -->
+            
           </div>
         </div>
         <!--Miss-->
