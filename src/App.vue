@@ -7,7 +7,7 @@ const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(300)
+const hintsLeft = ref(3)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -139,7 +139,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 300
+  hintsLeft.value = 3
   resetNewBestTime()
   getSave()
 }
@@ -150,7 +150,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value = 300
+  hintsLeft.value = 3
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
