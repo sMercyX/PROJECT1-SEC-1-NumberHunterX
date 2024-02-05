@@ -141,7 +141,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value=3
+  hintsLeft.value = 3
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
@@ -167,9 +167,9 @@ function nextLevel() {
 }
 let newBestTime = ref(false)
 function checkNewBestTime() {
-  if (milliSecs.value < save) {
+  if (save == undefined || milliSecs.value < save) {
     newBestTime.value = true
-  }
+  } else newBestTime.value = false
 }
 function resetNewBestTime() {
   newBestTime.value = false
@@ -191,7 +191,6 @@ function checkHintable() {
   }
 }
 
-
 const playCellElements = ref(null)
 const genHint = () => {
   let randomIndex
@@ -206,7 +205,7 @@ const genHint = () => {
     ) {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
-      
+
       let press4U = toRawBlock(correctBlock[randomIndex])
       press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
@@ -302,7 +301,6 @@ function mark(event) {
     targetTile.style.backgroundColor = 'grey'
   }
 }
-
 function checkWin() {
   let winTemp = true
   correctBlock.forEach((mustCheckCell) => {
@@ -356,10 +354,13 @@ function checkWin() {
     <div class="container p-10 m-auto w-full" v-show="show == 2">
       <section class="flex items-center justify-between">
         <div>
-          <div id="bestTimePlayed">
+          <div id="bestTimePlayed" class="flex">
             Best Time :
-            <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-            <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+            <p v-if="bestTime.sec != undefined">
+              <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+              <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+            </p>
+            <p v-if="bestTime.sec == undefined">Never play</p>
           </div>
           <div id="timer" v-show="start">
             Time :
@@ -422,9 +423,7 @@ function checkWin() {
           >
             Get hint
           </button>
-          <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium">
-            
-          </div>
+          <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
         </div>
         <!--Miss-->
         <div class="missed order-last">
@@ -439,7 +438,7 @@ function checkWin() {
   </section>
 
   <section id="modal">
-    <div class="tutorial" v-show="show == 3">
+    <div class="modal-container" v-show="show == 3">
       <div id="" class="min-h-screen">
         <div class="hero-content text-center">
           <div class="max-w-md">
@@ -509,5 +508,11 @@ function checkWin() {
 
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Ensures that the container takes at least the full height of the viewport */
 }
 </style>
