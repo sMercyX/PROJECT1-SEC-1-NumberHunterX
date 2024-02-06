@@ -87,13 +87,11 @@ function toRawBlock(id) {
 
 //reset block style
 const resetBlockStyles = () => {
-  const allCheckMark = checked.concat(marked)
   checked.forEach((id) => {
     toRawBlock(id).style.backgroundColor = ''
     toRawBlock(id).textContent = ''
-    // toRawBlock(id).targetClasses = 'hanjie-cell'
   })
-  console.log(marked)
+  //marked is store event.target that no need to used toRawBlock() to get their event from playCellElements
   marked.forEach((id) => {
     id.style.backgroundColor = ''
     id.textContent = ''
