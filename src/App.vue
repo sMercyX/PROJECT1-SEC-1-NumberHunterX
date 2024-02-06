@@ -7,7 +7,7 @@ const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(3)
+const hintsLeft = ref(300)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -34,6 +34,7 @@ let secs = ref(0)
 let timeUsed = ref(0)
 //levels
 const currentLv = ref(0)
+const marked = []
 //to stores row and column to blocks
 rows.forEach((ele) => {
   blocks.push({ row: ele, column: [...columns] }) //use spread to easy copy data without reference
@@ -86,9 +87,16 @@ function toRawBlock(id) {
 
 //reset block style
 const resetBlockStyles = () => {
+  const allCheckMark = checked.concat(marked)
   checked.forEach((id) => {
-    toRawBlock(id).style.backgroundColor = 'rgba(251,247,245,255)'
+    toRawBlock(id).style.backgroundColor = ''
     toRawBlock(id).textContent = ''
+    // toRawBlock(id).targetClasses = 'hanjie-cell'
+  })
+  console.log(marked)
+  marked.forEach((id) => {
+    id.style.backgroundColor = ''
+    id.textContent = ''
   })
 }
 function resetGame() {
@@ -99,6 +107,7 @@ function resetGame() {
   correctBlock = level[currentLv.value].correctBlock
   headerNums = level[currentLv.value].headerNums
   hints.value = []
+  marked.splice(0)
 }
 function resetValue() {
   currentLv.value = 0
@@ -139,7 +148,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   resetNewBestTime()
   getSave()
 }
@@ -150,7 +159,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
@@ -183,6 +192,8 @@ function checkHintable() {
   let checkedCorrect = checked.filter((tile) => {
     return correctBlock.includes(tile)
   })
+  //แก้ให้ตัวที่ถูกmarkสามารถกดhintทับลงไปได้เพื่อแก้bug
+
   // let hintAndChecked = hints.value.concat(checkedCorrect)
   // .log(hintAndChecked)
   // if (hintAndChecked.length >= correctBlock.length) {
@@ -250,7 +261,7 @@ const addClickers = (event) => {
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
   let targetClasses = targetTile.className.split(' ') //split class into array
-  if (checked.includes(id) || targetClasses.includes('marked')) {
+  if (checked.includes(id) || marked.includes(targetTile)) {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
@@ -278,28 +289,25 @@ function mark(event) {
   }
   let targetTile = event.target //tile clicked
   let targetTileId = targetTile.id //clicked tile id
-  let targetClasses = targetTile.className.split(' ') //split class into array
-  if (
+  if (checked.includes(targetTileId)) {
+    return
+  }
+
+  if (marked.includes(targetTile)) {
+    console.log('ooh yeah!!!')
+    targetTile.style.backgroundColor = ''
+    let unmarked = marked.findIndex((tile) => tile.id === targetTile.id)
+    console.log(unmarked)
+    marked.splice(unmarked, 1)
+    console.log(marked)
+  } else if (
+    !marked.includes(targetTile) &&
     !targetTileId.includes('0') &&
     !targetTileId.includes('99') &&
     !targetTileId.includes('t')
   ) {
-    if (checked.includes(targetTileId)) {
-      //if already checked, return
-      return
-    }
-    if (targetClasses.includes('marked')) {
-      //remove marked class from the tile
-      let markToRm = targetClasses.findIndex((tileClass) => {
-        return tileClass === 'marked'
-      })
-      targetClasses.splice(markToRm, 1)
-      targetTile.className = targetClasses.join(' ')
-      targetTile.style.backgroundColor = 'white'
-      return
-    }
-    targetClasses.push('marked')
-    targetTile.className = targetClasses.join(' ')
+    marked.push(event.target)
+    console.log(marked)
     targetTile.style.backgroundColor = 'grey'
   }
 }
