@@ -1,13 +1,11 @@
 <script setup>
 import { onMounted, ref, toRaw } from 'vue'
-// const refreshPage = () => {
-//   location.reload() // Reloads the current page
-// }
+
 const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(300)
+const hintsLeft = ref(3)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -51,7 +49,7 @@ let headerNums = level[currentLv.value].headerNums
 let timerInterval
 
 function startGame() {
-  //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
+  //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
   start.value = true
   timer(true)
   if (hintsLeft.value >= 0) {
@@ -146,7 +144,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 300
+  hintsLeft.value = 3
   resetNewBestTime()
   getSave()
 }
@@ -157,7 +155,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value = 300
+  hintsLeft.value = 3
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
@@ -192,11 +190,6 @@ function checkHintable() {
   })
   //แก้ให้ตัวที่ถูกmarkสามารถกดhintทับลงไปได้เพื่อแก้bug
 
-  // let hintAndChecked = hints.value.concat(checkedCorrect)
-  // .log(hintAndChecked)
-  // if (hintAndChecked.length >= correctBlock.length) {
-  //   hintable.value = false
-  // }
   if (hintsLeft.value <= 0) {
     hintable.value = false
   }
