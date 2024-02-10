@@ -144,7 +144,7 @@ function resetValue() {
   // clearInterval(timerInterval)
 }
 
-let save
+let save = ref()
 let bestTime = ref({})
 function calTimeToMin(time) {
   let min = Math.floor(time / 60)
@@ -153,19 +153,9 @@ function calTimeToMin(time) {
 }
 
 function setBestTime() {
-  bestTime.value = calTimeToMin(save)
+  bestTime.value = calTimeToMin(save.value)
 }
-function getSave() {
-  save = localStorage.getItem('save')
-  if (save === null || save === undefined) {
-    save = 0
-    setBestTime()
-  } else {
-    save = JSON.parse(save)
-    setBestTime()
-  }
-}
-
+let mode = 'easyMode'
 let show = ref(0)
 function homePage() {
   show.value = 0
@@ -183,6 +173,29 @@ function gamePage() {
 function modalPage() {
   show.value = 3
 }
+const ezMode = () => {
+  gameSize.value = 0
+  mode = 'easyMode'
+  console.log(mode)
+  gamePage()
+}
+const hardMode = () => {
+  gameSize.value = 1
+  mode = 'hardMode'
+  console.log(mode)
+  gamePage()
+}
+function getSave() {
+  save.value = localStorage.getItem(mode)
+  if (save.value === null || save.value === undefined) {
+    save.value = 0
+    setBestTime()
+  } else {
+    save.value = JSON.parse(save.value)
+    setBestTime()
+  }
+}
+
 let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
@@ -198,7 +211,7 @@ function nextLevel() {
     checkNewBestTime()
     lastMin.value = mins.value
     lastSec.value = secs.value
-    localStorage.setItem('save', JSON.stringify(save))
+    localStorage.setItem(mode, JSON.stringify(save.value))
     getSave()
     resetBlockStyles()
     resetValue()
@@ -208,9 +221,9 @@ function nextLevel() {
 }
 let newBestTime = ref(false)
 function checkNewBestTime() {
-  if (save === 0 || timeUsed.value < save) {
+  if (save.value === 0 || timeUsed.value < save.value) {
     newBestTime.value = true
-    save = timeUsed.value
+    save.value = timeUsed.value
   } else newBestTime.value = false
 }
 function resetNewBestTime() {
@@ -347,8 +360,10 @@ function checkWin() {
 </script>
 
 <template>
-  <div  class="header pb-2 flex justify-center py-3">
-    <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
+  <div class="header pb-2 flex justify-center py-3">
+    <div class="mb-4 text-4xl font-extrabold ">
+    NUMBER HUNTER
+    </div>
   </div>
   <section id="homePage">
     <div v-show="show == 0" class="flex justify-center gap-3">
@@ -358,27 +373,9 @@ function checkWin() {
       <!-- <button @click="gamePage" class="btn btn-success text-white">
         Play Game
       </button> -->
-      <button
-        @click="
-          () => {
-            gameSize = 0
-            console.log(gameSize)
-            gamePage()
-          }
-        "
-        class="btn btn-primary text-white"
-      >
+      <button @click="ezMode" class="btn btn-primary text-white">
         Easy mode</button
-      ><button
-        @click="
-          () => {
-            gameSize = 1
-            console.log(gameSize)
-            gamePage()
-          }
-        "
-        class="btn btn-error text-white"
-      >
+      ><button @click="hardMode" class="btn btn-error text-white">
         Hard mode
       </button>
     </div>
