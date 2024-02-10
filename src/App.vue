@@ -44,6 +44,52 @@ let timeUsed = ref(0)
 
 const currentLv = ref(0)
 const marked = []
+
+import easyLevel from './easyLevel.json'
+import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
+let level = [...easyLevel]
+
+const ezMode = () => {
+  gameSize.value = 0
+  mode = 'easyMode'
+  level = [...easyLevel]
+  console.log(mode)
+  gamePage()
+}
+const hardMode = () => {
+  gameSize.value = 1
+  mode = 'hardMode'
+  level = [...hardLevel]
+  console.log(mode)
+  gamePage()
+}
+
+//correctBlock stores block that when click its will change to correct color
+let correctBlock
+//headerNums stores id and result of block of table head
+let headerNums
+
+const randomlv = []
+const randomLevel = () => {
+  randomlv.splice(0)
+  let randomIndex
+  while (randomlv.length < 5) {
+    randomIndex = Math.floor(Math.random() * level.length)
+    // level.splice(randomIndex, 1)
+    if (randomlv.length == 0) randomlv.push(level[randomIndex])
+    else if (
+      !randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle) //หาตัวที่ยังไม่ถูกสุ่ม
+    ) {
+      randomlv.push(level[randomIndex])
+    }
+  }
+  console.log(randomlv)
+}
+
+randomLevel()
+correctBlock = randomlv[currentLv.value].correctBlock
+headerNums = []
+
 let mode = 'easyMode'
 let show = ref(0)
 function homePage() {
@@ -63,53 +109,14 @@ function gamePage() {
 function modalPage() {
   show.value = 3
 }
-import easyLevel from './easyLevel.json'
-import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
-let level = easyLevel
-
-const ezMode = () => {
-  gameSize.value = 0
-  mode = 'easyMode'
-  level = easyLevel
-  console.log(mode)
-  gamePage()
-}
-const hardMode = () => {
-  gameSize.value = 1
-  mode = 'hardMode'
-  level = hardLevel
-  console.log(mode)
-  gamePage()
-}
-
-//correctBlock stores block that when click its will change to correct color
-let correctBlock
-//headerNums stores id and result of block of table head
-let headerNums
-
-const randomlv = []
-const randomLevel = () => {
-  randomlv.splice(0)
-  let randomIndex
-  while (randomlv.length < 5) {
-    randomIndex = Math.floor(Math.random() * level.length)
-    if (
-      !randomlv.includes(level[randomIndex]) //หาตัวที่ยังไม่ถูกสุ่ม
-    ) {
-      randomlv.push(level[randomIndex])
-    }
-  }
-  correctBlock = randomlv[currentLv.value].correctBlock
-  headerNums = randomlv[currentLv.value].headerNums
-  console.log(randomlv)
-}
-
-randomLevel()
-
 let timerInterval
 
 function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
+
+  console.log(randomlv[currentLv.value])
+  correctBlock = randomlv[currentLv.value].correctBlock
+  headerNums = randomlv[currentLv.value].headerNums
   start.value = true
   timer(true)
   if (hintsLeft.value >= 0) {
@@ -160,8 +167,6 @@ function resetGame() {
   checked.splice(0)
   win.value = false
   clearInterval(timerInterval)
-  correctBlock = level[currentLv.value].correctBlock
-  headerNums = level[currentLv.value].headerNums
   hints.value = []
   marked.splice(0)
 }
@@ -524,7 +529,11 @@ function checkWin() {
               <button
                 class="btn btn-outline btn-primary"
                 type="button"
-                @click="gamePage"
+                @click="
+                  () => {
+                    gamePage()
+                  }
+                "
               >
                 <img src="./assets/play-button.png" class="h-7" />
                 Try again

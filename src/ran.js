@@ -1,0 +1,31 @@
+const level = [1, 2, 3, 4, 5]
+const randomlv = []
+
+const randomLevel = () => {
+  randomlv.splice(0)
+  let randomIndex
+  while (randomlv.length < 5) {
+    randomIndex = Math.floor(Math.random() * level.length)
+    if (
+      !randomlv.includes(level[randomIndex]) //หาตัวที่ยังไม่ถูกสุ่ม
+    ) {
+      randomlv.push(level[randomIndex])
+    }
+  }
+}
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
+randomLevel()
+console.log(randomlv)
