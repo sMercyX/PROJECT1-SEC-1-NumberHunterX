@@ -17,12 +17,23 @@ const halfBlock = 'hanjie-cell-half'
 const correct = 'MediumSeaGreen'
 const unCorrect = '#f87171'
 
+let gameSize = ref(0) // 0, 1
+import tableSize from './tableSize.json'
 //block stores row and column of table
-const blocks = []
-//rows stores row name of table
-const rows = ['t', '0', '1', '2', '3', '4', '5']
-//columns stores column name of table
-const columns = ['0', 'a', 'b', 'c', 'd', 'e', '99']
+let blocks = ref([])
+let rows //add 2 row for show header number(t,0)
+let columns //add 2 columns for show header number(0) and clear block(99)
+const genBlock = () => {
+  blocks.value = []
+  //rows stores row name of table
+  rows = tableSize[gameSize.value].rows
+  columns = tableSize[gameSize.value].columns
+  rows.forEach((ele) => {
+    blocks.value.push({ row: ele, column: [...columns] })
+  })
+  console.log(blocks.value)
+}
+genBlock()
 //checked blocks array
 const checked = []
 const win = ref(false)
@@ -30,17 +41,21 @@ const win = ref(false)
 let mins = ref(0)
 let secs = ref(0)
 let timeUsed = ref(0)
-//levels
+
 const currentLv = ref(0)
 const marked = []
 //to stores row and column to blocks
 rows.forEach((ele) => {
-  blocks.push({ row: ele, column: [...columns] }) //use spread to easy copy data without reference
+  blocks.value.push({ row: ele, column: [...columns] }) //use spread to easy copy data without reference
 })
 
-//level
-import level from './level.json'
-// const levels = level
+import easyLevel from './easyLevel.json'
+import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
+let level
+if (gameSize.value == 1) {
+  level = hardLevel
+} else level = easyLevel
+
 const randomlv = []
 const randomLevel = () => {
   let randomIndex
@@ -159,6 +174,7 @@ function tutorialPage() {
   show.value = 1
 }
 function gamePage() {
+  genBlock()
   show.value = 2
   hintsLeft.value = 300
   resetNewBestTime()
@@ -331,16 +347,39 @@ function checkWin() {
 </script>
 
 <template>
-  <div class="header pb-2 flex justify-center py-3">
+  <div  class="header pb-2 flex justify-center py-3">
     <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
-  <section id="homePage" class="flex justify-center">
-    <div v-show="show == 0">
+  <section id="homePage">
+    <div v-show="show == 0" class="flex justify-center gap-3">
       <button @click="tutorialPage" class="btn btn-success text-white">
         Tutorial
       </button>
-      <button @click="gamePage" class="btn btn-success text-white">
+      <!-- <button @click="gamePage" class="btn btn-success text-white">
         Play Game
+      </button> -->
+      <button
+        @click="
+          () => {
+            gameSize = 0
+            console.log(gameSize)
+            gamePage()
+          }
+        "
+        class="btn btn-primary text-white"
+      >
+        Easy mode</button
+      ><button
+        @click="
+          () => {
+            gameSize = 1
+            console.log(gameSize)
+            gamePage()
+          }
+        "
+        class="btn btn-error text-white"
+      >
+        Hard mode
       </button>
     </div>
   </section>
@@ -373,7 +412,7 @@ function checkWin() {
   </section>
 
   <section id="gamePage">
-    <div class="container p-10 m-auto w-full" v-show="show == 2">
+    <div class="container p-10 m-auto w-full" v-if="show == 2">
       <section class="flex items-center justify-between">
         <div>
           <div id="bestTimePlayed" class="flex">
