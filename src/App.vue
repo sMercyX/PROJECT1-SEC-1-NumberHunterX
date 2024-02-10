@@ -18,6 +18,7 @@ const correct = 'MediumSeaGreen'
 const unCorrect = '#f87171'
 
 let gameSize = ref(0) // 0, 1
+
 import tableSize from './tableSize.json'
 //block stores row and column of table
 let blocks = ref([])
@@ -31,7 +32,6 @@ const genBlock = () => {
   rows.forEach((ele) => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
-  console.log(blocks.value)
 }
 genBlock()
 //checked blocks array
@@ -44,20 +44,52 @@ let timeUsed = ref(0)
 
 const currentLv = ref(0)
 const marked = []
-//to stores row and column to blocks
-rows.forEach((ele) => {
-  blocks.value.push({ row: ele, column: [...columns] }) //use spread to easy copy data without reference
-})
-
+let mode = 'easyMode'
+let show = ref(0)
+function homePage() {
+  show.value = 0
+}
+function tutorialPage() {
+  show.value = 1
+}
+function gamePage() {
+  genBlock()
+  randomLevel()
+  show.value = 2
+  hintsLeft.value = 300
+  resetNewBestTime()
+  getSave()
+}
+function modalPage() {
+  show.value = 3
+}
 import easyLevel from './easyLevel.json'
 import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
-let level
-if (gameSize.value == 1) {
+let level = easyLevel
+
+const ezMode = () => {
+  gameSize.value = 0
+  mode = 'easyMode'
+  level = easyLevel
+  console.log(mode)
+  gamePage()
+}
+const hardMode = () => {
+  gameSize.value = 1
+  mode = 'hardMode'
   level = hardLevel
-} else level = easyLevel
+  console.log(mode)
+  gamePage()
+}
+
+//correctBlock stores block that when click its will change to correct color
+let correctBlock
+//headerNums stores id and result of block of table head
+let headerNums
 
 const randomlv = []
 const randomLevel = () => {
+  randomlv.splice(0)
   let randomIndex
   while (randomlv.length < 5) {
     randomIndex = Math.floor(Math.random() * level.length)
@@ -67,19 +99,17 @@ const randomLevel = () => {
       randomlv.push(level[randomIndex])
     }
   }
+  correctBlock = randomlv[currentLv.value].correctBlock
+  headerNums = randomlv[currentLv.value].headerNums
+  console.log(randomlv)
 }
+
 randomLevel()
-//correctBlock stores block that when click its will change to correct color
-let correctBlock = randomlv[currentLv.value].correctBlock
-//headerNums stores id and result of block of table head
-let headerNums = randomlv[currentLv.value].headerNums
 
 let timerInterval
 
 function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
-  randomLevel()
-  console.log(randomlv)
   start.value = true
   timer(true)
   if (hintsLeft.value >= 0) {
@@ -140,7 +170,6 @@ function resetValue() {
   mins.value = 0
   secs.value = 0
   timeUsed.value = 0
-  randomlv.splice(0)
   // clearInterval(timerInterval)
 }
 
@@ -155,36 +184,7 @@ function calTimeToMin(time) {
 function setBestTime() {
   bestTime.value = calTimeToMin(save.value)
 }
-let mode = 'easyMode'
-let show = ref(0)
-function homePage() {
-  show.value = 0
-}
-function tutorialPage() {
-  show.value = 1
-}
-function gamePage() {
-  genBlock()
-  show.value = 2
-  hintsLeft.value = 300
-  resetNewBestTime()
-  getSave()
-}
-function modalPage() {
-  show.value = 3
-}
-const ezMode = () => {
-  gameSize.value = 0
-  mode = 'easyMode'
-  console.log(mode)
-  gamePage()
-}
-const hardMode = () => {
-  gameSize.value = 1
-  mode = 'hardMode'
-  console.log(mode)
-  gamePage()
-}
+
 function getSave() {
   save.value = localStorage.getItem(mode)
   if (save.value === null || save.value === undefined) {
@@ -328,14 +328,14 @@ function mark(event) {
   if (checked.includes(targetTileId)) {
     return
   }
-
+  let markId
   if (marked.includes(targetTile)) {
-    console.log('ooh yeah!!!')
     targetTile.style.backgroundColor = ''
     let unmarked = marked.findIndex((tile) => tile.id === targetTile.id)
-    console.log(unmarked)
+
     marked.splice(unmarked, 1)
-    console.log(marked)
+    markId = marked.map((mark) => mark.id)
+    console.log(markId)
   } else if (
     !marked.includes(targetTile) &&
     !targetTileId.includes('0') &&
@@ -343,7 +343,8 @@ function mark(event) {
     !targetTileId.includes('t')
   ) {
     marked.push(event.target)
-    console.log(marked)
+    markId = marked.map((mark) => mark.id)
+    console.log(markId)
     targetTile.style.backgroundColor = 'grey'
   }
 }
@@ -361,9 +362,7 @@ function checkWin() {
 
 <template>
   <div class="header pb-2 flex justify-center py-3">
-    <div class="mb-4 text-4xl font-extrabold ">
-    NUMBER HUNTER
-    </div>
+    <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
   <section id="homePage">
     <div v-show="show == 0" class="flex justify-center gap-3">
