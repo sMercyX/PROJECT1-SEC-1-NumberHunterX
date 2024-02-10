@@ -5,7 +5,7 @@ const start = ref(false)
 
 const missed = ref(0)
 //hint
-const hintsLeft = ref(3)
+const hintsLeft = ref(300)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -40,16 +40,31 @@ rows.forEach((ele) => {
 
 //level
 import level from './level.json'
-
+// const levels = level
+const randomlv = []
+const randomLevel = () => {
+  let randomIndex
+  while (randomlv.length < 5) {
+    randomIndex = Math.floor(Math.random() * level.length)
+    if (
+      !randomlv.includes(level[randomIndex]) //หาตัวที่ยังไม่ถูกสุ่ม
+    ) {
+      randomlv.push(level[randomIndex])
+    }
+  }
+}
+randomLevel()
 //correctBlock stores block that when click its will change to correct color
-let correctBlock = level[currentLv.value].correctBlock
+let correctBlock = randomlv[currentLv.value].correctBlock
 //headerNums stores id and result of block of table head
-let headerNums = level[currentLv.value].headerNums
+let headerNums = randomlv[currentLv.value].headerNums
 
 let timerInterval
 
 function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
+  randomLevel()
+  console.log(randomlv)
   start.value = true
   timer(true)
   if (hintsLeft.value >= 0) {
@@ -110,7 +125,8 @@ function resetValue() {
   mins.value = 0
   secs.value = 0
   timeUsed.value = 0
-  clearInterval(timerInterval)
+  randomlv.splice(0)
+  // clearInterval(timerInterval)
 }
 
 let save
@@ -144,7 +160,7 @@ function tutorialPage() {
 }
 function gamePage() {
   show.value = 2
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   resetNewBestTime()
   getSave()
 }
@@ -155,7 +171,7 @@ let lastMin = ref(0)
 let lastSec = ref(0)
 function nextLevel() {
   currentLv.value++
-  hintsLeft.value = 3
+  hintsLeft.value = 300
   if (currentLv.value < level.length) {
     resetBlockStyles()
     resetGame()
