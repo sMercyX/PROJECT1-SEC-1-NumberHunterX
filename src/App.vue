@@ -512,18 +512,7 @@ function checkWin() {
               <span v-if="lastMin < 10">0</span>{{ lastMin }} :
               <span v-if="lastSec < 10">0</span>{{ lastSec }}
             </p>
-            <div v-show="newBestTime">
-              <p>CONGRADULATION!!!!</p>
-              <p>YOU ARE THE NEW RECORD</p>
-              <button
-                class="btn btn-outline btn-primary"
-                type="button"
-                @click="homePage"
-              >
-                <img src="./assets/Home_icon_green.png" class="h-7" />
-                BACK HOME
-              </button>
-            </div>
+
             <div v-show="!newBestTime">
               <h3 class="text-2xl">BE FASTER</h3>
               <button
@@ -537,6 +526,20 @@ function checkWin() {
               >
                 <img src="./assets/play-button.png" class="h-7" />
                 Try again
+              </button>
+            </div>
+            <div v-show="newBestTime">
+              <p>CONGRADULATION!!!!</p>
+              <p>YOU ARE THE NEW RECORD</p>
+            </div>
+            <div>
+              <button
+                class="btn btn-outline btn-primary"
+                type="button"
+                @click="homePage"
+              >
+                <img src="./assets/Home_icon_green.png" class="h-7" />
+                BACK HOME
               </button>
             </div>
           </div>
