@@ -96,6 +96,7 @@ let mode = "easyMode"
 let show = ref(0)
 function homePage() {
   show.value = 0
+  missed.value = 0
 }
 function tutorialPage() {
   show.value = 1
@@ -171,6 +172,7 @@ function resetGame() {
   clearInterval(timerInterval)
   hints.value = []
   marked.splice(0)
+  
 }
 function resetValue() {
   currentLv.value = 0
@@ -325,7 +327,7 @@ const addClickers = (event) => {
       // console.log("you failed!!!")
 
       alert("You Failed")
-      missed.value = 0
+      
       resetBlockStyles()
       resetValue()
       resetGame()
@@ -373,6 +375,9 @@ function checkWin() {
   })
   win.value = winTemp
   return winTemp
+}
+function resetMiss(){
+  missed.value = 0
 }
 </script>
 
@@ -555,6 +560,7 @@ function checkWin() {
                 @click="
                   () => {
                     gamePage()
+                    resetMiss()
                   }
                 "
               >
@@ -572,7 +578,7 @@ function checkWin() {
                 type="button"
                 @click="homePage"
               >
-                <img src="./assets/Home_icon_green.png" class="h-7" />
+                <img src="./assets/Home_icon_green.png"  class="h-7" />
                 BACK HOME
               </button>
             </div>
