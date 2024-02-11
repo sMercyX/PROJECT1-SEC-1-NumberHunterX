@@ -3,7 +3,6 @@ import { onMounted, ref, toRaw } from "vue"
 
 const start = ref(false)
 
-const missed = ref(0)
 //hint
 const hintsLeft = ref(300)
 let hints = ref([])
@@ -18,6 +17,8 @@ const correct = "MediumSeaGreen"
 const unCorrect = "#f87171"
 
 let gameSize = ref(0) // 0, 1
+const missed = ref(0)
+let fails
 
 import tableSize from "./tableSize.json"
 //block stores row and column of table
@@ -33,7 +34,8 @@ const genBlock = () => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
-genBlock()
+// genBlock()
+
 //checked blocks array
 const checked = []
 const win = ref(false)
@@ -51,6 +53,7 @@ let level = [...easyLevel]
 
 const ezMode = () => {
   gameSize.value = 0
+  fails = 5
   mode = "easyMode"
   level = [...easyLevel]
   console.log(mode)
@@ -58,6 +61,7 @@ const ezMode = () => {
 }
 const hardMode = () => {
   gameSize.value = 1
+  fails = 10
   mode = "hardMode"
   level = [...hardLevel]
   console.log(mode)
@@ -65,9 +69,9 @@ const hardMode = () => {
 }
 
 //correctBlock stores block that when click its will change to correct color
-let correctBlock
+let correctBlock = []
 //headerNums stores id and result of block of table head
-let headerNums
+let headerNums = []
 
 const randomlv = []
 const randomLevel = () => {
@@ -86,9 +90,7 @@ const randomLevel = () => {
   console.log(randomlv)
 }
 
-randomLevel()
-correctBlock = randomlv[currentLv.value].correctBlock
-headerNums = []
+// randomLevel()
 
 let mode = "easyMode"
 let show = ref(0)
@@ -290,18 +292,17 @@ const checkTR = (id) => {
 }
 
 const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to find result
+  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
   return index >= 0 ? headerNums[index].result : ""
 }
 
-//addClickers is use to adding click to only block that should be (block that have a line)
 const addClickers = (event) => {
   if (!start.value || win.value) {
     return
   }
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
-  let targetClasses = targetTile.className.split(" ") //split class into array
+  let targetClasses = targetTile.className.split(" ") //split class into array //unused
   if (checked.includes(id) || marked.includes(targetTile)) {
     return
   }
@@ -319,6 +320,16 @@ const addClickers = (event) => {
     }
     if (checkWin()) {
       timer(false)
+    }
+    if (missed.value >= fails) {
+      // console.log("you failed!!!")
+
+      alert("You Failed")
+      missed.value = 0
+      resetBlockStyles()
+      resetValue()
+      resetGame()
+      homePage()
     }
   }
 }
@@ -369,8 +380,8 @@ function checkWin() {
   <div class="header pb-2 flex justify-center py-3">
     <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
   </div>
-  <section id="homePage" class="flex justify-center align-middle">
-    <div v-show="show == 0" class="flex justify-center gap-3 align-middle">
+  <section id="homePage">
+    <div v-show="show == 0" class="flex justify-center gap-3">
       <button @click="tutorialPage" class="btn btn-success text-white">
         Tutorial
       </button>
@@ -535,18 +546,7 @@ function checkWin() {
               <span v-if="lastMin < 10">0</span>{{ lastMin }} :
               <span v-if="lastSec < 10">0</span>{{ lastSec }}
             </p>
-            <div v-show="newBestTime">
-              <p>CONGRADULATION!!!!</p>
-              <p>YOU ARE THE NEW RECORD</p>
-              <button
-                class="btn btn-outline btn-primary"
-                type="button"
-                @click="homePage"
-              >
-                <img src="./assets/Home_icon_green.png" class="h-7" />
-                BACK HOME
-              </button>
-            </div>
+
             <div v-show="!newBestTime">
               <h3 class="text-2xl">BE FASTER</h3>
               <button
@@ -560,6 +560,20 @@ function checkWin() {
               >
                 <img src="./assets/play-button.png" class="h-7" />
                 Try again
+              </button>
+            </div>
+            <div v-show="newBestTime">
+              <p>CONGRADULATION!!!!</p>
+              <p>YOU ARE THE NEW RECORD</p>
+            </div>
+            <div>
+              <button
+                class="btn btn-outline btn-primary"
+                type="button"
+                @click="homePage"
+              >
+                <img src="./assets/Home_icon_green.png" class="h-7" />
+                BACK HOME
               </button>
             </div>
           </div>
