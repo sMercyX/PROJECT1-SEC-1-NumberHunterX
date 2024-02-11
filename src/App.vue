@@ -33,7 +33,8 @@ const genBlock = () => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
-genBlock()
+// genBlock()
+
 //checked blocks array
 const checked = []
 const win = ref(false)
@@ -65,9 +66,9 @@ const hardMode = () => {
 }
 
 //correctBlock stores block that when click its will change to correct color
-let correctBlock
+let correctBlock = []
 //headerNums stores id and result of block of table head
-let headerNums
+let headerNums = []
 
 const randomlv = []
 const randomLevel = () => {
@@ -86,9 +87,7 @@ const randomLevel = () => {
   console.log(randomlv)
 }
 
-randomLevel()
-correctBlock = randomlv[currentLv.value].correctBlock
-headerNums = []
+// randomLevel()
 
 let mode = 'easyMode'
 let show = ref(0)
