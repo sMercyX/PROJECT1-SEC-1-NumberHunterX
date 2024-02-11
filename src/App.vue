@@ -3,7 +3,6 @@ import { onMounted, ref, toRaw } from 'vue'
 
 const start = ref(false)
 
-const missed = ref(0)
 //hint
 const hintsLeft = ref(300)
 let hints = ref([])
@@ -18,6 +17,8 @@ const correct = 'MediumSeaGreen'
 const unCorrect = '#f87171'
 
 let gameSize = ref(0) // 0, 1
+const missed = ref(0)
+let fails
 
 import tableSize from './tableSize.json'
 //block stores row and column of table
@@ -52,6 +53,7 @@ let level = [...easyLevel]
 
 const ezMode = () => {
   gameSize.value = 0
+  fails = 5
   mode = 'easyMode'
   level = [...easyLevel]
   console.log(mode)
@@ -59,6 +61,7 @@ const ezMode = () => {
 }
 const hardMode = () => {
   gameSize.value = 1
+  fails = 10
   mode = 'hardMode'
   level = [...hardLevel]
   console.log(mode)
@@ -289,18 +292,17 @@ const checkTR = (id) => {
 }
 
 const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to find result
+  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
   return index >= 0 ? headerNums[index].result : ''
 }
 
-//addClickers is use to adding click to only block that should be (block that have a line)
 const addClickers = (event) => {
   if (!start.value || win.value) {
     return
   }
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
-  let targetClasses = targetTile.className.split(' ') //split class into array
+  let targetClasses = targetTile.className.split(' ') //split class into array //unused
   if (checked.includes(id) || marked.includes(targetTile)) {
     return
   }
@@ -318,6 +320,14 @@ const addClickers = (event) => {
     }
     if (checkWin()) {
       timer(false)
+    }
+    if (missed.value >= fails) {
+      console.log('you failed!!!')
+
+      resetBlockStyles()
+      resetValue()
+      resetGame()
+      homePage()
     }
   }
 }
