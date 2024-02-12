@@ -1,9 +1,8 @@
 <script setup>
-import { onMounted, ref, toRaw } from 'vue'
+import { onMounted, ref, toRaw } from "vue"
 
 const start = ref(false)
 
-const missed = ref(0)
 //hint
 const hintsLeft = ref(300)
 let hints = ref([])
@@ -11,15 +10,17 @@ let hintable = ref(false)
 // const timer = ref(0)
 
 //style
-const blockStyle = 'hanjie-cell'
-const noneBorder = 'row-number'
-const halfBlock = 'hanjie-cell-half'
-const correct = 'MediumSeaGreen'
-const unCorrect = '#f87171'
+const blockStyle = "hanjie-cell"
+const noneBorder = "row-number"
+const halfBlock = "hanjie-cell-half"
+const correct = "MediumSeaGreen"
+const unCorrect = "#f87171"
 
 let gameSize = ref(0) // 0, 1
+const missed = ref(0)
+let fails
 
-import tableSize from './tableSize.json'
+import tableSize from "./tableSize.json"
 //block stores row and column of table
 let blocks = ref([])
 let rows //add 2 row for show header number(t,0)
@@ -46,20 +47,22 @@ let timeUsed = ref(0)
 const currentLv = ref(0)
 const marked = []
 
-import easyLevel from './easyLevel.json'
-import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
+import easyLevel from "./easyLevel.json"
+import hardLevel from "./hardLevel.json" //no dat to used now its copy data from level
 let level = [...easyLevel]
 
 const ezMode = () => {
   gameSize.value = 0
-  mode = 'easyMode'
+  fails = 5
+  mode = "easyMode"
   level = [...easyLevel]
   console.log(mode)
   gamePage()
 }
 const hardMode = () => {
   gameSize.value = 1
-  mode = 'hardMode'
+  fails = 10
+  mode = "hardMode"
   level = [...hardLevel]
   console.log(mode)
   gamePage()
@@ -89,10 +92,11 @@ const randomLevel = () => {
 
 // randomLevel()
 
-let mode = 'easyMode'
+let mode = "easyMode"
 let show = ref(0)
 function homePage() {
   show.value = 0
+  missed.value = 0
 }
 function tutorialPage() {
   show.value = 1
@@ -152,13 +156,13 @@ function toRawBlock(id) {
 //reset block style
 const resetBlockStyles = () => {
   checked.forEach((id) => {
-    toRawBlock(id).style.backgroundColor = ''
-    toRawBlock(id).textContent = ''
+    toRawBlock(id).style.backgroundColor = ""
+    toRawBlock(id).textContent = ""
   })
   //marked is store event.target that no need to used toRawBlock() to get their event from playCellElements
   marked.forEach((id) => {
-    id.style.backgroundColor = ''
-    id.textContent = ''
+    id.style.backgroundColor = ""
+    id.textContent = ""
   })
 }
 function resetGame() {
@@ -168,6 +172,7 @@ function resetGame() {
   clearInterval(timerInterval)
   hints.value = []
   marked.splice(0)
+  
 }
 function resetValue() {
   currentLv.value = 0
@@ -255,13 +260,16 @@ const genHint = () => {
   }
   while (true) {
     randomIndex = Math.floor(Math.random() * correctBlock.length)
-    if (
+    let correctButMarkedCellNum = marked.filter((markedDom) => correctBlock.includes(markedDom.id)).length; 
+    if(correctButMarkedCellNum === correctBlock.length - checked.filter((tile) => correctBlock.includes(tile)).length){
+      return
+    }
+    else if (
       !checked.includes(correctBlock[randomIndex]) && //หาตัวที่ยังไม่ถูกกด
       !hints.value.includes(correctBlock[randomIndex]) //และไม่ซ้ำกับ hint ที่กดไปแล้ว
     ) {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
-
       let press4U = toRawBlock(correctBlock[randomIndex])
       press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
@@ -273,43 +281,42 @@ const genHint = () => {
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
-  if (id.includes('0')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('t')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('99')) return `${blockStyle} ${noneBorder}`
+  if (id.includes("0")) return `${halfBlock} ${noneBorder}`
+  if (id.includes("t")) return `${halfBlock} ${noneBorder}`
+  if (id.includes("99")) return `${blockStyle} ${noneBorder}`
   return blockStyle
 }
 
 const checkTR = (id) => {
-  if (id.includes('0'))
+  if (id.includes("0"))
     return `
   height: 30px;`
-  if (id.includes('t'))
+  if (id.includes("t"))
     return `
   height: 30px;`
 }
 
 const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to find result
-  return index >= 0 ? headerNums[index].result : ''
+  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
+  return index >= 0 ? headerNums[index].result : ""
 }
 
-//addClickers is use to adding click to only block that should be (block that have a line)
 const addClickers = (event) => {
   if (!start.value || win.value) {
     return
   }
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
-  let targetClasses = targetTile.className.split(' ') //split class into array
+  let targetClasses = targetTile.className.split(" ") //split class into array //unused
   if (checked.includes(id) || marked.includes(targetTile)) {
     return
   }
-  if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
+  if (!id.includes("0") && !id.includes("99") && !id.includes("t")) {
     const blockColor = correctBlock.includes(id) ? correct : unCorrect
     const targetBlock = targetTile
     targetBlock.style.backgroundColor = blockColor
     if (blockColor === unCorrect) {
-      targetBlock.textContent = 'x'
+      targetBlock.textContent = "x"
       missed.value++
     }
     checked.push(id)
@@ -318,6 +325,16 @@ const addClickers = (event) => {
     }
     if (checkWin()) {
       timer(false)
+    }
+    if (missed.value >= fails) {
+      // console.log("you failed!!!")
+
+      alert("You Failed")
+      
+      resetBlockStyles()
+      resetValue()
+      resetGame()
+      homePage()
     }
   }
 }
@@ -334,7 +351,7 @@ function mark(event) {
   }
   let markId
   if (marked.includes(targetTile)) {
-    targetTile.style.backgroundColor = ''
+    targetTile.style.backgroundColor = ""
     let unmarked = marked.findIndex((tile) => tile.id === targetTile.id)
 
     marked.splice(unmarked, 1)
@@ -342,14 +359,14 @@ function mark(event) {
     console.log(markId)
   } else if (
     !marked.includes(targetTile) &&
-    !targetTileId.includes('0') &&
-    !targetTileId.includes('99') &&
-    !targetTileId.includes('t')
+    !targetTileId.includes("0") &&
+    !targetTileId.includes("99") &&
+    !targetTileId.includes("t")
   ) {
     marked.push(event.target)
     markId = marked.map((mark) => mark.id)
     console.log(markId)
-    targetTile.style.backgroundColor = 'grey'
+    targetTile.style.backgroundColor = "grey"
   }
 }
 function checkWin() {
@@ -362,6 +379,11 @@ function checkWin() {
   win.value = winTemp
   return winTemp
 }
+function resetMiss(){
+  missed.value = 0
+}
+
+
 </script>
 
 <template>
@@ -383,22 +405,45 @@ function checkWin() {
       </button>
     </div>
   </section>
+
   <section id="tutorialPage">
     <!--main tutorial-->
-    <div class="tutorial flex" v-show="show == 1">
-      <div class="tutorials px-4 py-2 m-2 center">
+    <div class="tutorial" v-show="show == 1">
+      <div class="tutorials py-2 m-2 center">
         <h1 class="text-center text-2xl font-bold">tutorials</h1>
-        <h2>I think should have some picture</h2>
-        <br /><br /><br /><br />
-        <h2 class="p-20">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit,
-          temporibus, cum harum natus ea dicta sequi accusantium ducimus
-          voluptas deserunt eaque, earum eos. Similique, architecto. Ullam
-          debitis error ipsa unde? Numquam doloribus dolorem aspernatur libero
-          eligendi ab molestias, dolor rem sunt suscipit nihil, totam, ut nulla
-          quae commodi! Quod a vero tempore atque! Perspiciatis, eum nisi quas
-          nihil tempore totam!
-        </h2>
+
+        <div class="tuto">
+          <h2 class="flex justify-center">
+            Along the top and left side of the grid, there are sequences of
+            numbers. These numbers provide clues about the groups of filled-in
+            squares in the corresponding row or column. Each number represents a
+            consecutive group of filled squares, and the numbers are separated
+            by at least one blank square. The order of the numbers corresponds
+            to the order of the groups in the row or column. <br />Additionally,
+            each game mode comes with a timeer to challenge players further.
+            Players can test their speed-solving skills in various difficulty
+            levels. The fastest completion time for each mode will be recorded.
+            players have access to a total of 3 hints for each level in all mode
+            to assist them in solving challenging puzzles.
+          </h2>
+
+          <div class="pic">
+            <h1 class="flex justify-center">Example</h1>
+            <div class="flex justify-center">
+              <img src="./assets/t1-1.png" class="w-80" />
+              <img src="./assets/t1-2.png" class="w-80" />
+            </div>
+            <div class="flex justify-center">
+              <img src="./assets/t2-1.png" class="w-80" />
+              <img src="./assets/t2-2.png" class="w-80" />
+            </div>
+            <div class="flex justify-center">
+              <img src="./assets/t3-1.png" class="w-80" />
+              <img src="./assets/t3-2.png" class="w-80" />
+            </div>
+          </div>
+        </div>
+
         <button
           class="btn btn-outline btn-primary"
           type="button"
@@ -520,6 +565,7 @@ function checkWin() {
                 @click="
                   () => {
                     gamePage()
+                    resetMiss()
                   }
                 "
               >
@@ -537,7 +583,7 @@ function checkWin() {
                 type="button"
                 @click="homePage"
               >
-                <img src="./assets/Home_icon_green.png" class="h-7" />
+                <img src="./assets/Home_icon_green.png"  class="h-7" />
                 BACK HOME
               </button>
             </div>
@@ -549,6 +595,67 @@ function checkWin() {
 </template>
 
 <style scoped>
+.pic {
+  border: rgb(209, 205, 205) solid 3px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  box-shadow: 5px 6px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  max-width: 150vh;
+  margin: 0 auto;
+}
+.tuto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
+  align-items: center;
+
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  max-width: 150vh;
+  margin: 0 auto;
+}
+
+.tutorials {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tuto h2 {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.tuto .example {
+  text-align: center;
+}
+
+.tuto .example h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.tuto .example img {
+  width: 120px;
+  height: 120px;
+  margin: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.tuto .example img:hover {
+  transform: scale(1.05);
+}
+
 .hanjie {
   border-collapse: collapse;
   margin: 20px;
