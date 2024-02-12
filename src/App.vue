@@ -91,15 +91,24 @@ const randomLevel = () => {
 }
 
 // randomLevel()
-
+let tutorial = ref(0)
 let mode = "easyMode"
 let show = ref(0)
+function nextPage() {
+  tutorial.value++
+  console.log(tutorial.value)
+}
+function beforePage() {
+  tutorial.value--
+  console.log(tutorial.value)
+}
 function homePage() {
   show.value = 0
   missed.value = 0
 }
 function tutorialPage() {
   show.value = 1
+  console.log(tutorial.value)
 }
 function gamePage() {
   genBlock()
@@ -172,7 +181,7 @@ function resetGame() {
   clearInterval(timerInterval)
   hints.value = []
   marked.splice(0)
-  
+
 }
 function resetValue() {
   currentLv.value = 0
@@ -260,12 +269,20 @@ const genHint = () => {
   }
   while (true) {
     randomIndex = Math.floor(Math.random() * correctBlock.length)
-    let correctButMarkedCell = marked.filter((markedDom) => correctBlock.includes(markedDom.id)); 
+    let correctButMarkedCell = marked.filter((markedDom) =>
+      correctBlock.includes(markedDom.id)
+    )
     console.log(correctButMarkedCell)
-    if(correctButMarkedCell.length === (correctBlock.length - checked.filter((tile) => correctBlock.includes(tile)).length) || correctButMarkedCell.map((markedDom) => markedDom.id).includes(correctBlock[randomIndex])){
+    if (
+      correctButMarkedCell.length ===
+        correctBlock.length -
+          checked.filter((tile) => correctBlock.includes(tile)).length ||
+      correctButMarkedCell
+        .map((markedDom) => markedDom.id)
+        .includes(correctBlock[randomIndex])
+    ) {
       return
-    }
-    else if (
+    } else if (
       !checked.includes(correctBlock[randomIndex]) && //หาตัวที่ยังไม่ถูกกด
       !hints.value.includes(correctBlock[randomIndex]) //และไม่ซ้ำกับ hint ที่กดไปแล้ว
     ) {
@@ -273,14 +290,13 @@ const genHint = () => {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
       let press4U = toRawBlock(correctBlock[randomIndex])
-      press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
+      press4U.dispatchEvent(new Event("click")) //addClickers จำลอง
       checkHintable()
       // checkWin()
       return
     }
   }
-} 
-
+}
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
@@ -333,7 +349,7 @@ const addClickers = (event) => {
       // console.log("you failed!!!")
 
       alert("You Failed")
-      
+
       resetBlockStyles()
       resetValue()
       resetGame()
@@ -382,222 +398,273 @@ function checkWin() {
   win.value = winTemp
   return winTemp
 }
-function resetMiss(){
+function resetMiss() {
   missed.value = 0
 }
-
-
 </script>
 
 <template>
-  <div class="header pb-2 flex justify-center py-3">
-    <div class="mb-4 text-4xl font-extrabold">NUMBER HUNTER</div>
-  </div>
-  <section id="homePage">
-    <div v-show="show == 0" class="flex justify-center gap-3">
-      <button @click="tutorialPage" class="btn btn-success text-white">
-        Tutorial
-      </button>
-      <!-- <button @click="gamePage" class="btn btn-success text-white">
+  <div class="gamePlay">
+    <div class="header pb-2 flex  justify-center py-3">
+      <div class="p-2 mb-8 text-4xl font-extrabold">NUMBER HUNTER</div>
+    </div>
+
+    <section id="homePage">
+      <div v-show="show == 0" class="flex justify-center gap-3">
+        <button @click="tutorialPage" class="btn btn-success text-white">
+          Tutorial
+        </button>
+        <!-- <button @click="gamePage" class="btn btn-success text-white">
         Play Game
       </button> -->
-      <button @click="ezMode" class="btn btn-primary text-white">
-        Easy mode</button
-      ><button @click="hardMode" class="btn btn-error text-white">
-        Hard mode
-      </button>
-    </div>
-  </section>
+        <button @click="ezMode" class="btn btn-primary text-white">
+          Easy mode</button><button @click="hardMode" class="btn btn-error text-white">
+          Hard mode
+        </button>
+      </div>
+    </section>
 
-  <section id="tutorialPage">
-    <!--main tutorial-->
-    <div class="tutorial" v-show="show == 1">
-      <div class="tutorials py-2 m-2 center">
-        <h1 class="text-center text-2xl font-bold">tutorials</h1>
+    <!--tutorial page-->
+    <section id="tutorialPage">
+      <!--main tutorial-->
+      <div class="tutorial" v-show="show == 1">
+        <div class="min-h-screen flex flex-col items-center">
+          <h1 class="text-4xl text-black mb-8 font-sans font-bold">Tutorial</h1>
 
-        <div class="tuto">
-          <h2 class="flex justify-center">
-            Along the top and left side of the grid, there are sequences of
-            numbers. These numbers provide clues about the groups of filled-in
-            squares in the corresponding row or column. Each number represents a
+          <div class="box-wrapper" v-show="tutorial == 0">
+            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+              <!--img-->
+              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                <img src="./assets/t1-1.png" class="w-full h-auto ">
+              </div>
+              <!--text-->
+              <div class="md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Along the top and left side of the grid,
+                  there are sequences of
+                  numbers. These numbers provide clues about the groups of filled-in
+                  squares in the corresponding row or column.
+                </div>
+              </div>
+              <!--btn-->
+              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+
+                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-wrapper" v-show="tutorial == 1">
+            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+              <!--img-->
+              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                <img src="./assets/t1-2.png" class="w-full h-auto ">
+              </div>
+              <!--text-->
+              <div class="md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Each number represents a
             consecutive group of filled squares, and the numbers are separated
-            by at least one blank square. The order of the numbers corresponds
-            to the order of the groups in the row or column. <br />Additionally,
+            by at least one blank square.
+                </div>
+              </div>
+              <!--btn-->
+              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+
+                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-wrapper" v-show="tutorial == 2">
+            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+              <!--img-->
+              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                <img src="./assets/t2-1.png" class="w-full h-auto ">
+              </div>
+              <!--text-->
+              <div class="md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">The order of the numbers corresponds
+            to the order of the groups in the row or column. Additionally,
             each game mode comes with a timeer to challenge players further.
-            Players can test their speed-solving skills in various difficulty
+                </div>
+              </div>
+              <!--btn-->
+              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+
+                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-wrapper" v-show="tutorial == 3">
+            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+              <!--img-->
+              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                <img src="./assets/t2-2.png" class="w-full h-auto ">
+              </div>
+              <!--text-->
+              <div class="md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Players can test their speed-solving skills in various difficulty
             levels. The fastest completion time for each mode will be recorded.
-            players have access to a total of 3 hints for each level in all mode
+                </div>
+              </div>
+              <!--btn-->
+              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+
+                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="box-wrapper" v-show="tutorial == 4">
+            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+              <!--img-->
+              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                <img src="./assets/t2-2.png" class="w-full h-auto ">
+              </div>
+              <!--text-->
+              <div class="md:w-1/2 flex flex-col items-center justify-center">
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">players have access to a total of 3 hints for each level in all mode
             to assist them in solving challenging puzzles.
-          </h2>
+                </div>
+              </div>
+              <!--btn-->
+              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
 
-          <div class="pic">
-            <h1 class="flex justify-center">Example</h1>
-            <div class="flex justify-center">
-              <img src="./assets/t1-1.png" class="w-80" />
-              <img src="./assets/t1-2.png" class="w-80" />
-            </div>
-            <div class="flex justify-center">
-              <img src="./assets/t2-1.png" class="w-80" />
-              <img src="./assets/t2-2.png" class="w-80" />
-            </div>
-            <div class="flex justify-center">
-              <img src="./assets/t3-1.png" class="w-80" />
-              <img src="./assets/t3-2.png" class="w-80" />
+                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <button
-          class="btn btn-outline btn-primary"
-          type="button"
-          @click="homePage"
-        >
-          <img src="./assets/Home_icon_green.png" class="h-7" />
-          BACK HOME
-        </button>
-      </div>
-    </div>
-  </section>
 
-  <section id="gamePage">
-    <div class="container p-10 m-auto w-full" v-if="show == 2">
-      <section class="flex items-center justify-between">
-        <div>
-          <div id="bestTimePlayed" class="flex">
-            Best Time :
-            <p v-if="bestTime.sec != undefined">
-              <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-              <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
-            </p>
-            <p v-if="bestTime.sec == undefined">Never play</p>
-          </div>
-          <div id="timer" v-show="start">
-            Time :
-            <span v-if="mins < 10">0</span>{{ mins }} :
-            <span v-if="secs < 10">0</span>{{ secs }}
-          </div>
-          <button
-            v-if="!start"
-            class="btn btn-outline btn-primary"
-            type="button"
-            @click="startGame()"
-          >
-            <img src="./assets/play-button.png" class="h-7" />
-            Start
+          <!--home button-->
+          <button class="btn btn-outline btn-primary" type="button" @click="homePage">
+            <img src="./assets/Home_icon_green.png" class="h-7" />
+            BACK HOME
           </button>
         </div>
-        <button v-if="win" class="join-item btn" @click="nextLevel">
-          NEXT LEVEL
-        </button>
-      </section>
 
-      <!--Table-->
-      <div class="join flex justify-center">
-        <table class="hanjie-table">
-          <tr
-            v-for="block in blocks"
-            :key="block.row"
-            :id="block.row"
-            :style="checkTR(block.row)"
-          >
-            <td
-              ref="playCellElements"
-              :class="checkHeaderStyle(col + block.row)"
-              v-for="col in block.column"
-              :key="col + block.row"
-              :id="col + block.row"
-              @click="addClickers"
-              @click.right="mark"
-            >
-              {{ checkHeader(col + block.row) }}
-            </td>
-          </tr>
-        </table>
       </div>
+    </section>
 
-      <div class="flex justify-between m-5">
-        <!-- Hint -->
-        <div class="hint order-1 flex flex-row">
-          <button
-            :class="
-              hintsLeft > 0 && hintable
-                ? 'btn btn-outline btn-accent m-1'
-                : 'btn btn-active btn-ghost cursor-not-allowed m-1'
-            "
-            :disable="hintsLeft > 0 ? false : true"
-            @click="genHint"
-          >
-            Get hint: {{ hintsLeft }}
-          </button>
-          <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
-        </div>
-        <!--Miss-->
-        <div class="missed order-last">
-          <div class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</div>
-        </div>
-      </div>
-
-      <div class="join pagination flex justify-center">
-        <button class="join-item btn">Level {{ currentLv + 1 }}</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="modal">
-    <div class="modal-container" v-show="show == 3">
-      <div id="" class="min-h-screen">
-        <div class="hero-content text-center">
-          <div class="max-w-md">
-            <h1 class="text-3xl font-bold py-8">Something</h1>
-            <p class="">
+    <section id="gamePage">
+      <div class="container p-10 m-auto w-full" v-if="show == 2">
+        <section class="flex items-center justify-between">
+          <div>
+            <div id="bestTimePlayed" class="flex">
               Best Time :
-              <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-              <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
-            </p>
-            <p>
-              Time Used :
-              <span v-if="lastMin < 10">0</span>{{ lastMin }} :
-              <span v-if="lastSec < 10">0</span>{{ lastSec }}
-            </p>
+              <p v-if="bestTime.sec != undefined">
+                <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+                <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+              </p>
+              <p v-if="bestTime.sec == undefined">Never play</p>
+            </div>
+            <div id="timer" v-show="start">
+              Time :
+              <span v-if="mins < 10">0</span>{{ mins }} :
+              <span v-if="secs < 10">0</span>{{ secs }}
+            </div>
+            <button v-if="!start" class="btn btn-outline btn-primary" type="button" @click="startGame()">
+              <img src="./assets/play-button.png" class="h-7" />
+              Start
+            </button>
+          </div>
+          <button v-if="win" class="join-item btn" @click="nextLevel">
+            NEXT LEVEL
+          </button>
+        </section>
 
-            <div v-show="!newBestTime">
-              <h3 class="text-2xl">BE FASTER</h3>
-              <button
-                class="btn btn-outline btn-primary"
-                type="button"
-                @click="
-                  () => {
-                    gamePage()
-                    resetMiss()
-                  }
-                "
-              >
-                <img src="./assets/play-button.png" class="h-7" />
-                Try again
-              </button>
-            </div>
-            <div v-show="newBestTime">
-              <p>CONGRADULATION!!!!</p>
-              <p>YOU ARE THE NEW RECORD</p>
-            </div>
-            <div>
-              <button
-                class="btn btn-outline btn-primary"
-                type="button"
-                @click="homePage"
-              >
-                <img src="./assets/Home_icon_green.png"  class="h-7" />
-                BACK HOME
-              </button>
+        <!--Table-->
+        <div class="join flex justify-center">
+          <table class="hanjie-table">
+            <tr v-for="block in blocks" :key="block.row" :id="block.row" :style="checkTR(block.row)">
+              <td ref="playCellElements" :class="checkHeaderStyle(col + block.row)" v-for="col in block.column"
+                :key="col + block.row" :id="col + block.row" @click="addClickers" @click.right="mark">
+                {{ checkHeader(col + block.row) }}
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="flex justify-between m-5">
+          <!-- Hint -->
+          <div class="hint order-1 flex flex-row">
+            <button :class="hintsLeft > 0 && hintable
+              ? 'btn btn-outline btn-accent m-1'
+              : 'btn btn-active btn-ghost cursor-not-allowed m-1'
+              " :disable="hintsLeft > 0 ? false : true" @click="genHint">
+              Get hint: {{ hintsLeft }}
+            </button>
+            <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
+          </div>
+          <!--Miss-->
+          <div class="missed order-last">
+            <button class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</button>
+          </div>
+        </div>
+
+        <div class="join pagination flex justify-center">
+          <button class="join-item btn">Level {{ currentLv + 1 }}</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="modal">
+      <div class="modal-container" v-show="show == 3">
+        <div id="" class="min-h-screen">
+          <div class="hero-content text-center">
+            <div class="max-w-md">
+              <h1 class="text-3xl font-bold py-8">Something</h1>
+              <p class="">
+                Best Time :
+                <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+                <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+              </p>
+              <p>
+                Time Used :
+                <span v-if="lastMin < 10">0</span>{{ lastMin }} :
+                <span v-if="lastSec < 10">0</span>{{ lastSec }}
+              </p>
+
+              <div v-show="!newBestTime">
+                <h3 class="text-2xl">BE FASTER</h3>
+                <button class="btn btn-outline btn-primary" type="button" @click="() => {
+                  gamePage()
+                  resetMiss()
+                }
+                  ">
+                  <img src="./assets/play-button.png" class="h-7" />
+                  Try again
+                </button>
+              </div>
+              <div v-show="newBestTime">
+                <p>CONGRADULATION!!!!</p>
+                <p>YOU ARE THE NEW RECORD</p>
+              </div>
+              <div>
+                <button class="btn btn-outline btn-primary" type="button" @click="homePage">
+                  <img src="./assets/Home_icon_green.png" class="h-7" />
+                  BACK HOME
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped>
+.gamePlay {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
 .pic {
   border: rgb(209, 205, 205) solid 3px;
   padding: 20px;
@@ -608,6 +675,7 @@ function resetMiss(){
   max-width: 150vh;
   margin: 0 auto;
 }
+
 .tuto {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -627,37 +695,6 @@ function resetMiss(){
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.tuto h2 {
-  font-size: 20px;
-  line-height: 1.6;
-  color: #333;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.tuto .example {
-  text-align: center;
-}
-
-.tuto .example h1 {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.tuto .example img {
-  width: 120px;
-  height: 120px;
-  margin: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out;
-}
-
-.tuto .example img:hover {
-  transform: scale(1.05);
-}
 
 .hanjie {
   border-collapse: collapse;
@@ -692,10 +729,28 @@ function resetMiss(){
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
 }
+
 .modal-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Ensures that the container takes at least the full height of the viewport */
+  min-height: 100vh;
+  /* Ensures that the container takes at least the full height of the viewport */
+}
+
+.btn {
+  border-radius: 999px;
+  margin-top: 3%;
+}
+
+.box-wrapper {
+  max-width: 800px;
+}
+
+.box {
+  background-color: #ffffff;
+  /* White background */
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 </style>
