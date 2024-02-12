@@ -260,14 +260,16 @@ const genHint = () => {
   }
   while (true) {
     randomIndex = Math.floor(Math.random() * correctBlock.length)
-    let correctButMarkedCellNum = marked.filter((markedDom) => correctBlock.includes(markedDom.id)).length; 
-    if(correctButMarkedCellNum === correctBlock.length - checked.filter((tile) => correctBlock.includes(tile)).length){
+    let correctButMarkedCell = marked.filter((markedDom) => correctBlock.includes(markedDom.id)); 
+    console.log(correctButMarkedCell)
+    if(correctButMarkedCell.length === (correctBlock.length - checked.filter((tile) => correctBlock.includes(tile)).length) || correctButMarkedCell.map((markedDom) => markedDom.id).includes(correctBlock[randomIndex])){
       return
     }
     else if (
       !checked.includes(correctBlock[randomIndex]) && //หาตัวที่ยังไม่ถูกกด
       !hints.value.includes(correctBlock[randomIndex]) //และไม่ซ้ำกับ hint ที่กดไปแล้ว
     ) {
+      console.log(correctBlock[randomIndex])
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
       let press4U = toRawBlock(correctBlock[randomIndex])
@@ -277,7 +279,8 @@ const genHint = () => {
       return
     }
   }
-}
+} 
+
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
