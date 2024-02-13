@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, toRaw } from "vue"
+import { ref, toRaw } from 'vue'
 
 const start = ref(false)
 
@@ -10,17 +10,17 @@ let hintable = ref(false)
 // const timer = ref(0)
 
 //style
-const blockStyle = "hanjie-cell"
-const noneBorder = "row-number"
-const halfBlock = "hanjie-cell-half"
-const correct = "MediumSeaGreen"
-const unCorrect = "#f87171"
+const blockStyle = 'hanjie-cell'
+const noneBorder = 'row-number'
+const halfBlock = 'hanjie-cell-half'
+const correct = 'MediumSeaGreen'
+const unCorrect = '#f87171'
 
 let gameSize = ref(0) // 0, 1
 const missed = ref(0)
 let fails
 
-import tableSize from "./tableSize.json"
+import tableSize from './tableSize.json'
 //block stores row and column of table
 let blocks = ref([])
 let rows //add 2 row for show header number(t,0)
@@ -47,14 +47,14 @@ let timeUsed = ref(0)
 const currentLv = ref(0)
 const marked = []
 
-import easyLevel from "./easyLevel.json"
-import hardLevel from "./hardLevel.json" //no dat to used now its copy data from level
+import easyLevel from './easyLevel.json'
+import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
 let level = [...easyLevel]
 
 const ezMode = () => {
   gameSize.value = 0
   fails = 5
-  mode = "easyMode"
+  mode = 'easyMode'
   level = [...easyLevel]
   console.log(mode)
   gamePage()
@@ -62,7 +62,7 @@ const ezMode = () => {
 const hardMode = () => {
   gameSize.value = 1
   fails = 10
-  mode = "hardMode"
+  mode = 'hardMode'
   level = [...hardLevel]
   console.log(mode)
   gamePage()
@@ -92,8 +92,9 @@ const randomLevel = () => {
 
 // randomLevel()
 let tutorial = ref(0)
-let mode = "easyMode"
+let mode = 'easyMode'
 let show = ref(0)
+
 function nextPage() {
   tutorial.value++
   console.log(tutorial.value)
@@ -105,6 +106,7 @@ function beforePage() {
 function homePage() {
   show.value = 0
   missed.value = 0
+  resetGame()
 }
 function tutorialPage() {
   show.value = 1
@@ -121,6 +123,7 @@ function gamePage() {
 function modalPage() {
   show.value = 3
 }
+
 let timerInterval
 
 function startGame() {
@@ -165,13 +168,13 @@ function toRawBlock(id) {
 //reset block style
 const resetBlockStyles = () => {
   checked.forEach((id) => {
-    toRawBlock(id).style.backgroundColor = ""
-    toRawBlock(id).textContent = ""
+    toRawBlock(id).style.backgroundColor = ''
+    toRawBlock(id).textContent = ''
   })
   //marked is store event.target that no need to used toRawBlock() to get their event from playCellElements
   marked.forEach((id) => {
-    id.style.backgroundColor = ""
-    id.textContent = ""
+    id.style.backgroundColor = ''
+    id.textContent = ''
   })
 }
 function resetGame() {
@@ -181,7 +184,8 @@ function resetGame() {
   clearInterval(timerInterval)
   hints.value = []
   marked.splice(0)
-
+  headerNums = []
+  hintable.value = false
 }
 function resetValue() {
   currentLv.value = 0
@@ -290,7 +294,7 @@ const genHint = () => {
       hintsLeft.value--
       hints.value.push(correctBlock[randomIndex])
       let press4U = toRawBlock(correctBlock[randomIndex])
-      press4U.dispatchEvent(new Event("click")) //addClickers จำลอง
+      press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
       checkHintable()
       // checkWin()
       return
@@ -300,24 +304,24 @@ const genHint = () => {
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
-  if (id.includes("0")) return `${halfBlock} ${noneBorder}`
-  if (id.includes("t")) return `${halfBlock} ${noneBorder}`
-  if (id.includes("99")) return `${blockStyle} ${noneBorder}`
+  if (id.includes('0')) return `${halfBlock} ${noneBorder}`
+  if (id.includes('t')) return `${halfBlock} ${noneBorder}`
+  if (id.includes('99')) return `${blockStyle} ${noneBorder}`
   return blockStyle
 }
 
 const checkTR = (id) => {
-  if (id.includes("0"))
+  if (id.includes('0'))
     return `
   height: 30px;`
-  if (id.includes("t"))
+  if (id.includes('t'))
     return `
   height: 30px;`
 }
 
 const checkHeader = (id) => {
   const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
-  return index >= 0 ? headerNums[index].result : ""
+  return index >= 0 ? headerNums[index].result : ''
 }
 
 const addClickers = (event) => {
@@ -326,16 +330,16 @@ const addClickers = (event) => {
   }
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
-  let targetClasses = targetTile.className.split(" ") //split class into array //unused
+  let targetClasses = targetTile.className.split(' ') //split class into array //unused
   if (checked.includes(id) || marked.includes(targetTile)) {
     return
   }
-  if (!id.includes("0") && !id.includes("99") && !id.includes("t")) {
+  if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
     const blockColor = correctBlock.includes(id) ? correct : unCorrect
     const targetBlock = targetTile
     targetBlock.style.backgroundColor = blockColor
     if (blockColor === unCorrect) {
-      targetBlock.textContent = "x"
+      targetBlock.textContent = 'x'
       missed.value++
     }
     checked.push(id)
@@ -348,12 +352,12 @@ const addClickers = (event) => {
     if (missed.value >= fails) {
       // console.log("you failed!!!")
 
-      alert("You Failed")
+      // alert('You Failed')
 
       resetBlockStyles()
       resetValue()
-      resetGame()
       homePage()
+      show.value = 4
     }
   }
 }
@@ -370,7 +374,7 @@ function mark(event) {
   }
   let markId
   if (marked.includes(targetTile)) {
-    targetTile.style.backgroundColor = ""
+    targetTile.style.backgroundColor = ''
     let unmarked = marked.findIndex((tile) => tile.id === targetTile.id)
 
     marked.splice(unmarked, 1)
@@ -378,14 +382,14 @@ function mark(event) {
     console.log(markId)
   } else if (
     !marked.includes(targetTile) &&
-    !targetTileId.includes("0") &&
-    !targetTileId.includes("99") &&
-    !targetTileId.includes("t")
+    !targetTileId.includes('0') &&
+    !targetTileId.includes('99') &&
+    !targetTileId.includes('t')
   ) {
     marked.push(event.target)
     markId = marked.map((mark) => mark.id)
     console.log(markId)
-    targetTile.style.backgroundColor = "grey"
+    targetTile.style.backgroundColor = 'grey'
   }
 }
 function checkWin() {
@@ -405,7 +409,7 @@ function resetMiss() {
 
 <template>
   <div class="gamePlay">
-    <div class="header pb-2 flex  justify-center py-3">
+    <div class="header pb-2 flex justify-center py-3">
       <div class="p-2 mb-8 text-4xl font-extrabold">NUMBER HUNTER</div>
     </div>
 
@@ -418,7 +422,8 @@ function resetMiss() {
         Play Game
       </button> -->
         <button @click="ezMode" class="btn btn-primary text-white">
-          Easy mode</button><button @click="hardMode" class="btn btn-error text-white">
+          Easy mode</button
+        ><button @click="hardMode" class="btn btn-error text-white">
           Hard mode
         </button>
       </div>
@@ -432,122 +437,208 @@ function resetMiss() {
           <h1 class="text-4xl text-black mb-8 font-sans font-bold">Tutorial</h1>
 
           <div class="box-wrapper" v-show="tutorial == 0">
-            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+            <div
+              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
+            >
               <!--img-->
               <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t1-1.png" class="w-full h-auto ">
+                <img src="./assets/t1-1.png" class="w-full h-auto" />
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Along the top and left side of the grid,
-                  there are sequences of
-                  numbers. These numbers provide clues about the groups of filled-in
-                  squares in the corresponding row or column.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                  Along the top and left side of the grid, there are sequences
+                  of numbers. These numbers provide clues about the groups of
+                  filled-in squares in the corresponding row or column.
                 </div>
               </div>
               <!--btn-->
-              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+              <div
+                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+              >
+                <button
+                  v-if="tutorial > 0"
+                  @click="beforePage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  previous page
+                </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+                <button
+                  v-if="tutorial < 4"
+                  @click="nextPage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  next page
+                </button>
               </div>
             </div>
           </div>
 
           <div class="box-wrapper" v-show="tutorial == 1">
-            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+            <div
+              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
+            >
               <!--img-->
               <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t1-2.png" class="w-full h-auto ">
+                <img src="./assets/t1-2.png" class="w-full h-auto" />
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Each number represents a
-            consecutive group of filled squares, and the numbers are separated
-            by at least one blank square.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                  Each number represents a consecutive group of filled squares,
+                  and the numbers are separated by at least one blank square.
                 </div>
               </div>
               <!--btn-->
-              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+              <div
+                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+              >
+                <button
+                  v-if="tutorial > 0"
+                  @click="beforePage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  previous page
+                </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+                <button
+                  v-if="tutorial < 4"
+                  @click="nextPage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  next page
+                </button>
               </div>
             </div>
           </div>
 
           <div class="box-wrapper" v-show="tutorial == 2">
-            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+            <div
+              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
+            >
               <!--img-->
               <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-1.png" class="w-full h-auto ">
+                <img src="./assets/t2-1.png" class="w-full h-auto" />
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">The order of the numbers corresponds
-            to the order of the groups in the row or column. Additionally,
-            each game mode comes with a timeer to challenge players further.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                  The order of the numbers corresponds to the order of the
+                  groups in the row or column. Additionally, each game mode
+                  comes with a timeer to challenge players further.
                 </div>
               </div>
               <!--btn-->
-              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+              <div
+                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+              >
+                <button
+                  v-if="tutorial > 0"
+                  @click="beforePage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  previous page
+                </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+                <button
+                  v-if="tutorial < 4"
+                  @click="nextPage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  next page
+                </button>
               </div>
             </div>
           </div>
 
           <div class="box-wrapper" v-show="tutorial == 3">
-            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+            <div
+              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
+            >
               <!--img-->
               <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-2.png" class="w-full h-auto ">
+                <img src="./assets/t2-2.png" class="w-full h-auto" />
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Players can test their speed-solving skills in various difficulty
-            levels. The fastest completion time for each mode will be recorded.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                  Players can test their speed-solving skills in various
+                  difficulty levels. The fastest completion time for each mode
+                  will be recorded.
                 </div>
               </div>
               <!--btn-->
-              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+              <div
+                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+              >
+                <button
+                  v-if="tutorial > 0"
+                  @click="beforePage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  previous page
+                </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+                <button
+                  v-if="tutorial < 4"
+                  @click="nextPage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  next page
+                </button>
               </div>
             </div>
           </div>
 
           <div class="box-wrapper" v-show="tutorial == 4">
-            <div class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12">
+            <div
+              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
+            >
               <!--img-->
               <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-2.png" class="w-full h-auto ">
+                <img src="./assets/t2-2.png" class="w-full h-auto" />
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">players have access to a total of 3 hints for each level in all mode
-            to assist them in solving challenging puzzles.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                  players have access to a total of 3 hints for each level in
+                  all mode to assist them in solving challenging puzzles.
                 </div>
               </div>
               <!--btn-->
-              <div class="button-group self-start md:self-end flex flex-row  md:flex-col mr-2">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn btn-primary mb-2 m-3">previous page</button>
+              <div
+                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+              >
+                <button
+                  v-if="tutorial > 0"
+                  @click="beforePage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  previous page
+                </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn btn-primary mb-2 m-3">next page</button>
+                <button
+                  v-if="tutorial < 4"
+                  @click="nextPage"
+                  class="btn btn-primary mb-2 m-3"
+                >
+                  next page
+                </button>
               </div>
             </div>
           </div>
 
-
           <!--home button-->
-          <button class="btn btn-outline btn-primary" type="button" @click="homePage">
+          <button
+            class="btn btn-outline btn-primary"
+            type="button"
+            @click="homePage"
+          >
             <img src="./assets/Home_icon_green.png" class="h-7" />
             BACK HOME
           </button>
         </div>
-
       </div>
     </section>
 
@@ -568,7 +659,12 @@ function resetMiss() {
               <span v-if="mins < 10">0</span>{{ mins }} :
               <span v-if="secs < 10">0</span>{{ secs }}
             </div>
-            <button v-if="!start" class="btn btn-outline btn-primary" type="button" @click="startGame()">
+            <button
+              v-if="!start"
+              class="btn btn-outline btn-primary"
+              type="button"
+              @click="startGame()"
+            >
               <img src="./assets/play-button.png" class="h-7" />
               Start
             </button>
@@ -581,9 +677,21 @@ function resetMiss() {
         <!--Table-->
         <div class="join flex justify-center">
           <table class="hanjie-table">
-            <tr v-for="block in blocks" :key="block.row" :id="block.row" :style="checkTR(block.row)">
-              <td ref="playCellElements" :class="checkHeaderStyle(col + block.row)" v-for="col in block.column"
-                :key="col + block.row" :id="col + block.row" @click="addClickers" @click.right="mark">
+            <tr
+              v-for="block in blocks"
+              :key="block.row"
+              :id="block.row"
+              :style="checkTR(block.row)"
+            >
+              <td
+                ref="playCellElements"
+                :class="checkHeaderStyle(col + block.row)"
+                v-for="col in block.column"
+                :key="col + block.row"
+                :id="col + block.row"
+                @click="addClickers"
+                @click.right="mark"
+              >
                 {{ checkHeader(col + block.row) }}
               </td>
             </tr>
@@ -593,17 +701,27 @@ function resetMiss() {
         <div class="flex justify-between m-5">
           <!-- Hint -->
           <div class="hint order-1 flex flex-row">
-            <button :class="hintsLeft > 0 && hintable
-              ? 'btn btn-outline btn-accent m-1'
-              : 'btn btn-active btn-ghost cursor-not-allowed m-1'
-              " :disable="hintsLeft > 0 ? false : true" @click="genHint">
+            <button
+              :class="
+                hintsLeft > 0 && hintable
+                  ? 'btn btn-outline btn-accent m-1'
+                  : 'btn btn-active btn-ghost cursor-not-allowed m-1'
+              "
+              :disable="hintsLeft > 0 ? false : true"
+              @click="genHint"
+            >
               Get hint: {{ hintsLeft }}
             </button>
-            <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
+            <div
+              v-if="hints.length > 0"
+              class="px-4 py-2 m-2 font-medium"
+            ></div>
           </div>
           <!--Miss-->
           <div class="missed order-last">
-            <button class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</button>
+            <button class="btn m-1 cursor-not-allowed">
+              Missed : {{ missed }}
+            </button>
           </div>
         </div>
 
@@ -632,11 +750,16 @@ function resetMiss() {
 
               <div v-show="!newBestTime">
                 <h3 class="text-2xl">BE FASTER</h3>
-                <button class="btn btn-outline btn-primary" type="button" @click="() => {
-                  gamePage()
-                  resetMiss()
-                }
-                  ">
+                <button
+                  class="btn btn-outline btn-primary"
+                  type="button"
+                  @click="
+                    () => {
+                      gamePage()
+                      resetMiss()
+                    }
+                  "
+                >
                   <img src="./assets/play-button.png" class="h-7" />
                   Try again
                 </button>
@@ -646,7 +769,11 @@ function resetMiss() {
                 <p>YOU ARE THE NEW RECORD</p>
               </div>
               <div>
-                <button class="btn btn-outline btn-primary" type="button" @click="homePage">
+                <button
+                  class="btn btn-outline btn-primary"
+                  type="button"
+                  @click="homePage"
+                >
                   <img src="./assets/Home_icon_green.png" class="h-7" />
                   BACK HOME
                 </button>
@@ -657,13 +784,32 @@ function resetMiss() {
       </div>
     </section>
   </div>
+
+  <section id="failsPage">
+    <!--main tutorial-->
+    <div class="tutorial" v-if="show === 4">
+      <div class="tutorials py-2 m-2 center">
+        <h1 class="text-center text-2xl font-bold">tutorials</h1>
+
+        <div class="tuto">
+          <button
+            class="btn btn-outline btn-primary"
+            type="button"
+            @click="homePage"
+          >
+            <img src="./assets/Home_icon_green.png" class="h-7" />
+            BACK HOME
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
 .gamePlay {
   font-family: Arial, Helvetica, sans-serif;
 }
-
 
 .pic {
   border: rgb(209, 205, 205) solid 3px;
@@ -694,7 +840,6 @@ function resetMiss() {
 .tutorials {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 
 .hanjie {
   border-collapse: collapse;
