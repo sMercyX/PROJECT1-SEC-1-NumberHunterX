@@ -1,7 +1,7 @@
 [
   {
     "puzzle": 11,
-    "correctBlock": [
+    "correctBlocks": [
       "g7",
       "f6",
       "d7",
@@ -110,7 +110,7 @@
   },
   {
     "puzzle": 22,
-    "correctBlock": [
+    "correctBlocks": [
       "a1",
       "b1",
       "b2",
@@ -219,7 +219,7 @@
   },
   {
     "puzzle": 33,
-    "correctBlock": [
+    "correctBlocks": [
       "a2",
       "b2",
       "c2",
@@ -331,7 +331,7 @@
   },
   {
     "puzzle": 44,
-    "correctBlock": [
+    "correctBlocks": [
       "a1",
       "a2",
       "a3",
@@ -431,7 +431,7 @@
   },
   {
     "puzzle": 55,
-    "correctBlock": [
+    "correctBlocks": [
       "g1",
       "g2",
       "g6",
