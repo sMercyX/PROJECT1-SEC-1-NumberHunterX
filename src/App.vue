@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw } from 'vue'
+import { ref, toRaw, watchEffect } from 'vue'
 
 const start = ref(false)
 
@@ -37,7 +37,7 @@ const genBlock = () => {
 // genBlock()
 
 //checked blocks array
-const checked = []
+const checked = ref([])
 const win = ref(false)
 ///times
 let mins = ref(0)
@@ -68,8 +68,8 @@ const hardMode = () => {
   gamePage()
 }
 
-//correctBlock stores block that when click its will change to correct color
-let correctBlock = []
+//correctBlockss stores block that when click its will change to correct color
+let correctBlocks = []
 //headerNums stores id and result of block of table head
 let headerNums = []
 
@@ -130,7 +130,7 @@ function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
 
   console.log(randomlv[currentLv.value])
-  correctBlock = randomlv[currentLv.value].correctBlock
+  correctBlocks = randomlv[currentLv.value].correctBlocks
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true
   timer(true)
@@ -167,7 +167,7 @@ function toRawBlock(id) {
 
 //reset block style
 const resetBlockStyles = () => {
-  checked.forEach((id) => {
+  checked.value.forEach((id) => {
     toRawBlock(id).style.backgroundColor = ''
     toRawBlock(id).textContent = ''
   })
@@ -179,7 +179,7 @@ const resetBlockStyles = () => {
 }
 function resetGame() {
   start.value = false
-  checked.splice(0)
+  checked.value.splice(0)
   win.value = false
   clearInterval(timerInterval)
   hints.value = []
@@ -251,56 +251,41 @@ function checkNewBestTime() {
 function resetNewBestTime() {
   newBestTime.value = false
 }
-function checkHintable() {
-  let checkedCorrect = checked.filter((tile) => {
-    return correctBlock.includes(tile)
-  })
-  //แก้ให้ตัวที่ถูกmarkสามารถกดhintทับลงไปได้เพื่อแก้bug
-
-  if (hintsLeft.value <= 0) {
-    hintable.value = false
-  }
-  if (checkedCorrect.length === correctBlock.length) {
-    hintable.value = false
-  }
-}
 
 const playCellElements = ref(null)
 const genHint = () => {
+  let hintableBlocks = correctBlocks.filter((correctBlocks) => {
+    return (
+      !checked.value.includes(correctBlocks) &&
+      !marked.map((markedBlock) => markedBlock.id).includes(correctBlocks)
+    )
+  })
   let randomIndex
-  if (hintsLeft.value <= 0 || !hintable.value) {
+  if (hintsLeft.value <= 0 || !hintable.value || hintableBlocks.length === 0) {
     return
   }
   while (true) {
-    randomIndex = Math.floor(Math.random() * correctBlock.length)
-    let correctButMarkedCell = marked.filter((markedDom) =>
-      correctBlock.includes(markedDom.id)
-    )
-    console.log(correctButMarkedCell)
-    if (
-      correctButMarkedCell.length ===
-        correctBlock.length -
-          checked.filter((tile) => correctBlock.includes(tile)).length ||
-      correctButMarkedCell
-        .map((markedDom) => markedDom.id)
-        .includes(correctBlock[randomIndex])
-    ) {
-      return
-    } else if (
-      !checked.includes(correctBlock[randomIndex]) && //หาตัวที่ยังไม่ถูกกด
-      !hints.value.includes(correctBlock[randomIndex]) //และไม่ซ้ำกับ hint ที่กดไปแล้ว
-    ) {
-      console.log(correctBlock[randomIndex])
-      hintsLeft.value--
-      hints.value.push(correctBlock[randomIndex])
-      let press4U = toRawBlock(correctBlock[randomIndex])
-      press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
-      checkHintable()
-      // checkWin()
-      return
-    }
+    console.log(hintableBlocks)
+    randomIndex = Math.floor(Math.random() * hintableBlocks.length)
+    hintsLeft.value--
+    hints.value.push(hintableBlocks[randomIndex])
+    let press4U = toRawBlock(hintableBlocks[randomIndex])
+    press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
+    // checkWin()
+    hintableBlocks = []
+    return
   }
 }
+
+//แก้ให้ตัวที่ถูกmarkสามารถกดhintทับลงไปได้เพื่อแก้bug
+watchEffect(() => {
+  let checkedCorrect = checked.value.filter((tile) => {
+    return correctBlocks.includes(tile)
+  })
+  if (hintsLeft.value <= 0 || checkedCorrect.length === correctBlocks.length) {
+    hintable.value = false
+  }
+})
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
@@ -331,21 +316,19 @@ const addClickers = (event) => {
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
   let targetClasses = targetTile.className.split(' ') //split class into array //unused
-  if (checked.includes(id) || marked.includes(targetTile)) {
+  if (checked.value.includes(id) || marked.includes(targetTile)) {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
-    const blockColor = correctBlock.includes(id) ? correct : unCorrect
+    const blockColor = correctBlocks.includes(id) ? correct : unCorrect
     const targetBlock = targetTile
     targetBlock.style.backgroundColor = blockColor
     if (blockColor === unCorrect) {
       targetBlock.textContent = 'x'
       missed.value++
     }
-    checked.push(id)
-    if (blockColor === correct) {
-      checkHintable()
-    }
+    checked.value.push(id)
+
     if (checkWin()) {
       timer(false)
     }
@@ -369,7 +352,7 @@ function mark(event) {
   }
   let targetTile = event.target //tile clicked
   let targetTileId = targetTile.id //clicked tile id
-  if (checked.includes(targetTileId)) {
+  if (checked.value.includes(targetTileId)) {
     return
   }
   let markId
@@ -394,8 +377,8 @@ function mark(event) {
 }
 function checkWin() {
   let winTemp = true
-  correctBlock.forEach((mustCheckCell) => {
-    if (!checked.includes(mustCheckCell)) {
+  correctBlocks.forEach((mustCheckCell) => {
+    if (!checked.value.includes(mustCheckCell)) {
       winTemp = false
     }
   })
