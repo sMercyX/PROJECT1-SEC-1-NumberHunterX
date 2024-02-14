@@ -105,6 +105,7 @@ function beforePage() {
 function homePage() {
   show.value = 0
   missed.value = 0
+  tutorial.value = 0
 }
 function tutorialPage() {
   show.value = 1
@@ -247,7 +248,7 @@ function checkNewBestTime() {
 function resetNewBestTime() {
   newBestTime.value = false
 }
-function checkHintable() {
+function checkHintTable() {
   let checkedCorrect = checked.filter((tile) => {
     return correctBlock.includes(tile)
   })
@@ -278,7 +279,7 @@ const genHint = () => {
 
       let press4U = toRawBlock(correctBlock[randomIndex])
       press4U.dispatchEvent(new Event("click")) //addClickers จำลอง
-      checkHintable()
+      checkHintTable()
       // checkWin()
       return
     }
@@ -287,6 +288,7 @@ const genHint = () => {
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
+
   if (id.includes("0")) return `${halfBlock} ${noneBorder}`
   if (id.includes("t")) return `${halfBlock} ${noneBorder}`
   if (id.includes("99")) return `${blockStyle} ${noneBorder}`
@@ -327,7 +329,7 @@ const addClickers = (event) => {
     }
     checked.push(id)
     if (blockColor === correct) {
-      checkHintable()
+      checkHintTable()
     }
     if (checkWin()) {
       timer(false)
@@ -392,22 +394,26 @@ function resetMiss() {
 
 <template>
   <div class="gamePlay">
-    <div class="header pb-2 flex  justify-center py-3">
-      <div class="p-2 mb-8 text-4xl font-extrabold">NUMBER HUNTER</div>
+    <div class="header p-2 flex  justify-center py-3">
+      <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
     </div>
 
     <section id="homePage">
-      <div v-show="show == 0" class="flex justify-center gap-3">
-        <button @click="tutorialPage" class="btn btn-success text-white">
-          Tutorial
-        </button>
-        <!-- <button @click="gamePage" class="btn btn-success text-white">
-        Play Game
-      </button> -->
-        <button @click="ezMode" class="btn btn-primary text-white">
-          Easy mode</button><button @click="hardMode" class="btn btn-error text-white">
-          Hard mode
-        </button>
+      <div v-show="show == 0" class=" flex flex-col items-center justify-center pt-56">
+        <div class="mode mb-5">
+          <button @click="ezMode"
+            class="mx-5 btn bg-blue-600 hover:bg-blue-900 text-white  font-extrabold text-xl font-sans"> Easy mode
+          </button>
+
+          <button @click="hardMode"
+            class="mx-5 btn bg-red-600 hover:bg-red-900 text-white font-extrabold text-xl font-sans"> Hard mode
+          </button>
+        </div>
+        <div class="tutorial flex mt-5">
+          <button @click="tutorialPage" class="mx-5 btn hover:bg-yellow-600 text-black font-extrabold text-xl font-sans">
+            Tutorial
+          </button>
+        </div>
       </div>
     </section>
 
@@ -450,8 +456,8 @@ function resetMiss() {
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
                 <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Each number represents a
-            consecutive group of filled squares, and the numbers are separated
-            by at least one blank square.
+                  consecutive group of filled squares, and the numbers are separated
+                  by at least one blank square.
                 </div>
               </div>
               <!--btn-->
@@ -472,8 +478,8 @@ function resetMiss() {
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
                 <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">The order of the numbers corresponds
-            to the order of the groups in the row or column. Additionally,
-            each game mode comes with a timeer to challenge players further.
+                  to the order of the groups in the row or column. Additionally,
+                  each game mode comes with a timeer to challenge players further.
                 </div>
               </div>
               <!--btn-->
@@ -493,8 +499,9 @@ function resetMiss() {
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Players can test their speed-solving skills in various difficulty
-            levels. The fastest completion time for each mode will be recorded.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">Players can test their speed-solving skills
+                  in various difficulty
+                  levels. The fastest completion time for each mode will be recorded.
                 </div>
               </div>
               <!--btn-->
@@ -514,8 +521,9 @@ function resetMiss() {
               </div>
               <!--text-->
               <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">players have access to a total of 3 hints for each level in all mode
-            to assist them in solving challenging puzzles.
+                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">players have access to a total of 3 hints
+                  for each level in all mode
+                  to assist them in solving challenging puzzles.
                 </div>
               </div>
               <!--btn-->
@@ -529,20 +537,25 @@ function resetMiss() {
 
 
           <!--home button-->
-          <button class="btn btn-outline btn-primary" type="button" @click="homePage">
-            <img src="./assets/Home_icon_green.png" class="h-7" />
-            BACK HOME
+
+          <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+              <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+            </svg>
+            <span class="text-white">Home</span>
           </button>
+
         </div>
 
       </div>
     </section>
 
     <section id="gamePage">
-      <div class="container p-10 m-auto w-full" v-if="show == 2">
+      <div class="container px-10 py-3 m-auto w-full" v-if="show == 2">
         <section class="flex items-center justify-between">
-          <div>
-            <div id="bestTimePlayed" class="flex">
+          <div class="text-center align-middle shadow-md w-36 bg-base-200 p-2 py-4 font-sans font-semibold order-first"
+            style="border-radius: 9px;">
+            <div id="bestTimePlayed" class="flex ">
               Best Time :
               <p v-if="bestTime.sec != undefined">
                 <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
@@ -560,9 +573,18 @@ function resetMiss() {
               Start
             </button>
           </div>
-          <button v-if="win" class="join-item btn" @click="nextLevel">
-            NEXT LEVEL
-          </button>
+          <div class="text-center shadow-md w-36 bg-base-200 p-2 py-4 font-sans font-semibold"
+            style="border-radius: 9px;">
+            <!--level-->
+            <div class="level">
+              <div class="font-sans font-bold">Level {{ currentLv + 1 }}</div>
+            </div>
+            <button v-if="win" class="btn bg-green-500 text-white hover:bg-green-700" @click="nextLevel">
+              NEXT LEVEL
+            </button>
+          </div>
+
+
         </section>
 
         <!--Table-->
@@ -577,25 +599,34 @@ function resetMiss() {
           </table>
         </div>
 
-        <div class="flex justify-between m-5">
+        <div class="flex justify-between m-3 items-center">
           <!-- Hint -->
-          <div class="hint order-1 flex flex-row">
+          <div class="hint flex flex-row order-first">
             <button :class="hintsLeft > 0 && hintable
-              ? 'btn btn-outline btn-accent m-1'
-              : 'btn btn-active btn-ghost cursor-not-allowed m-1'
+              ? 'btn border-none bg-yellow-400 hover:bg-yellow-200 text-black m-1'
+              : 'btn border-none bg-yellow-400 hover:bg-gray-600 cursor-not-allowed m-1'
               " :disable="hintsLeft > 0 ? false : true" @click="genHint">
               Get hint: {{ hintsLeft }}
             </button>
-            <div v-if="hints.length > 0" class="px-4 py-2 m-2 font-medium"></div>
           </div>
           <!--Miss-->
           <div class="missed order-last">
-            <button class="btn m-1 cursor-not-allowed">Missed : {{ missed }}</button>
+            <button class="btn bg-red-500 text-white hover:bg-red-950 m-1 cursor-not-allowed">Missed : {{ missed
+            }}</button>
           </div>
         </div>
 
-        <div class="join pagination flex justify-center">
-          <button class="join-item btn">Level {{ currentLv + 1 }}</button>
+        <div class=" pagination flex flex-col items-center">
+          <div>
+            <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+                <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+              </svg>
+              <span class="text-white">Home</span>
+            </button>
+          </div>
+
+
         </div>
       </div>
     </section>
@@ -633,9 +664,11 @@ function resetMiss() {
                 <p>YOU ARE THE NEW RECORD</p>
               </div>
               <div>
-                <button class="btn btn-outline btn-primary" type="button" @click="homePage">
-                  <img src="./assets/Home_icon_green.png" class="h-7" />
-                  BACK HOME
+                <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+                    <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+                  </svg>
+                  <span class="text-white">Home</span>
                 </button>
               </div>
             </div>
@@ -740,4 +773,4 @@ function resetMiss() {
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
-</style>
+</style>                                        
