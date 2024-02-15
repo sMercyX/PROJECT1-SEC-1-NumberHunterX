@@ -252,18 +252,19 @@ function checkNewBestTime() {
   } else newBestTime.value = false
 }
 
+
 function nextLevel() {
-  currentLv.value++
-  if (currentLv.value < level.length) {
-    resetBlockStyles()
-    resetGame()
-    resetHint()
-    startGame()
-    win.value = false
+  currentLv.value++;
+  if (currentLv.value < randomlv.length) {
+    resetBlockStyles();
+    resetGame();
+    resetHint();
+    startGame();
+    win.value = false;
   } else {
-    checkNewBestTime() //set bestTimeUsed to save.value
-    localStorage.setItem(mode, JSON.stringify(save.value))
-    modalPage()
+    checkNewBestTime(); //set bestTimeUsed to save.value
+    localStorage.setItem(mode, JSON.stringify(save.value));
+    modalPage();
   }
 }
 
@@ -695,7 +696,7 @@ watch(checked.value, () => {
     <section id="modal">
       <div class="modal-container" v-show="show == 3">
         <div id="" class="min-h-screen">
-          <div class="hero-content text-center">
+          <div class=" text-center">
             <div class="max-w-md">
               <h1 class="text-3xl font-bold py-8">Something</h1>
               <p class="">
