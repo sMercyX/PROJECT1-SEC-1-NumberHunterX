@@ -62,6 +62,7 @@ const randomlv = []
 
 const playCellElements = ref(null)
 
+let healthStatus
 const genBlock = () => {
   blocks.value = []
   //rows stores row name of table
@@ -254,7 +255,7 @@ function checkNewBestTime() {
 
 function nextLevel() {
   currentLv.value++
-  if (currentLv.value < level.length) {
+  if (currentLv.value < randomlv.length) {
     resetBlockStyles()
     resetGame()
     resetHint()
@@ -291,6 +292,17 @@ watchEffect(() => {
   })
   if (hintsLeft.value <= 0 || checkedCorrect.length === correctBlocks.length) {
     hintable.value = false
+  }
+})
+watchEffect(() => {
+  if (missed.value / fails.value < 0.25) {
+    healthStatus = 'bg-green-300'
+  } else if (missed.value / fails.value < 0.5) {
+    healthStatus = 'bg-yellow-400'
+  } else if (missed.value / fails.value < 0.75) {
+    healthStatus = 'bg-orange-400'
+  } else {
+    healthStatus = 'bg-red-400'
   }
 })
 
@@ -367,10 +379,18 @@ watch(checked.value, () => {
         <!-- <button @click="gamePage" class="btn btn-success text-white">
         Play Game
       </button> -->
-        <button @click="ezMode" class="btn btn-primary text-white">
-          Easy mode</button
-        ><button @click="hardMode" class="btn btn-error text-white">
-          Hard mode
+        <button
+          @click="ezMode"
+          id="easymodebtn"
+          class="btn btn-primary text-white w-30"
+        >
+          <span>Easy mode</span></button
+        ><button
+          @click="hardMode"
+          id="hardmodebtn"
+          class="btn btn-error text-white w-30"
+        >
+          <span>Hard mode</span>
         </button>
       </div>
     </section>
@@ -646,11 +666,11 @@ watch(checked.value, () => {
 
         <div class="flex justify-between m-5">
           <!-- Hint -->
-          <div class="hint order-1 flex flex-row">
+          <div class="hint order-1 flex flex-row mt-2">
             <button
               :class="
                 hintsLeft > 0 && hintable
-                  ? 'btn btn-outline btn-accent m-1'
+                  ? 'btn btn-outline btn-warning m-1'
                   : 'btn btn-active btn-ghost cursor-not-allowed m-1'
               "
               :disable="hintsLeft > 0 ? false : true"
@@ -658,21 +678,17 @@ watch(checked.value, () => {
             >
               Get hint: {{ hintsLeft }}
             </button>
-            <div
-              v-if="hints.length > 0"
-              class="px-4 py-2 m-2 font-medium"
-            ></div>
           </div>
           <!--Miss-->
           <div class="missed order-last">
-            <div class="m-1 cursor-default">
+            <div class="m-1 rounded-2xl p-4 font-bold" :class="healthStatus">
               Missed : {{ missed }}/{{ fails }}
               <div
                 class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
               >
                 <div
                   class="bg-teal-500 h-2.5 rounded-full"
-                  :style="` width: ${(1 - missed / fails) * 100}% `"
+                  :style="{ width: (1 - missed / fails) * 100 + '%' }"
                 ></div>
               </div>
             </div>
@@ -695,7 +711,7 @@ watch(checked.value, () => {
     <section id="modal">
       <div class="modal-container" v-show="show == 3">
         <div id="" class="min-h-screen">
-          <div class="hero-content text-center">
+          <div class="text-center">
             <div class="max-w-md">
               <h1 class="text-3xl font-bold py-8">Something</h1>
               <p class="">
@@ -861,5 +877,31 @@ watch(checked.value, () => {
   /* White background */
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#hardmodebtn {
+  width: 110px;
+  height: 45px;
+}
+#hardmodebtn:hover span {
+  display: none;
+}
+#hardmodebtn:hover:after {
+  transition: 3s;
+  color: white;
+  font-size: 15px;
+  content: '7 x 7 Table';
+}
+#easymodebtn {
+  width: 110px;
+  height: 45px;
+}
+#easymodebtn:hover span {
+  display: none;
+}
+#easymodebtn:hover:after {
+  transition: 3s;
+  color: white;
+  font-size: 15px;
+  content: '5 x 5 Table';
 }
 </style>
