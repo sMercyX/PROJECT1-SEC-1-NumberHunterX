@@ -1,10 +1,19 @@
 <script setup>
+<<<<<<< HEAD
 import { ref, toRaw, watchEffect } from 'vue'
+=======
+import { ref, toRaw, watchEffect, watch } from 'vue'
+import easyLevel from './easyLevel.json'
+import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
+import tableSize from './tableSize.json'
+
+let level = [...easyLevel]
+>>>>>>> yadajen
 
 const start = ref(false)
 
 //hint
-const hintsLeft = ref(300)
+const hintsLeft = ref(3)
 let hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
@@ -18,13 +27,49 @@ const unCorrect = '#f87171'
 
 let gameSize = ref(0) // 0, 1
 const missed = ref(0)
+<<<<<<< HEAD
 let fails
+=======
+let fails = ref(0)
+>>>>>>> yadajen
 
-import tableSize from './tableSize.json'
 //block stores row and column of table
 let blocks = ref([])
 let rows //add 2 row for show header number(t,0)
 let columns //add 2 columns for show header number(0) and clear block(99)
+
+//checked blocks array
+const checked = ref([])
+const win = ref(false)
+
+///times
+let mins = ref(0)
+let secs = ref(0)
+
+let timeUsed = ref(0)
+let timerInterval
+
+let newBestTime = ref(false)
+
+const currentLv = ref(0)
+const marked = []
+
+let save = ref()
+let bestTime = ref({})
+
+let tutorial = ref(0)
+let mode = 'easyMode'
+let show = ref(0)
+
+//correctBlockss stores block that when click its will change to correct color
+let correctBlocks = []
+//headerNums stores id and result of block of table head
+let headerNums = []
+
+const randomlv = []
+
+const playCellElements = ref(null)
+
 const genBlock = () => {
   blocks.value = []
   //rows stores row name of table
@@ -34,6 +79,7 @@ const genBlock = () => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
+<<<<<<< HEAD
 // genBlock()
 
 //checked blocks array
@@ -54,28 +100,39 @@ let level = [...easyLevel]
 const ezMode = () => {
   gameSize.value = 0
   fails = 5
+=======
+
+const ezMode = () => {
+  gameSize.value = 0
+  fails.value = 5
+>>>>>>> yadajen
   mode = 'easyMode'
   level = [...easyLevel]
-  console.log(mode)
   gamePage()
 }
 const hardMode = () => {
   gameSize.value = 1
+<<<<<<< HEAD
   fails = 10
+=======
+  fails.value = 10
+>>>>>>> yadajen
   mode = 'hardMode'
   level = [...hardLevel]
-  console.log(mode)
   gamePage()
 }
 
+<<<<<<< HEAD
 //correctBlockss stores block that when click its will change to correct color
 let correctBlocks = []
 //headerNums stores id and result of block of table head
 let headerNums = []
 
 const randomlv = []
+=======
+>>>>>>> yadajen
 const randomLevel = () => {
-  randomlv.splice(0)
+  randomlv.splice(0) //should reset when start game
   let randomIndex
   while (randomlv.length < 5) {
     randomIndex = Math.floor(Math.random() * level.length)
@@ -87,9 +144,9 @@ const randomLevel = () => {
       randomlv.push(level[randomIndex])
     }
   }
-  console.log(randomlv)
 }
 
+<<<<<<< HEAD
 // randomLevel()
 let tutorial = ref(0)
 let mode = 'easyMode'
@@ -102,6 +159,77 @@ function nextPage() {
 function beforePage() {
   tutorial.value--
   console.log(tutorial.value)
+=======
+function nextPage() {
+  tutorial.value++
+}
+function beforePage() {
+  tutorial.value--
+}
+function resetHint() {
+  hintsLeft.value = 300
+}
+function resetMiss() {
+  missed.value = 0
+}
+function resetNewBestTime() {
+  newBestTime.value = false
+}
+
+function toRawBlock(id) {
+  return toRaw(playCellElements.value).find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
+}
+
+//reset block style
+const resetBlockStyles = () => {
+  checked.value.forEach((id) => {
+    toRawBlock(id).style.backgroundColor = ''
+    toRawBlock(id).textContent = ''
+  })
+  //marked is store event.target that no need to used toRawBlock() to get their event from playCellElements
+  marked.forEach((id) => {
+    id.style.backgroundColor = ''
+    id.textContent = ''
+  })
+}
+function resetGame() {
+  start.value = false
+  checked.value.splice(0)
+  win.value = false
+  clearInterval(timerInterval)
+  hints.value = []
+  marked.splice(0)
+  headerNums = []
+  hintable.value = false
+}
+function resetTime() {
+  currentLv.value = 0
+  mins.value = 0
+  secs.value = 0
+  timeUsed.value = 0
+  // clearInterval(timerInterval)
+}
+
+function calTimeToMin(time) {
+  let min = Math.floor(time / 60)
+  let sec = time % 60
+  return { min, sec }
+}
+
+function setBestTime() {
+  bestTime.value = calTimeToMin(save.value)
+}
+
+function getSave() {
+  save.value = localStorage.getItem(mode)
+  if (save.value === null || save.value === undefined) {
+    save.value = 0
+    setBestTime()
+  } else {
+    save.value = JSON.parse(save.value)
+    setBestTime()
+  }
+>>>>>>> yadajen
 }
 function homePage() {
   show.value = 0
@@ -113,23 +241,55 @@ function tutorialPage() {
   console.log(tutorial.value)
 }
 function gamePage() {
+  resetTime()
+  resetGame()
+  resetHint()
+  resetNewBestTime()
+  resetMiss()
   genBlock()
   randomLevel()
-  show.value = 2
-  hintsLeft.value = 300
-  resetNewBestTime()
   getSave()
+  show.value = 2
 }
 function modalPage() {
   show.value = 3
 }
+<<<<<<< HEAD
 
 let timerInterval
+=======
+function failPage() {
+  show.value = 4
+}
+//checkHeaderStyle is use for checking that block is header or not to custom style
+const checkHeaderStyle = (id) => {
+  if (id.includes('0')) return `${halfBlock} ${noneBorder}`
+  if (id.includes('t')) return `${halfBlock} ${noneBorder}`
+  if (id.includes('99')) return `${blockStyle} ${noneBorder}`
+  return blockStyle
+}
+>>>>>>> yadajen
 
+const checkTR = (id) => {
+  if (id.includes('0'))
+    return `
+  height: 30px;`
+  if (id.includes('t'))
+    return `
+  height: 30px;`
+}
+
+const checkHeader = (id) => {
+  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
+  return index >= 0 ? headerNums[index].result : ''
+}
 function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
+<<<<<<< HEAD
 
   console.log(randomlv[currentLv.value])
+=======
+>>>>>>> yadajen
   correctBlocks = randomlv[currentLv.value].correctBlocks
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true
@@ -161,6 +321,7 @@ function timer(op) {
   }
 }
 
+<<<<<<< HEAD
 function toRawBlock(id) {
   return toRaw(playCellElements.value).find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
 }
@@ -242,17 +403,35 @@ function nextLevel() {
   }
 }
 let newBestTime = ref(false)
+=======
+>>>>>>> yadajen
 function checkNewBestTime() {
   if (save.value === 0 || timeUsed.value < save.value) {
     newBestTime.value = true
     save.value = timeUsed.value
   } else newBestTime.value = false
 }
+<<<<<<< HEAD
 function resetNewBestTime() {
   newBestTime.value = false
+=======
+
+function nextLevel() {
+  currentLv.value++
+  if (currentLv.value < level.length) {
+    resetBlockStyles()
+    resetGame()
+    resetHint()
+    startGame()
+    win.value = false
+  } else {
+    checkNewBestTime() //set bestTimeUsed to save.value
+    localStorage.setItem(mode, JSON.stringify(save.value))
+    modalPage()
+  }
+>>>>>>> yadajen
 }
 
-const playCellElements = ref(null)
 const genHint = () => {
   let hintableBlocks = correctBlocks.filter((correctBlocks) => {
     return (
@@ -265,6 +444,7 @@ const genHint = () => {
     return
   }
   while (true) {
+<<<<<<< HEAD
     console.log(hintableBlocks)
     randomIndex = Math.floor(Math.random() * hintableBlocks.length)
     hintsLeft.value--
@@ -273,11 +453,24 @@ const genHint = () => {
     press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
     // checkWin()
     hintableBlocks = []
+=======
+    randomIndex = Math.floor(Math.random() * hintableBlocks.length)
+    hintsLeft.value--
+    hints.value.push(hintableBlocks[randomIndex])
+
+    toRawBlock(hintableBlocks[randomIndex]).dispatchEvent(new Event('click')) //addClickers จำลอง
+
+    // let press4U = toRawBlock(hintableBlocks[randomIndex])
+    // press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
+>>>>>>> yadajen
     return
   }
 }
 
+<<<<<<< HEAD
 //แก้ให้ตัวที่ถูกmarkสามารถกดhintทับลงไปได้เพื่อแก้bug
+=======
+>>>>>>> yadajen
 watchEffect(() => {
   let checkedCorrect = checked.value.filter((tile) => {
     return correctBlocks.includes(tile)
@@ -286,6 +479,7 @@ watchEffect(() => {
     hintable.value = false
   }
 })
+<<<<<<< HEAD
 
 //checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
@@ -309,28 +503,43 @@ const checkHeader = (id) => {
   return index >= 0 ? headerNums[index].result : ''
 }
 
+=======
+
+>>>>>>> yadajen
 const addClickers = (event) => {
   if (!start.value || win.value) {
     return
   }
   let targetTile = event.target //tile clicked
   let id = targetTile.id //clicked tile id
+<<<<<<< HEAD
   let targetClasses = targetTile.className.split(' ') //split class into array //unused
+=======
+>>>>>>> yadajen
   if (checked.value.includes(id) || marked.includes(targetTile)) {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
     const blockColor = correctBlocks.includes(id) ? correct : unCorrect
+<<<<<<< HEAD
     const targetBlock = targetTile
     targetBlock.style.backgroundColor = blockColor
+=======
+    targetTile.style.backgroundColor = blockColor
+>>>>>>> yadajen
     if (blockColor === unCorrect) {
-      targetBlock.textContent = 'x'
+      targetTile.textContent = 'x'
       missed.value++
     }
     checked.value.push(id)
 
+<<<<<<< HEAD
     if (checkWin()) {
       timer(false)
+=======
+    if (missed.value >= fails.value) {
+      failPage()
+>>>>>>> yadajen
     }
     if (missed.value >= fails) {
       // console.log("you failed!!!")
@@ -347,14 +556,17 @@ const addClickers = (event) => {
 
 function mark(event) {
   event.preventDefault()
-  if (!start.value || win.value) {
-    return
-  }
+  if (!start.value || win.value) return
   let targetTile = event.target //tile clicked
   let targetTileId = targetTile.id //clicked tile id
+<<<<<<< HEAD
   if (checked.value.includes(targetTileId)) {
     return
   }
+=======
+  if (checked.value.includes(targetTileId)) return
+  //now markId is unused!!!!
+>>>>>>> yadajen
   let markId
   if (marked.includes(targetTile)) {
     targetTile.style.backgroundColor = ''
@@ -362,7 +574,6 @@ function mark(event) {
 
     marked.splice(unmarked, 1)
     markId = marked.map((mark) => mark.id)
-    console.log(markId)
   } else if (
     !marked.includes(targetTile) &&
     !targetTileId.includes('0') &&
@@ -371,13 +582,14 @@ function mark(event) {
   ) {
     marked.push(event.target)
     markId = marked.map((mark) => mark.id)
-    console.log(markId)
     targetTile.style.backgroundColor = 'grey'
   }
 }
-function checkWin() {
+watch(checked.value, () => {
+  //checked.value because checked is an array object requiring .value to have the watcher watch it
   let winTemp = true
   correctBlocks.forEach((mustCheckCell) => {
+<<<<<<< HEAD
     if (!checked.value.includes(mustCheckCell)) {
       winTemp = false
     }
@@ -388,6 +600,13 @@ function checkWin() {
 function resetMiss() {
   missed.value = 0
 }
+=======
+    if (!checked.value.includes(mustCheckCell)) winTemp = false
+  })
+  win.value = winTemp
+  if (win.value) timer(false)
+})
+>>>>>>> yadajen
 </script>
 
 <template>
@@ -703,7 +922,11 @@ function resetMiss() {
           <!--Miss-->
           <div class="missed order-last">
             <button class="btn m-1 cursor-not-allowed">
+<<<<<<< HEAD
               Missed : {{ missed }}
+=======
+              Missed : {{ missed }}/{{ fails }}
+>>>>>>> yadajen
             </button>
           </div>
         </div>
@@ -727,8 +950,13 @@ function resetMiss() {
               </p>
               <p>
                 Time Used :
+<<<<<<< HEAD
                 <span v-if="lastMin < 10">0</span>{{ lastMin }} :
                 <span v-if="lastSec < 10">0</span>{{ lastSec }}
+=======
+                <span v-if="mins < 10">0</span>{{ mins }} :
+                <span v-if="secs < 10">0</span>{{ secs }}
+>>>>>>> yadajen
               </p>
 
               <div v-show="!newBestTime">
@@ -768,7 +996,11 @@ function resetMiss() {
     </section>
   </div>
 
+<<<<<<< HEAD
   <section id="failsPage">
+=======
+  <section id="failPage">
+>>>>>>> yadajen
     <!--main tutorial-->
     <div class="tutorial" v-if="show === 4">
       <div class="tutorials py-2 m-2 center">
