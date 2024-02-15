@@ -665,7 +665,7 @@ watch(checked.value, () => {
           </div>
           <!--Miss-->
           <div class="missed order-last">
-            <button class="btn m-1 cursor-default">
+            <div class="m-1 cursor-default">
               Missed : {{ missed }}/{{ fails }}
               <div
                 class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
@@ -675,7 +675,7 @@ watch(checked.value, () => {
                   :style="` width: ${(1 - missed / fails) * 100}% `"
                 ></div>
               </div>
-            </button>
+            </div>
           </div>
           <!-- <div class="missed order-last">
             <button class="btn m-1 cursor-not-allowed">
@@ -685,7 +685,9 @@ watch(checked.value, () => {
         </div>
 
         <div class="join pagination flex justify-center">
-          <button class="join-item btn">Level {{ currentLv + 1 }}</button>
+          <div class="join-item pointer-events-none">
+            Level {{ currentLv + 1 }}
+          </div>
         </div>
       </div>
     </section>
