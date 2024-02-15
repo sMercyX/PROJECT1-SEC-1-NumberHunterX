@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw, watchEffect, watch } from 'vue'
+import { ref, watchEffect, watch } from 'vue'
 import easyLevel from './easyLevel.json'
 import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
 import tableSize from './tableSize.json'
@@ -89,9 +89,8 @@ const hardMode = () => {
 
 const randomLevel = () => {
   randomlv.splice(0) //should reset when start game
-  let randomIndex
   while (randomlv.length < 5) {
-    randomIndex = Math.floor(Math.random() * level.length)
+    let randomIndex = Math.floor(Math.random() * level.length)
     // level.splice(randomIndex, 1)
     if (randomlv.length == 0) randomlv.push(level[randomIndex])
     else if (
@@ -118,17 +117,16 @@ function resetNewBestTime() {
   newBestTime.value = false
 }
 
-function toRawBlock(id) {
-  return toRaw(playCellElements.value).find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
+function getPlayCellTarget(id) {
+  return playCellElements.value.find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
 }
 
 //reset block style
 const resetBlockStyles = () => {
   checked.value.forEach((id) => {
-    toRawBlock(id).style.backgroundColor = ''
-    toRawBlock(id).textContent = ''
+    getPlayCellTarget(id).style.backgroundColor = ''
+    getPlayCellTarget(id).textContent = ''
   })
-  //marked is store event.target that no need to used toRawBlock() to get their event from playCellElements
   marked.forEach((id) => {
     id.style.backgroundColor = ''
     id.textContent = ''
@@ -278,21 +276,15 @@ const genHint = () => {
       !marked.map((markedBlock) => markedBlock.id).includes(correctBlocks)
     )
   })
-  let randomIndex
   if (hintsLeft.value <= 0 || !hintable.value || hintableBlocks.length === 0) {
     return
   }
-  while (true) {
-    randomIndex = Math.floor(Math.random() * hintableBlocks.length)
-    hintsLeft.value--
-    hints.value.push(hintableBlocks[randomIndex])
-
-    toRawBlock(hintableBlocks[randomIndex]).dispatchEvent(new Event('click')) //addClickers จำลอง
-
-    // let press4U = toRawBlock(hintableBlocks[randomIndex])
-    // press4U.dispatchEvent(new Event('click')) //addClickers จำลอง
-    return
-  }
+  let randomIndex = Math.floor(Math.random() * hintableBlocks.length)
+  hintsLeft.value--
+  hints.value.push(hintableBlocks[randomIndex])
+  getPlayCellTarget(hintableBlocks[randomIndex]).dispatchEvent(
+    new Event('click')
+  ) //addClickers จำลอง
 }
 
 watchEffect(() => {
@@ -710,12 +702,7 @@ watch(checked.value, () => {
                 <button
                   class="btn btn-outline btn-primary"
                   type="button"
-                  @click="
-                    () => {
-                      gamePage()
-                      resetMiss()
-                    }
-                  "
+                  @click="gamePage"
                 >
                   <img src="./assets/play-button.png" class="h-7" />
                   Try again
@@ -756,6 +743,14 @@ watch(checked.value, () => {
           >
             <img src="./assets/Home_icon_green.png" class="h-7" />
             BACK HOME
+          </button>
+          <button
+            class="btn btn-outline btn-primary"
+            type="button"
+            @click="gamePage"
+          >
+            <img src="./assets/play-button.png" class="h-7" />
+            Try again
           </button>
         </div>
       </div>
