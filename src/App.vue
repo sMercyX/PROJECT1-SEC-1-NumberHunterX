@@ -10,7 +10,7 @@ const start = ref(false)
 
 //hint
 const hintsLeft = ref(3)
-let hints = ref([])
+const hints = ref([])
 let hintable = ref(false)
 // const timer = ref(0)
 
@@ -91,7 +91,6 @@ const randomLevel = () => {
   randomlv.splice(0) //should reset when start game
   while (randomlv.length < 5) {
     let randomIndex = Math.floor(Math.random() * level.length)
-    // level.splice(randomIndex, 1)
     if (randomlv.length == 0) randomlv.push(level[randomIndex])
     else if (
       !randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle) //หาตัวที่ยังไม่ถูกสุ่ม
@@ -121,7 +120,6 @@ function getPlayCellTarget(id) {
   return playCellElements.value.find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
 }
 
-//reset block style
 const resetBlockStyles = () => {
   checked.value.forEach((id) => {
     getPlayCellTarget(id).style.backgroundColor = ''
@@ -137,7 +135,7 @@ function resetGame() {
   checked.value.splice(0)
   win.value = false
   clearInterval(timerInterval)
-  hints.value = []
+  hints.value.splice(0)
   marked.splice(0)
   headerNums = []
   hintable.value = false
@@ -358,10 +356,9 @@ watch(checked.value, () => {
 
 <template>
   <div class="gamePlay">
-    <div class="header pb-2 flex justify-center py-3">
-      <div class="p-2 mb-8 text-4xl font-extrabold">NUMBER HUNTER</div>
+    <div class="header px-2 flex justify-center py-3 text-4xl font-extrabold">
+      NUMBER HUNTER
     </div>
-
     <section id="homePage">
       <div v-show="show == 0" class="flex justify-center gap-3">
         <button @click="tutorialPage" class="btn btn-success text-white">
@@ -592,7 +589,7 @@ watch(checked.value, () => {
     </section>
 
     <section id="gamePage">
-      <div class="container p-10 m-auto w-full" v-if="show == 2">
+      <div class="container m-auto w-full" v-if="show == 2">
         <section class="flex items-center justify-between">
           <div>
             <div id="bestTimePlayed" class="flex">
@@ -668,10 +665,23 @@ watch(checked.value, () => {
           </div>
           <!--Miss-->
           <div class="missed order-last">
+            <button class="btn m-1 cursor-default">
+              Missed : {{ missed }}/{{ fails }}
+              <div
+                class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
+              >
+                <div
+                  class="bg-teal-500 h-2.5 rounded-full"
+                  :style="` width: ${(1 - missed / fails) * 100}% `"
+                ></div>
+              </div>
+            </button>
+          </div>
+          <!-- <div class="missed order-last">
             <button class="btn m-1 cursor-not-allowed">
               Missed : {{ missed }}/{{ fails }}
             </button>
-          </div>
+          </div> -->
         </div>
 
         <div class="join pagination flex justify-center">
