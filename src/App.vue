@@ -23,7 +23,7 @@ const unCorrect = '#f87171'
 
 let gameSize = ref(0) // 0, 1
 const missed = ref(0)
-let fails
+let fails = ref(0)
 
 //block stores row and column of table
 let blocks = ref([])
@@ -74,14 +74,14 @@ const genBlock = () => {
 
 const ezMode = () => {
   gameSize.value = 0
-  fails = 5
+  fails.value = 5
   mode = 'easyMode'
   level = [...easyLevel]
   gamePage()
 }
 const hardMode = () => {
   gameSize.value = 1
-  fails = 10
+  fails.value = 10
   mode = 'hardMode'
   level = [...hardLevel]
   gamePage()
@@ -322,7 +322,7 @@ const addClickers = (event) => {
     }
     checked.value.push(id)
 
-    if (missed.value >= fails) {
+    if (missed.value >= fails.value) {
       failPage()
     }
   }
@@ -677,7 +677,7 @@ watch(checked.value, () => {
           <!--Miss-->
           <div class="missed order-last">
             <button class="btn m-1 cursor-not-allowed">
-              Missed : {{ missed }}
+              Missed : {{ missed }}/{{ fails }}
             </button>
           </div>
         </div>
@@ -742,7 +742,7 @@ watch(checked.value, () => {
     </section>
   </div>
 
-  <section id="failsPage">
+  <section id="failPage">
     <!--main tutorial-->
     <div class="tutorial" v-if="show === 4">
       <div class="tutorials py-2 m-2 center">
