@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw, watchEffect } from 'vue'
+import { ref, toRaw, watchEffect, watch } from 'vue'
 
 const start = ref(false)
 
@@ -56,7 +56,6 @@ const ezMode = () => {
   fails = 5
   mode = 'easyMode'
   level = [...easyLevel]
-  console.log(mode)
   gamePage()
 }
 const hardMode = () => {
@@ -64,7 +63,6 @@ const hardMode = () => {
   fails = 10
   mode = 'hardMode'
   level = [...hardLevel]
-  console.log(mode)
   gamePage()
 }
 
@@ -87,7 +85,6 @@ const randomLevel = () => {
       randomlv.push(level[randomIndex])
     }
   }
-  console.log(randomlv)
 }
 
 // randomLevel()
@@ -97,11 +94,9 @@ let show = ref(0)
 
 function nextPage() {
   tutorial.value++
-  console.log(tutorial.value)
 }
 function beforePage() {
   tutorial.value--
-  console.log(tutorial.value)
 }
 function homePage() {
   show.value = 0
@@ -110,7 +105,6 @@ function homePage() {
 }
 function tutorialPage() {
   show.value = 1
-  console.log(tutorial.value)
 }
 function gamePage() {
   genBlock()
@@ -128,8 +122,6 @@ let timerInterval
 
 function startGame() {
   //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
-
-  console.log(randomlv[currentLv.value])
   correctBlocks = randomlv[currentLv.value].correctBlocks
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true
@@ -265,7 +257,6 @@ const genHint = () => {
     return
   }
   while (true) {
-    console.log(hintableBlocks)
     randomIndex = Math.floor(Math.random() * hintableBlocks.length)
     hintsLeft.value--
     hints.value.push(hintableBlocks[randomIndex])
@@ -329,9 +320,9 @@ const addClickers = (event) => {
     }
     checked.value.push(id)
 
-    if (checkWin()) {
-      timer(false)
-    }
+    // if (checkWin()) {
+    //   timer(false)
+    // }
     if (missed.value >= fails) {
       // console.log("you failed!!!")
 
@@ -362,7 +353,6 @@ function mark(event) {
 
     marked.splice(unmarked, 1)
     markId = marked.map((mark) => mark.id)
-    console.log(markId)
   } else if (
     !marked.includes(targetTile) &&
     !targetTileId.includes('0') &&
@@ -371,11 +361,11 @@ function mark(event) {
   ) {
     marked.push(event.target)
     markId = marked.map((mark) => mark.id)
-    console.log(markId)
     targetTile.style.backgroundColor = 'grey'
   }
 }
-function checkWin() {
+watch(checked.value, () => {
+  //checked.value because checked is an array object requiring .value to have the watcher watch it
   let winTemp = true
   correctBlocks.forEach((mustCheckCell) => {
     if (!checked.value.includes(mustCheckCell)) {
@@ -383,8 +373,14 @@ function checkWin() {
     }
   })
   win.value = winTemp
-  return winTemp
-}
+  if (win.value) timer(false)
+})
+
+// watch(win, () => {
+//   console.log(win.value)
+//   console.log(timerInterval)
+//   if (win.value) timer(false)
+// })
 function resetMiss() {
   missed.value = 0
 }
