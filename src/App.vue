@@ -10,9 +10,7 @@ const start = ref(false)
 
 //hint
 const hintsLeft = ref(3)
-const hints = ref([])
 let hintable = ref(false)
-// const timer = ref(0)
 
 //style
 const blockStyle = 'hanjie-cell'
@@ -50,6 +48,7 @@ let save = ref()
 let bestTime = ref({})
 
 let tutorial = ref(0)
+
 let mode = 'easyMode'
 let show = ref(0)
 
@@ -62,6 +61,7 @@ const randomlv = []
 
 const playCellElements = ref(null)
 
+let healthStatus
 const genBlock = () => {
   blocks.value = []
   //rows stores row name of table
@@ -70,21 +70,6 @@ const genBlock = () => {
   rows.forEach((ele) => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
-}
-
-const ezMode = () => {
-  gameSize.value = 0
-  fails.value = 5
-  mode = 'easyMode'
-  level = [...easyLevel]
-  gamePage()
-}
-const hardMode = () => {
-  gameSize.value = 1
-  fails.value = 10
-  mode = 'hardMode'
-  level = [...hardLevel]
-  gamePage()
 }
 
 const randomLevel = () => {
@@ -100,6 +85,36 @@ const randomLevel = () => {
   }
 }
 
+function calTimeToMin(time) {
+  let min = Math.floor(time / 60)
+  let sec = time % 60
+  return { min, sec }
+}
+
+function timer(op) {
+  if (op) {
+    timerInterval = setInterval(() => {
+      // timeUsed.value++
+      // if (secs.value >= 59) {
+      //   //แปลงหน่วยวิให้เป็นหน่วยนาที
+      //   mins.value++
+      //   secs.value = 0
+      //   return
+      // } else {
+      //   secs.value++
+      // }
+      let { min, sec } = calTimeToMin(++timeUsed.value)
+      mins.value = min
+      secs.value = sec
+    }, 1000)
+  } else {
+    if (timerInterval === undefined) {
+      return
+    } else {
+      clearInterval(timerInterval)
+    }
+  }
+}
 function nextPage() {
   tutorial.value++
 }
@@ -135,7 +150,6 @@ function resetGame() {
   checked.value.splice(0)
   win.value = false
   clearInterval(timerInterval)
-  hints.value.splice(0)
   marked.splice(0)
   headerNums = []
   hintable.value = false
@@ -146,12 +160,6 @@ function resetTime() {
   secs.value = 0
   timeUsed.value = 0
   // clearInterval(timerInterval)
-}
-
-function calTimeToMin(time) {
-  let min = Math.floor(time / 60)
-  let sec = time % 60
-  return { min, sec }
 }
 
 function setBestTime() {
@@ -184,6 +192,20 @@ function gamePage() {
   randomLevel()
   getSave()
   show.value = 2
+}
+const ezMode = () => {
+  gameSize.value = 0
+  fails.value = 5
+  mode = 'easyMode'
+  level = [...easyLevel]
+  gamePage()
+}
+const hardMode = () => {
+  gameSize.value = 1
+  fails.value = 10
+  mode = 'hardMode'
+  level = [...hardLevel]
+  gamePage()
 }
 function modalPage() {
   show.value = 3
@@ -223,28 +245,6 @@ function startGame() {
   }
 }
 
-function timer(op) {
-  if (op) {
-    timerInterval = setInterval(() => {
-      timeUsed.value++
-      if (secs.value >= 59) {
-        //แปลงหน่วยวิให้เป็นหน่วยนาที
-        mins.value++
-        secs.value = 0
-        return
-      } else {
-        secs.value++
-      }
-    }, 1000)
-  } else {
-    if (timerInterval === undefined) {
-      return
-    } else {
-      clearInterval(timerInterval)
-    }
-  }
-}
-
 function checkNewBestTime() {
   if (save.value === 0 || timeUsed.value < save.value) {
     newBestTime.value = true
@@ -252,19 +252,18 @@ function checkNewBestTime() {
   } else newBestTime.value = false
 }
 
-
 function nextLevel() {
-  currentLv.value++;
+  currentLv.value++
   if (currentLv.value < randomlv.length) {
-    resetBlockStyles();
-    resetGame();
-    resetHint();
-    startGame();
-    win.value = false;
+    resetBlockStyles()
+    resetGame()
+    resetHint()
+    startGame()
+    win.value = false
   } else {
-    checkNewBestTime(); //set bestTimeUsed to save.value
-    localStorage.setItem(mode, JSON.stringify(save.value));
-    modalPage();
+    checkNewBestTime() //set bestTimeUsed to save.value
+    localStorage.setItem(mode, JSON.stringify(save.value))
+    modalPage()
   }
 }
 
@@ -280,7 +279,6 @@ const genHint = () => {
   }
   let randomIndex = Math.floor(Math.random() * hintableBlocks.length)
   hintsLeft.value--
-  hints.value.push(hintableBlocks[randomIndex])
   getPlayCellTarget(hintableBlocks[randomIndex]).dispatchEvent(
     new Event('click')
   ) //addClickers จำลอง
@@ -292,6 +290,17 @@ watchEffect(() => {
   })
   if (hintsLeft.value <= 0 || checkedCorrect.length === correctBlocks.length) {
     hintable.value = false
+  }
+})
+watchEffect(() => {
+  if (missed.value / fails.value < 0.25) {
+    healthStatus = 'bg-green-300'
+  } else if (missed.value / fails.value < 0.5) {
+    healthStatus = 'bg-yellow-400'
+  } else if (missed.value / fails.value < 0.75) {
+    healthStatus = 'bg-orange-400'
+  } else {
+    healthStatus = 'bg-red-400'
   }
 })
 
@@ -321,6 +330,7 @@ const addClickers = (event) => {
 
 function mark(event) {
   event.preventDefault()
+  console.log(event.target.id)
   if (!start.value || win.value) return
   let targetTile = event.target //tile clicked
   let targetTileId = targetTile.id //clicked tile id
@@ -353,26 +363,50 @@ watch(checked.value, () => {
   win.value = winTemp
   if (win.value) timer(false)
 })
+
+const toggleTutorialMode = () => {
+  if (tutorial.value < 5) {
+    tutorial.value = 5
+  } else {
+    tutorial.value = 0
+  }
+}
 </script>
 
 <template>
   <div class="gamePlay">
-    <div class="header px-2 flex justify-center py-3 text-4xl font-extrabold">
-      NUMBER HUNTER
+    <div class="header p-2 flex justify-center py-3">
+      <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
     </div>
+
     <section id="homePage">
-      <div v-show="show == 0" class="flex justify-center gap-3">
-        <button @click="tutorialPage" class="btn btn-success text-white">
-          Tutorial
+      <div
+        v-show="show == 0"
+        class="flex flex-col items-center justify-center pt-56"
+      >
+        <button
+          @click="ezMode"
+          id="easymodebtn"
+          class="btn text-white w-30 mx-5 my-5 homepagebtn bg-green-600 hover:bg-green-700 font-extrabold text-xl font-sans"
+        >
+          <span>Easy mode</span>
         </button>
-        <!-- <button @click="gamePage" class="btn btn-success text-white">
-        Play Game
-      </button> -->
-        <button @click="ezMode" class="btn btn-primary text-white">
-          Easy mode</button
-        ><button @click="hardMode" class="btn btn-error text-white">
-          Hard mode
+        <button
+          @click="hardMode"
+          id="hardmodebtn"
+          class="btn text-white w-30 homepagebtn mx-5 my-5 bg-red-600 hover:bg-red-700 font-extrabold text-xl font-sans"
+        >
+          <span>Hard mode</span>
         </button>
+
+        <div class="tutorial flex mt-5">
+          <button
+            @click="tutorialPage"
+            class="btn w-30 mx-5 hover:bg-yellow-600 homepagebtn my-5 text-black font-extrabold text-xl font-sans"
+          >
+            Tutorial
+          </button>
+        </div>
       </div>
     </section>
 
@@ -381,225 +415,223 @@ watch(checked.value, () => {
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
         <div class="min-h-screen flex flex-col items-center">
-          <h1 class="text-4xl text-black mb-8 font-sans font-bold">Tutorial</h1>
-
-          <div class="box-wrapper" v-show="tutorial == 0">
-            <div
-              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
-            >
-              <!--img-->
-              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t1-1.png" class="w-full h-auto" />
-              </div>
-              <!--text-->
-              <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                  Along the top and left side of the grid, there are sequences
-                  of numbers. These numbers provide clues about the groups of
-                  filled-in squares in the corresponding row or column.
-                </div>
-              </div>
-              <!--btn-->
-              <div
-                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
+          <div
+            class="grid grid-cols-3 grid-rows-1 gap-4 items-center justify-between"
+          >
+            <div></div>
+            <div class="flex justify-center">
+              <h1
+                class="font-sans text-blue-800 text-4xl font-bold flex justify-center items-center"
               >
-                <button
-                  v-if="tutorial > 0"
-                  @click="beforePage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  previous page
-                </button>
+                Tutorial
+              </h1>
+            </div>
 
-                <button
-                  v-if="tutorial < 4"
-                  @click="nextPage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  next page
-                </button>
-              </div>
+            <div class="ml-20 flex justify-end">
+              <label
+                class="flex justify-center items-center p-1 cursor-pointer"
+                @click="toggleTutorialMode"
+              >
+                <div class="font-sans font-bold text-xl pr-2 text-black">
+                  <p v-show="tutorial <= 4">General</p>
+                </div>
+                <input type="checkbox" class="toggle" />
+                <div class="font-sans font-bold text-xl pl-2 text-black">
+                  <p v-show="tutorial >= 5">Game mode</p>
+                </div>
+              </label>
             </div>
           </div>
 
-          <div class="box-wrapper" v-show="tutorial == 1">
-            <div
-              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
-            >
-              <!--img-->
-              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t1-2.png" class="w-full h-auto" />
-              </div>
-              <!--text-->
-              <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                  Each number represents a consecutive group of filled squares,
-                  and the numbers are separated by at least one blank square.
+          <div class="box-wrapper mt-8">
+            <div class="box flex flex-col py-8">
+              <div class="changePage pt-11">
+                <div v-show="tutorial == 0" class="md:flex flex-row">
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t1-1.png" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      Along the top and left side of the grid, there are
+                      sequences of numbers. These numbers provide clues about
+                      the groups of filled-in squares in the corresponding row
+                      or column.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 1" class="md:flex flex-row">
+                  <!--img-->
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t1-2.png" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      Each number represents a consecutive group of filled
+                      squares, and the numbers are separated by at least one
+                      blank square.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 2" class="md:flex flex-row">
+                  <!--img-->
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t2-1.png" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      The order of the numbers corresponds to the order of the
+                      groups in the row or column. Additionally, each game mode
+                      comes with a timeer to challenge players further.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 3" class="md:flex flex-row">
+                  <!--img-->
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      Players can test their speed-solving skills in various
+                      difficulty levels. The fastest completion time for each
+                      mode will be recorded.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 4" class="md:flex flex-row">
+                  <!--img-->
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      players have access to a total of 3 hints for each level
+                      in all mode to assist them in solving challenging puzzles.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 5" class="md:flex flex-row">
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="#" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      <h1 class="text-2xl font-bold pb-3">Easy Mode</h1>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Quaerat optio, reprehenderit nobis aliquam dicta maiores
+                      eligendi id odio recusandae quo et reiciendis, laboriosam
+                      harum.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 6" class="md:flex flex-row">
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="#" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div
+                    class="md:w-1/2 flex flex-col items-center justify-center"
+                  >
+                    <div
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                    >
+                      <h1 class="text-2xl font-bold pb-3">Hard Mode</h1>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Quaerat optio, reprehenderit nobis aliquam dicta maiores
+                      eligendi id odio recusandae quo et reiciendis, laboriosam
+                      harum.
+                    </div>
+                  </div>
                 </div>
               </div>
-              <!--btn-->
-              <div
-                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
-              >
+
+              <div class="button-group self-center flex flex-row">
                 <button
                   v-if="tutorial > 0"
                   @click="beforePage"
-                  class="btn btn-primary mb-2 m-3"
+                  class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6"
                 >
-                  previous page
+                  &laquo;
                 </button>
 
                 <button
-                  v-if="tutorial < 4"
+                  v-if="tutorial < 6"
                   @click="nextPage"
-                  class="btn btn-primary mb-2 m-3"
+                  class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6"
                 >
-                  next page
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="box-wrapper" v-show="tutorial == 2">
-            <div
-              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
-            >
-              <!--img-->
-              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-1.png" class="w-full h-auto" />
-              </div>
-              <!--text-->
-              <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                  The order of the numbers corresponds to the order of the
-                  groups in the row or column. Additionally, each game mode
-                  comes with a timeer to challenge players further.
-                </div>
-              </div>
-              <!--btn-->
-              <div
-                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
-              >
-                <button
-                  v-if="tutorial > 0"
-                  @click="beforePage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  previous page
-                </button>
-
-                <button
-                  v-if="tutorial < 4"
-                  @click="nextPage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  next page
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="box-wrapper" v-show="tutorial == 3">
-            <div
-              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
-            >
-              <!--img-->
-              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-2.png" class="w-full h-auto" />
-              </div>
-              <!--text-->
-              <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                  Players can test their speed-solving skills in various
-                  difficulty levels. The fastest completion time for each mode
-                  will be recorded.
-                </div>
-              </div>
-              <!--btn-->
-              <div
-                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
-              >
-                <button
-                  v-if="tutorial > 0"
-                  @click="beforePage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  previous page
-                </button>
-
-                <button
-                  v-if="tutorial < 4"
-                  @click="nextPage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  next page
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="box-wrapper" v-show="tutorial == 4">
-            <div
-              class="box flex flex-col md:flex-row items-center justify-center py-8 md:py-12"
-            >
-              <!--img-->
-              <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                <img src="./assets/t2-2.png" class="w-full h-auto" />
-              </div>
-              <!--text-->
-              <div class="md:w-1/2 flex flex-col items-center justify-center">
-                <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                  players have access to a total of 3 hints for each level in
-                  all mode to assist them in solving challenging puzzles.
-                </div>
-              </div>
-              <!--btn-->
-              <div
-                class="button-group self-start md:self-end flex flex-row md:flex-col mr-2"
-              >
-                <button
-                  v-if="tutorial > 0"
-                  @click="beforePage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  previous page
-                </button>
-
-                <button
-                  v-if="tutorial < 4"
-                  @click="nextPage"
-                  class="btn btn-primary mb-2 m-3"
-                >
-                  next page
+                  &raquo;
                 </button>
               </div>
             </div>
           </div>
 
           <!--home button-->
-          <button
-            class="btn btn-outline btn-primary"
-            type="button"
-            @click="homePage"
-          >
-            <img src="./assets/Home_icon_green.png" class="h-7" />
-            BACK HOME
+          <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="white"
+              width="24"
+              height="24"
+            >
+              <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+            </svg>
+            <span class="text-white">Home</span>
           </button>
         </div>
       </div>
     </section>
 
     <section id="gamePage">
-      <div class="container m-auto w-full" v-if="show == 2">
+      <div class="container px-10 py-3 m-auto w-full" v-if="show == 2">
         <section class="flex items-center justify-between">
-          <div>
+          <div
+            class="text-center align-middle shadow-md w-45 bg-base-200 p-2 py-4 font-sans font-semibold order-first"
+            style="border-radius: 9px"
+          >
             <div id="bestTimePlayed" class="flex">
               Best Time :
-              <p v-if="bestTime.sec != undefined">
+              <p v-if="bestTime.sec != 0">
                 <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
                 <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
               </p>
-              <p v-if="bestTime.sec == undefined">Never play</p>
+              <p v-if="bestTime.sec == 0">&nbsp; -- : --</p>
             </div>
             <div id="timer" v-show="start">
               Time :
@@ -616,9 +648,22 @@ watch(checked.value, () => {
               Start
             </button>
           </div>
-          <button v-if="win" class="join-item btn" @click="nextLevel">
-            NEXT LEVEL
-          </button>
+          <div
+            class="text-center shadow-md w-36 bg-base-200 p-2 py-4 font-sans font-semibold"
+            style="border-radius: 9px"
+          >
+            <!--level-->
+            <div class="level">
+              <div class="font-sans font-bold">Level {{ currentLv + 1 }}</div>
+            </div>
+            <button
+              v-if="win"
+              class="btn bg-green-500 text-white hover:bg-green-700"
+              @click="nextLevel"
+            >
+              NEXT LEVEL
+            </button>
+          </div>
         </section>
 
         <!--Table-->
@@ -629,6 +674,7 @@ watch(checked.value, () => {
               :key="block.row"
               :id="block.row"
               :style="checkTR(block.row)"
+              class="font-sans font-medium text-base"
             >
               <td
                 ref="playCellElements"
@@ -645,49 +691,51 @@ watch(checked.value, () => {
           </table>
         </div>
 
-        <div class="flex justify-between m-5">
+        <div class="flex justify-between m-3 items-center">
           <!-- Hint -->
-          <div class="hint order-1 flex flex-row">
+          <div class="hint flex flex-row order-first">
             <button
               :class="
                 hintsLeft > 0 && hintable
-                  ? 'btn btn-outline btn-accent m-1'
-                  : 'btn btn-active btn-ghost cursor-not-allowed m-1'
+                  ? 'btn border-none bg-yellow-400 hover:bg-yellow-200 text-black m-1'
+                  : 'btn border-none bg-yellow-400 hover:bg-gray-600 cursor-not-allowed m-1'
               "
               :disable="hintsLeft > 0 ? false : true"
               @click="genHint"
             >
               Get hint: {{ hintsLeft }}
             </button>
-            <div
-              v-if="hints.length > 0"
-              class="px-4 py-2 m-2 font-medium"
-            ></div>
           </div>
           <!--Miss-->
           <div class="missed order-last">
-            <div class="m-1 cursor-default">
+            <div class="m-1 rounded-2xl p-4 font-bold" :class="healthStatus">
               Missed : {{ missed }}/{{ fails }}
               <div
                 class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700"
               >
                 <div
                   class="bg-teal-500 h-2.5 rounded-full"
-                  :style="` width: ${(1 - missed / fails) * 100}% `"
+                  :style="{ width: (1 - missed / fails) * 100 + '%' }"
                 ></div>
               </div>
             </div>
           </div>
-          <!-- <div class="missed order-last">
-            <button class="btn m-1 cursor-not-allowed">
-              Missed : {{ missed }}/{{ fails }}
-            </button>
-          </div> -->
         </div>
 
-        <div class="join pagination flex justify-center">
-          <div class="join-item pointer-events-none">
-            Level {{ currentLv + 1 }}
+        <div class="pagination flex flex-col items-center">
+          <div>
+            <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="white"
+                width="24"
+                height="24"
+              >
+                <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+              </svg>
+              <span class="text-white">Home</span>
+            </button>
           </div>
         </div>
       </div>
@@ -696,79 +744,149 @@ watch(checked.value, () => {
     <section id="modal">
       <div class="modal-container" v-show="show == 3">
         <div id="" class="min-h-screen">
-          <div class=" text-center">
-            <div class="max-w-md">
-              <h1 class="text-3xl font-bold py-8">Something</h1>
-              <p class="">
-                Best Time :
-                <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-                <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
-              </p>
-              <p>
-                Time Used :
-                <span v-if="mins < 10">0</span>{{ mins }} :
-                <span v-if="secs < 10">0</span>{{ secs }}
-              </p>
+          <div class="flex flex-col items-center justify-center">
+            <div class="box-wrapper mt-12">
+              <div
+                class="box flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md"
+              >
+                <div class="font-extrabold text-2xl text-black">
+                  Congratulation <span class="text-4xl">&#127881;</span>
+                  <p class="font-sans font-medium text-lg mt-2">
+                    you finish the game
+                  </p>
+                </div>
+                <div
+                  class="Time text-justify mx-16 my-5 font-sans text-lg font-medium"
+                >
+                  <div class="bestTime text-yellow-600 flex">
+                    Best Time :
+                    <p v-if="bestTime.sec != 0">
+                      <span v-if="bestTime.min < 10">0</span
+                      >{{ bestTime.min }} :
+                      <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+                    </p>
+                    <p v-if="bestTime.sec == 0">&nbsp; -- : --</p>
+                  </div>
+                  <div class="timeUsed text-blue-600">
+                    Time Used :
+                    <span v-if="mins < 10">0</span>{{ mins }} :
+                    <span v-if="secs < 10">0</span>{{ secs }}
+                  </div>
+                </div>
 
-              <div v-show="!newBestTime">
-                <h3 class="text-2xl">BE FASTER</h3>
-                <button
-                  class="btn btn-outline btn-primary"
-                  type="button"
-                  @click="gamePage"
+                <div v-show="!newBestTime">
+                  <h3 class="font-bold text-xl text-red-600">BE FASTER !</h3>
+                  <button
+                    class="btn bg-green-400 hover:bg-green-900 hover:text-white text-black mx-3"
+                    type="button"
+                    @click="
+                      () => {
+                        gamePage()
+                        resetMiss()
+                      }
+                    "
+                  >
+                    <img src="./assets/play-button.png" class="h-7" />
+                    Try again
+                  </button>
+                </div>
+
+                <div v-show="newBestTime">
+                  <h3 class="font-bold text-2xl text-red-600">
+                    Your new recorded !
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-10">
+              <button
+                class="btn bg-pink-600 hover:bg-pink-900"
+                @click="homePage"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  width="24"
+                  height="24"
                 >
-                  <img src="./assets/play-button.png" class="h-7" />
-                  Try again
-                </button>
-              </div>
-              <div v-show="newBestTime">
-                <p>CONGRADULATION!!!!</p>
-                <p>YOU ARE THE NEW RECORD</p>
-              </div>
-              <div>
-                <button
-                  class="btn btn-outline btn-primary"
-                  type="button"
-                  @click="homePage"
-                >
-                  <img src="./assets/Home_icon_green.png" class="h-7" />
-                  BACK HOME
-                </button>
-              </div>
+                  <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+                </svg>
+                <span class="text-white">Home</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
     </section>
-  </div>
 
-  <section id="failPage">
-    <!--main tutorial-->
-    <div class="tutorial" v-if="show === 4">
-      <div class="tutorials py-2 m-2 center">
-        <h1 class="text-center text-2xl font-bold">tutorials</h1>
-
-        <div class="tuto">
-          <button
-            class="btn btn-outline btn-primary"
-            type="button"
-            @click="homePage"
-          >
-            <img src="./assets/Home_icon_green.png" class="h-7" />
-            BACK HOME
-          </button>
-          <button
-            class="btn btn-outline btn-primary"
-            type="button"
-            @click="gamePage"
-          >
-            <img src="./assets/play-button.png" class="h-7" />
-            Try again
-          </button>
+    <section id="failPage">
+      <div v-show="show == 4">
+        <div class="flex flex-col items-center justify-center">
+          <div class="box-wrapper mt-12">
+            <div
+              class="box flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md"
+            >
+              <div class="font-extrabold text-2xl text-red-500">
+                Try Again !!
+              </div>
+              <div
+                class="text-justify mx-16 my-5 font-sans text-xl font-medium text-gray-700"
+              >
+                You've missed it
+                <span class="text-black">{{ fails }}</span> times , please try
+                again.
+              </div>
+            </div>
+          </div>
+          <div class="button-group mt-12 flex">
+            <button
+              class="btn bg-pink-600 hover:bg-pink-900 mx-3"
+              @click="homePage"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="white"
+                width="24"
+                height="24"
+              >
+                <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+              </svg>
+              <span class="text-white">Home</span>
+            </button>
+            <button
+              v-show="mode === 'hardMode'"
+              @click="
+                () => {
+                  gamePage()
+                  resetMiss()
+                  hardMode()
+                }
+              "
+              class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3"
+            >
+              Play again
+            </button>
+            <button
+              v-show="mode === 'easyMode'"
+              @click="
+                () => {
+                  gamePage()
+                  resetMiss()
+                  ezMode()
+                }
+              "
+              class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3"
+            >
+              Play again
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped>
@@ -858,9 +976,34 @@ watch(checked.value, () => {
 }
 
 .box {
-  background-color: #ffffff;
+  height: max-content;
   /* White background */
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.homepagebtn {
+  width: 150px;
+  height: 45px;
+}
+#hardmodebtn:hover span {
+  display: none;
+}
+
+#hardmodebtn:hover:after {
+  transition: 3s;
+  color: white;
+  content: '7 x 7 Table';
+}
+
+#easymodebtn:hover span {
+  display: none;
+}
+
+/* Show "Easy Mode" text on hover over the button using pseudoElements */
+#easymodebtn:hover:after {
+  transition: 3s;
+  color: white;
+  content: '5 x 5 Table';
 }
 </style>
