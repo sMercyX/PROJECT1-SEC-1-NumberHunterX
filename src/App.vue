@@ -48,7 +48,7 @@ const marked = []
 
 let save = ref()
 let bestTime = ref({})
-let toggle = ref(false)
+let toggleModal = ref(false)
 let tutorial = ref(0)
 let mode = "easyMode"
 let show = ref(0)
@@ -256,7 +256,7 @@ function checkNewBestTime() {
 
 function nextLevel() {
   currentLv.value++
-  if (currentLv.value < randomLevel.length) {
+  if (currentLv.value < randomlv.length) {
     resetBlockStyles()
     resetGame()
     resetHint()
@@ -366,6 +366,15 @@ watch(checked.value, () => {
   win.value = winTemp
   if (win.value) timer(false)
 })
+
+const toggleTutorialMode = () => {
+  if (tutorial.value < 5) {
+    tutorial.value = 5;
+  } else {
+    tutorial.value = 0;
+  }
+};
+
 </script>
 
 <template>
@@ -399,17 +408,29 @@ watch(checked.value, () => {
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
         <div class="min-h-screen flex flex-col items-center ">
-          <div class="flex flex-row">
-            <div>
-              <h1 class="text-4xl text-black mb-8 font-sans font-bold">Tutorial</h1>
-            </div>
-            <div class="toggle">
-              for mode toggle
-            </div>          
 
+
+          <div class="grid grid-cols-3 grid-rows-1 gap-4 items-center justify-between">
+            <div></div>
+            <div class="flex justify-center">
+              <h1 class="font-sans text-blue-800 text-4xl font-bold flex justify-center items-center">Tutorial</h1>
+            </div>
+
+            <div class=" ml-20 flex justify-end">
+              <label class="flex justify-center items-center p-1 cursor-pointer" @click="toggleTutorialMode">
+                <div class="font-sans font-bold text-xl pr-2 text-black">
+                  <p v-show="tutorial <= 4"> General </p>
+                </div>
+                <input type="checkbox" class="toggle" />
+                <div class="font-sans font-bold text-xl pl-2 text-black">
+                  <p v-show="tutorial >= 5"> Game mode </p>
+                </div>
+              </label>
+            </div>
           </div>
 
-          <div class="box-wrapper ">
+
+          <div class="box-wrapper mt-8 ">
             <div class="box flex flex-col py-8 ">
 
               <div class="changePage pt-11">
@@ -484,6 +505,36 @@ watch(checked.value, () => {
                     </div>
                   </div>
                 </div>
+
+                <div v-show="tutorial == 5" class="md:flex flex-row">
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="#" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div class="md:w-1/2 flex flex-col items-center justify-center">
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                      <h1 class="text-2xl font-bold pb-3">Easy Mode</h1>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat optio, reprehenderit nobis aliquam
+                      dicta maiores eligendi id odio recusandae quo et reiciendis, laboriosam harum.
+                    </div>
+                  </div>
+                </div>
+
+                <div v-show="tutorial == 6" class="md:flex flex-row">
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                    <img src="#" class="w-full h-auto" />
+                  </div>
+                  <!--text-->
+                  <div class="md:w-1/2 flex flex-col items-center justify-center">
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                      <h1 class="text-2xl font-bold pb-3">Hard Mode</h1>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat optio, reprehenderit nobis aliquam
+                      dicta maiores eligendi id odio recusandae quo et reiciendis, laboriosam harum.
+                    </div>
+                  </div>
+                </div>
+
+
               </div>
 
               <div class="button-group self-center  flex flex-row">
@@ -491,7 +542,7 @@ watch(checked.value, () => {
                   &laquo;
                 </button>
 
-                <button v-if="tutorial < 4" @click="nextPage" class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6">
+                <button v-if="tutorial < 6" @click="nextPage" class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6">
                   &raquo;
                 </button>
               </div>
@@ -548,7 +599,8 @@ watch(checked.value, () => {
         <!--Table-->
         <div class="join flex justify-center">
           <table class="hanjie-table">
-            <tr v-for="block in blocks" :key="block.row" :id="block.row" :style="checkTR(block.row)">
+            <tr v-for="block in blocks" :key="block.row" :id="block.row" :style="checkTR(block.row)"
+              class="font-sans font-medium text-base">
               <td ref="playCellElements" :class="checkHeaderStyle(col + block.row)" v-for="col in block.column"
                 :key="col + block.row" :id="col + block.row" @click="addClickers" @click.right="mark">
                 {{ checkHeader(col + block.row) }}
@@ -594,43 +646,53 @@ watch(checked.value, () => {
     <section id="modal">
       <div class="modal-container" v-show="show == 3">
         <div id="" class="min-h-screen">
-          <div class="hero-content text-center">
-            <div class="max-w-md">
-              <h1 class="text-3xl font-bold py-8">Something</h1>
-              <p class="">
-                Best Time :
-                <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
-                <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
-              </p>
-              <p>
-                Time Used :
-                <span v-if="mins < 10">0</span>{{ mins }} :
-                <span v-if="secs < 10">0</span>{{ secs }}
-              </p>
+          <div class="flex flex-col items-center justify-center">
+            <div class="box-wrapper mt-12 ">
+              <div
+                class="box flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md">
+                <div class="font-extrabold text-2xl text-black">
+                  Congratulation <span class="text-4xl">&#127881;</span>
+                  <p class="font-sans font-medium text-lg mt-2">you finish the game</p>
+                </div>
+                <div class="Time text-justify mx-16 my-5 font-sans text-lg font-medium">
+                  <div class="bestTime text-yellow-600">
+                    Best Time :
+                    <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
+                    <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
+                  </div>
+                  <div class="timeUsed text-blue-600">
+                    Time Used :
+                    <span v-if="mins < 10">0</span>{{ mins }} :
+                    <span v-if="secs < 10">0</span>{{ secs }}
+                  </div>
+                </div>
 
-              <div v-show="!newBestTime">
-                <h3 class="text-2xl">BE FASTER</h3>
-                <button class="btn btn-outline btn-primary" type="button" @click="() => {
-                  gamePage()
-                  resetMiss()
-                }
-                  ">
-                  <img src="./assets/play-button.png" class="h-7" />
-                  Try again
-                </button>
+                <div v-show="!newBestTime">
+                  <h3 class="font-bold text-xl text-red-600">BE FASTER !</h3>
+                  <button class="btn bg-green-400 hover:bg-green-900 hover:text-white text-black mx-3" type="button"
+                    @click="() => {
+                      gamePage()
+                      resetMiss()
+                    }
+                      ">
+                    <img src="./assets/play-button.png" class="h-7" />
+                    Try again
+                  </button>
+                </div>
+
+                <div v-show="newBestTime">
+                  <h3 class="font-bold text-2xl text-red-600">Your new recorded !</h3>
+                </div>
               </div>
-              <div v-show="newBestTime">
-                <p>CONGRADULATION!!!!</p>
-                <p>YOU ARE THE NEW RECORD</p>
-              </div>
-              <div>
-                <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
-                    <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
-                  </svg>
-                  <span class="text-white">Home</span>
-                </button>
-              </div>
+            </div>
+
+            <div class="mt-10">
+              <button class="btn bg-pink-600 hover:bg-pink-900" @click="homePage">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+                  <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+                </svg>
+                <span class="text-white">Home</span>
+              </button>
             </div>
           </div>
         </div>
@@ -639,7 +701,40 @@ watch(checked.value, () => {
 
     <section id="failPage">
       <div v-show="show == 4">
-        TRY AGAIN
+        <div class="flex flex-col items-center justify-center">
+          <div class="box-wrapper mt-12 ">
+            <div class="box flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md">
+              <div class="font-extrabold text-2xl text-red-500">
+                Try Again !!
+              </div>
+              <div class="text-justify mx-16 my-5 font-sans text-xl font-medium text-gray-700">
+                You've missed it <span class="text-black">{{ fails }}</span> times , please try again.
+              </div>
+            </div>
+          </div>
+          <div class="button-group mt-12 flex">
+            <button class="btn bg-pink-600 hover:bg-pink-900 mx-3" @click="homePage">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24" height="24">
+                <path d="M12 3L4 9v12h5v-7h6v7h5V9L12 3z" />
+              </svg>
+              <span class="text-white">Home</span>
+            </button>
+            <button v-show="mode === 'hardMode'" @click="() => {
+              gamePage()
+              resetMiss()
+              hardMode()
+            }" class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3">
+              Play again
+            </button>
+            <button v-show="mode === 'easyMode'" @click="() => {
+              gamePage()
+              resetMiss()
+              ezMode()
+            }" class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3">
+              Play again
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -730,12 +825,12 @@ watch(checked.value, () => {
 
 .box-wrapper {
   max-width: 800px;
+  ;
 
 }
 
 .box {
   height: max-content;
-  background-color: #ffffff;
   /* White background */
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
