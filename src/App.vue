@@ -9,7 +9,7 @@ let level = [...easyLevel]
 const start = ref(false)
 
 //hint
-const hintsLeft = ref(3)
+const hintsLeft = ref()
 let hintable = ref(false)
 
 //style
@@ -122,7 +122,11 @@ function beforePage() {
   tutorial.value--
 }
 function resetHint() {
-  hintsLeft.value = 300
+  if (mode === "easyMode") {
+    hintsLeft.value = 3
+  } else if (mode === "hardMode") {
+    hintsLeft.value = 5
+  }
 }
 function resetMiss() {
   missed.value = 0
@@ -178,6 +182,7 @@ function getSave() {
 }
 function homePage() {
   show.value = 0
+  tutorial.value = 0
 }
 function tutorialPage() {
   show.value = 1
@@ -434,8 +439,8 @@ const toggleTutorialMode = (mode) => {
                   class="btn mx-2"
                   @click="toggleTutorialMode('general')"
                   :class="{
-                    'bg-orange-500': tutorial < 5,
-                    'bg-gray-500': tutorial >= 5,
+                    'bg-orange-500': tutorial >= 5,
+                    'bg-gray-500': tutorial < 5,
                   }"
                 >
                   <p>General</p>
@@ -444,8 +449,8 @@ const toggleTutorialMode = (mode) => {
                   class="btn mx-2"
                   @click="toggleTutorialMode('gameMode')"
                   :class="{
-                    'bg-blue-500': tutorial >= 5,
-                    'bg-gray-500': tutorial < 5,
+                    'bg-blue-500': tutorial < 5,
+                    'bg-gray-500': tutorial >= 5,
                   }"
                 >
                   <p>Game mode</p>
@@ -542,7 +547,7 @@ const toggleTutorialMode = (mode) => {
                 <div v-show="tutorial == 4" class="md:flex flex-row">
                   <!--img-->
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="#" class="w-full h-auto" />
+                    <img src="./assets/t5.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
@@ -575,7 +580,7 @@ const toggleTutorialMode = (mode) => {
                         <li>The grid size is 5x5</li>
                         <li>You have access to 3 hints per level.</li>
                         <li>
-                          You're allowed up to 5 mistakes. If you make 5
+                          You're allowed up to 4 mistakes. If you make 5
                           incorrect moves, the game will reset, and you'll need
                           to start over.
                         </li>
@@ -602,7 +607,7 @@ const toggleTutorialMode = (mode) => {
                         <li>The grid size is 7x7</li>
                         <li>You have access to 5 hints per level.</li>
                         <li>
-                          You're allowed up to 10 mistakes. If you make 5
+                          You're allowed up to 9 mistakes. If you make 10
                           incorrect moves, the game will reset, and you'll need
                           to start over.
                         </li>
