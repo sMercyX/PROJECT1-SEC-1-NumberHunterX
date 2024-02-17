@@ -763,6 +763,40 @@ const toggleTutorialMode = () => {
   font-family: sans-serif;
 }
 
+.hanjie {
+  border-collapse: collapse;
+  margin: 20px;
+}
+
+.hanjie-cell {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #000;
+  text-align: center;
+}
+
+.hanjie-cell-half {
+  width: 70px;
+  height: 30px;
+  border: 1px solid #000;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+.filled {
+  background-color: #000;
+}
+
+.col-number,
+.row-number,
+.none {
+  border: none;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 .modal-container {
   display: flex;
   align-items: center;
