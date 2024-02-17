@@ -1,79 +1,54 @@
 <script setup>
 import { ref, watchEffect, watch } from 'vue'
 import easyLevel from './easyLevel.json'
-import hardLevel from './hardLevel.json' //no dat to used now its copy data from level
+import hardLevel from './hardLevel.json'
 import tableSize from './tableSize.json'
 
 let level = [...easyLevel]
-
 const start = ref(false)
-
-//hint
 const hintsLeft = ref(3)
 let hintable = ref(false)
-
-//style
 const blockStyle = 'hanjie-cell'
 const noneBorder = 'row-number'
 const halfBlock = 'hanjie-cell-half'
 const correct = 'MediumSeaGreen'
 const unCorrect = '#f87171'
-
-let gameSize = ref(0) // 0, 1
+let gameSize = ref(0)
 const missed = ref(0)
 let fails = ref(0)
-
-//block stores row and column of table
 let blocks = ref([])
-let rows //add 2 row for show header number(t,0)
-let columns //add 2 columns for show header number(0) and clear block(99)
-
-//checked blocks array
+let rows
+let columns
 const checked = ref([])
 const win = ref(false)
-
-///times
 let mins = ref(0)
 let secs = ref(0)
-
 let timeUsed = ref(0)
 let timerInterval
-
 let newBestTime = ref(false)
-
 const currentLv = ref(0)
 const marked = []
-
 let save = ref()
 let bestTime = ref({})
-
 let tutorial = ref(0)
-
 let mode = 'easyMode'
 let show = ref(0)
-
-//correctBlockss stores block that when click its will change to correct color
 let correctBlocks = []
-//headerNums stores id and result of block of table head
 let headerNums = []
-
 const randomlv = []
-
 const playCellElements = ref(null)
-
-let healthStatus
+let healthStatus = 'bg-green-400'
+const tutorialMode = ref(1)
 const genBlock = () => {
   blocks.value = []
-  //rows stores row name of table
   rows = tableSize[gameSize.value].rows
   columns = tableSize[gameSize.value].columns
   rows.forEach((ele) => {
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
-
 const randomLevel = () => {
-  randomlv.splice(0) //should reset when start game
+  randomlv.splice(0)
   while (randomlv.length < 5) {
     let randomIndex = Math.floor(Math.random() * level.length)
     if (randomlv.length == 0) randomlv.push(level[randomIndex])
@@ -84,25 +59,14 @@ const randomLevel = () => {
     }
   }
 }
-
-function calTimeToMin(time) {
-  let min = Math.floor(time / 60)
+const calTimeToMin = (time) => {
+  let min = Math.floor(time / 60) 
   let sec = time % 60
   return { min, sec }
 }
-
-function timer(op) {
+const timer = (op) => {
   if (op) {
     timerInterval = setInterval(() => {
-      // timeUsed.value++
-      // if (secs.value >= 59) {
-      //   //แปลงหน่วยวิให้เป็นหน่วยนาที
-      //   mins.value++
-      //   secs.value = 0
-      //   return
-      // } else {
-      //   secs.value++
-      // }
       let { min, sec } = calTimeToMin(++timeUsed.value)
       mins.value = min
       secs.value = sec
@@ -115,26 +79,28 @@ function timer(op) {
     }
   }
 }
-function nextPage() {
+const nextPage = () => {
   tutorial.value++
 }
-function beforePage() {
+const beforePage = () => {
   tutorial.value--
 }
-function resetHint() {
-  hintsLeft.value = 300
+const resetHint = () => {
+  if (mode === 'easyMode') {
+    hintsLeft.value == 3
+  } else if (mode === 'hardMode') {
+    hintsLeft.value = 5
+  }
 }
-function resetMiss() {
+const resetMiss = () => {
   missed.value = 0
 }
-function resetNewBestTime() {
+const resetNewBestTime = () => {
   newBestTime.value = false
 }
-
-function getPlayCellTarget(id) {
+const getPlayCellTarget = (id) => {
   return playCellElements.value.find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
 }
-
 const resetBlockStyles = () => {
   checked.value.forEach((id) => {
     getPlayCellTarget(id).style.backgroundColor = ''
@@ -145,7 +111,7 @@ const resetBlockStyles = () => {
     id.textContent = ''
   })
 }
-function resetGame() {
+const resetGame = () => {
   start.value = false
   checked.value.splice(0)
   win.value = false
@@ -154,19 +120,16 @@ function resetGame() {
   headerNums = []
   hintable.value = false
 }
-function resetTime() {
+const resetTime = () => {
   currentLv.value = 0
   mins.value = 0
   secs.value = 0
   timeUsed.value = 0
-  // clearInterval(timerInterval)
 }
-
-function setBestTime() {
+const setBestTime = () => {
   bestTime.value = calTimeToMin(save.value)
 }
-
-function getSave() {
+const getSave = () => {
   save.value = localStorage.getItem(mode)
   if (save.value === null || save.value === undefined) {
     save.value = 0
@@ -176,13 +139,14 @@ function getSave() {
     setBestTime()
   }
 }
-function homePage() {
+const homePage = () => {
   show.value = 0
+  tutorial.value = 0
 }
-function tutorialPage() {
+const tutorialPage = () => {
   show.value = 1
 }
-function gamePage() {
+const gamePage = () => {
   resetTime()
   resetGame()
   resetHint()
@@ -207,20 +171,18 @@ const hardMode = () => {
   level = [...hardLevel]
   gamePage()
 }
-function modalPage() {
+const modalPage = () => {
   show.value = 3
 }
-function failPage() {
+const failPage = () => {
   show.value = 4
 }
-//checkHeaderStyle is use for checking that block is header or not to custom style
 const checkHeaderStyle = (id) => {
   if (id.includes('0')) return `${halfBlock} ${noneBorder}`
   if (id.includes('t')) return `${halfBlock} ${noneBorder}`
   if (id.includes('99')) return `${blockStyle} ${noneBorder}`
   return blockStyle
 }
-
 const checkTR = (id) => {
   if (id.includes('0'))
     return `
@@ -229,13 +191,11 @@ const checkTR = (id) => {
     return `
   height: 30px;`
 }
-
 const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id) //checking id in array of header numbers to show hints number at header
+  const index = headerNums.findIndex((num) => num.id === id)
   return index >= 0 ? headerNums[index].result : ''
 }
-function startGame() {
-  //1.กดปุ่มstart แล้วจะเรียกstartGame() มา
+const startGame = () => {
   correctBlocks = randomlv[currentLv.value].correctBlocks
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true
@@ -244,15 +204,13 @@ function startGame() {
     hintable.value = true
   }
 }
-
-function checkNewBestTime() {
+const checkNewBestTime = () => {
   if (save.value === 0 || timeUsed.value < save.value) {
     newBestTime.value = true
     save.value = timeUsed.value
   } else newBestTime.value = false
 }
-
-function nextLevel() {
+const nextLevel = () => {
   currentLv.value++
   if (currentLv.value < randomlv.length) {
     resetBlockStyles()
@@ -261,12 +219,11 @@ function nextLevel() {
     startGame()
     win.value = false
   } else {
-    checkNewBestTime() //set bestTimeUsed to save.value
+    checkNewBestTime()
     localStorage.setItem(mode, JSON.stringify(save.value))
     modalPage()
   }
 }
-
 const genHint = () => {
   let hintableBlocks = correctBlocks.filter((correctBlocks) => {
     return (
@@ -281,12 +238,11 @@ const genHint = () => {
   hintsLeft.value--
   getPlayCellTarget(hintableBlocks[randomIndex]).dispatchEvent(
     new Event('click')
-  ) //addClickers จำลอง
+  )
 }
-
 watchEffect(() => {
-  let checkedCorrect = checked.value.filter((tile) => {
-    return correctBlocks.includes(tile)
+  let checkedCorrect = checked.value.filter((block) => {
+    return correctBlocks.includes(block)
   })
   if (hintsLeft.value <= 0 || checkedCorrect.length === correctBlocks.length) {
     hintable.value = false
@@ -294,7 +250,7 @@ watchEffect(() => {
 })
 watchEffect(() => {
   if (missed.value / fails.value < 0.25) {
-    healthStatus = 'bg-green-300'
+    healthStatus = 'bg-green-400'
   } else if (missed.value / fails.value < 0.5) {
     healthStatus = 'bg-yellow-400'
   } else if (missed.value / fails.value < 0.75) {
@@ -303,21 +259,20 @@ watchEffect(() => {
     healthStatus = 'bg-red-400'
   }
 })
-
 const addClickers = (event) => {
   if (!start.value || win.value) {
     return
   }
-  let targetTile = event.target //tile clicked
-  let id = targetTile.id //clicked tile id
-  if (checked.value.includes(id) || marked.includes(targetTile)) {
+  let targetBlock = event.target
+  let id = targetBlock.id
+  if (checked.value.includes(id) || marked.includes(targetBlock)) {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
     const blockColor = correctBlocks.includes(id) ? correct : unCorrect
-    targetTile.style.backgroundColor = blockColor
+    targetBlock.style.backgroundColor = blockColor
     if (blockColor === unCorrect) {
-      targetTile.textContent = 'x'
+      targetBlock.textContent = 'x'
       missed.value++
     }
     checked.value.push(id)
@@ -327,35 +282,30 @@ const addClickers = (event) => {
     }
   }
 }
-
-function mark(event) {
+const mark = (event) => {
   event.preventDefault()
-  console.log(event.target.id)
   if (!start.value || win.value) return
-  let targetTile = event.target //tile clicked
-  let targetTileId = targetTile.id //clicked tile id
-  if (checked.value.includes(targetTileId)) return
-  //now markId is unused!!!!
+  let targetBlock = event.target
+  let targetBlockId = targetBlock.id
+  if (checked.value.includes(targetBlockId)) return
   let markId
-  if (marked.includes(targetTile)) {
-    targetTile.style.backgroundColor = ''
-    let unmarked = marked.findIndex((tile) => tile.id === targetTile.id)
-
+  if (marked.includes(targetBlock)) {
+    targetBlock.style.backgroundColor = ''
+    let unmarked = marked.findIndex((block) => block.id === targetBlock.id)
     marked.splice(unmarked, 1)
     markId = marked.map((mark) => mark.id)
   } else if (
-    !marked.includes(targetTile) &&
-    !targetTileId.includes('0') &&
-    !targetTileId.includes('99') &&
-    !targetTileId.includes('t')
+    !marked.includes(targetBlock) &&
+    !targetBlockId.includes('0') &&
+    !targetBlockId.includes('99') &&
+    !targetBlockId.includes('t')
   ) {
     marked.push(event.target)
     markId = marked.map((mark) => mark.id)
-    targetTile.style.backgroundColor = 'grey'
+    targetBlock.style.backgroundColor = 'grey'
   }
 }
 watch(checked.value, () => {
-  //checked.value because checked is an array object requiring .value to have the watcher watch it
   let winTemp = true
   correctBlocks.forEach((mustCheckCell) => {
     if (!checked.value.includes(mustCheckCell)) winTemp = false
@@ -363,50 +313,44 @@ watch(checked.value, () => {
   win.value = winTemp
   if (win.value) timer(false)
 })
-
-const toggleTutorialMode = () => {
-  if (tutorial.value < 5) {
-    tutorial.value = 5
-  } else {
+const toggleTutorialMode = (mode) => {
+  if (mode === 'general') {
     tutorial.value = 0
+    tutorialMode.value = 1
+  } else if (mode === 'gameMode') {
+    tutorialMode.value = 2
+    tutorial.value = 5
   }
 }
 </script>
 
 <template>
   <div class="gamePlay">
-    <div class="header p-2 flex justify-center py-3">
-      <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
-    </div>
-
-    <section id="homePage">
-      <div
-        v-show="show == 0"
-        class="flex flex-col items-center justify-center pt-56"
-      >
+    <section v-show="show == 0" id="homePage">
+      <div class="header p-2 flex justify-center py-3">
+        <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
+      </div>
+      <div class="flex flex-col items-center justify-center">
         <button
           @click="ezMode"
           id="easymodebtn"
-          class="btn text-white w-30 mx-5 my-5 homepagebtn bg-green-600 hover:bg-green-700 font-extrabold text-xl font-sans"
+          class="btn mx-5 my-3 text-white w-30 bg-green-600 hover:bg-green-700 font-extrabold text-xl font-sans homepagebtn"
         >
           <span>Easy mode</span>
         </button>
         <button
           @click="hardMode"
           id="hardmodebtn"
-          class="btn text-white w-30 homepagebtn mx-5 my-5 bg-red-600 hover:bg-red-700 font-extrabold text-xl font-sans"
+          class="btn mx-5 my-3 text-white w-30 bg-red-600 hover:bg-red-700 font-extrabold text-xl font-sans homepagebtn"
         >
           <span>Hard mode</span>
         </button>
-
-        <div class="tutorial flex mt-5">
-          <button
-            @click="tutorialPage"
-            class="btn w-30 mx-5 hover:bg-yellow-600 homepagebtn my-5 text-black font-extrabold text-xl font-sans"
-          >
-            Tutorial
-          </button>
-        </div>
+        <button
+          @click="tutorialPage"
+          class="btn w-30 mx-5 my-3 bg-slate-400 hover:bg-yellow-600 text-black font-extrabold text-xl font-sans homepagebtn"
+        >
+          Tutorial
+        </button>
       </div>
     </section>
 
@@ -415,90 +359,99 @@ const toggleTutorialMode = () => {
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
         <div class="min-h-screen flex flex-col items-center">
-          <div
-            class="grid grid-cols-3 grid-rows-1 gap-4 items-center justify-between"
-          >
-            <div></div>
-            <div class="flex justify-center">
-              <h1
-                class="font-sans text-blue-800 text-4xl font-bold flex justify-center items-center"
-              >
-                Tutorial
-              </h1>
-            </div>
-
-            <div class="ml-20 flex justify-end">
-              <label
-                class="flex justify-center items-center p-1 cursor-pointer"
-                @click="toggleTutorialMode"
-              >
-                <div class="font-sans font-bold text-xl pr-2 text-black">
-                  <p v-show="tutorial <= 4">General</p>
-                </div>
-                <input type="checkbox" class="toggle" />
-                <div class="font-sans font-bold text-xl pl-2 text-black">
-                  <p v-show="tutorial >= 5">Game mode</p>
-                </div>
-              </label>
-            </div>
+          <div class="header p-2 flex justify-center py-3">
+            <div class="font-extrabold HeaderName">Tutorial</div>
           </div>
 
           <div class="box-wrapper mt-8">
             <div class="box flex flex-col py-8">
-              <div class="changePage pt-11">
+              <div class="ml-20 flex justify-end mx-2">
+                <button
+                  class="btn mx-2"
+                  @click="toggleTutorialMode('general')"
+                  :class="{
+                    'bg-orange-500': tutorial >= 5,
+                    'bg-gray-500': tutorial < 5,
+                  }"
+                >
+                  <p>General</p>
+                </button>
+                <button
+                  class="btn mx-2"
+                  @click="toggleTutorialMode('gameMode')"
+                  :class="{
+                    'bg-blue-500': tutorial < 5,
+                    'bg-gray-500': tutorial >= 5,
+                  }"
+                >
+                  <p>Game mode</p>
+                </button>
+              </div>
+              <div class="changePage">
                 <div v-show="tutorial == 0" class="md:flex flex-row">
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t1-1.png" class="w-full h-auto" />
+                  <div class="md:w-1/2 mb-1 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t1.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
-                      Along the top and left side of the grid, there are
-                      sequences of numbers. These numbers provide clues about
-                      the groups of filled-in squares in the corresponding row
-                      or column.
+                      You'll see a
+                      <span class="font-bold text-pink-600">number</span> along
+                      the top and left side. These numbers provide clues about
+                      the groups of filled-in squares in each row or column.
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 1" class="md:flex flex-row">
                   <!--img-->
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t1-2.png" class="w-full h-auto" />
+                  <div class="md:w-1/2 mb-1 md:mb-0 md:mr-4 mx-3">
+                    <img src="./assets/t2.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       Each number represents a consecutive group of filled
-                      squares, and the numbers are separated by at least one
-                      blank square.
+                      squares, and the numbers are
+                      <i class="text-pink-600">
+                        separated by at least one blank square.</i
+                      >The order of the numbers corresponds to the order of the
+                      groups in the row or column.
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 2" class="md:flex flex-row">
                   <!--img-->
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-1.png" class="w-full h-auto" />
+                  <div
+                    class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3 flex justify-center items-center"
+                  >
+                    <img src="./assets/t3.png" class="h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
-                      The order of the numbers corresponds to the order of the
-                      groups in the row or column. Additionally, each game mode
-                      comes with a timeer to challenge players further.
+                      <h1 class="font-bold text-xl mb-2">Solving the Puzzle</h1>
+                      To fill a square, simply
+                      <i class="text-pink-600"> left-click</i> it. If the
+                      decision is correct, it turns green; otherwise, it turnsÂ
+                      red. You can also disable clicked squares by
+                      <i class="text-pink-600">right-click</i> on them.If you
+                      make a mistake, don't worry! You can
+                      <i class="text-pink-600">right click again</i> to remove
+                      the blank filling.
                     </div>
                   </div>
                 </div>
@@ -506,16 +459,16 @@ const toggleTutorialMode = () => {
                 <div v-show="tutorial == 3" class="md:flex flex-row">
                   <!--img-->
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                    <img src="./assets/t4.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
-                      Players can test their speed-solving skills in various
+                      You can test your speed-solving skills in various
                       difficulty levels. The fastest completion time for each
                       mode will be recorded.
                     </div>
@@ -525,75 +478,94 @@ const toggleTutorialMode = () => {
                 <div v-show="tutorial == 4" class="md:flex flex-row">
                   <!--img-->
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                    <img src="./assets/t5.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
-                      players have access to a total of 3 hints for each level
-                      in all mode to assist them in solving challenging puzzles.
+                      If you need help. Clicking the <b>"Get Hint"</b> button
+                      will reveal some of the correct squares for the puzzle.
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 5" class="md:flex flex-row">
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="#" class="w-full h-auto" />
+                    <img src="./assets/t6.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       <h1 class="text-2xl font-bold pb-3">Easy Mode</h1>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Quaerat optio, reprehenderit nobis aliquam dicta maiores
-                      eligendi id odio recusandae quo et reiciendis, laboriosam
-                      harum.
+                      In Easy Mode, the puzzles are simpler and suitable for
+                      beginners. <br /><br />
+                      <ol class="list-disc font-medium">
+                        <li>The grid size is 5x5</li>
+                        <li>You have access to 3 hints per level.</li>
+                        <li>
+                          You're allowed up to 4 mistakes. If you make 5
+                          incorrect moves, the game will reset, and you'll need
+                          to start over.
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 6" class="md:flex flex-row">
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="#" class="w-full h-auto" />
+                    <img src="./assets/t7.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6"
+                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       <h1 class="text-2xl font-bold pb-3">Hard Mode</h1>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                      Quaerat optio, reprehenderit nobis aliquam dicta maiores
-                      eligendi id odio recusandae quo et reiciendis, laboriosam
-                      harum.
+                      Hard Mode offers challenging puzzles for experienced
+                      players. <br /><br />
+                      <ol class="list-disc font-medium">
+                        <li>The grid size is 7x7</li>
+                        <li>You have access to 5 hints per level.</li>
+                        <li>
+                          You're allowed up to 9 mistakes. If you make 10
+                          incorrect moves, the game will reset, and you'll need
+                          to start over.
+                        </li>
+                      </ol>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="button-group self-center flex flex-row">
+              <div
+                class="button-group self-center flex flex-row justify-items-end"
+              >
                 <button
-                  v-if="tutorial > 0"
+                  :disabled="tutorial === 0"
                   @click="beforePage"
-                  class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6"
+                  class="btn bg-blue-400 text-white mx-4"
                 >
                   &laquo;
                 </button>
+                <div class="font-bold font-sans flex items-center">
+                  {{ tutorial + 1 }} / 7
+                </div>
 
                 <button
-                  v-if="tutorial < 6"
+                  :disabled="tutorial >= 6"
                   @click="nextPage"
-                  class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6"
+                  class="btn bg-blue-400 text-white mx-4"
                 >
                   &raquo;
                 </button>
@@ -619,19 +591,29 @@ const toggleTutorialMode = () => {
     </section>
 
     <section id="gamePage">
-      <div class="container px-10 py-3 m-auto w-full" v-if="show == 2">
+      <div class="container px-10 pb-3 m-auto w-full" v-if="show == 2">
+        <div class="header p-2 flex justify-center py-3">
+          <div v-show="mode === 'easyMode'" class="font-extrabold HeaderName">
+            EASY MODE
+          </div>
+          <div v-show="mode === 'hardMode'" class="font-extrabold HeaderName">
+            HARD MODE
+          </div>
+        </div>
         <section class="flex items-center justify-between">
           <div
             class="text-center align-middle shadow-md w-45 bg-base-200 p-2 py-4 font-sans font-semibold order-first"
             style="border-radius: 9px"
           >
             <div id="bestTimePlayed" class="flex">
-              Best Time :
-              <p v-if="bestTime.sec != 0">
+              Best Time :&nbsp
+              <p v-if="bestTime.sec == 0 && bestTime.min == 0">
+                &nbsp; -- : --
+              </p>
+              <p v-else>
                 <span v-if="bestTime.min < 10">0</span>{{ bestTime.min }} :
                 <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
               </p>
-              <p v-if="bestTime.sec == 0">&nbsp; -- : --</p>
             </div>
             <div id="timer" v-show="start">
               Time :
@@ -654,7 +636,7 @@ const toggleTutorialMode = () => {
           >
             <!--level-->
             <div class="level">
-              <div class="font-sans font-bold">Level {{ currentLv + 1 }}</div>
+              <div class="">Level {{ currentLv + 1 }}</div>
             </div>
             <button
               v-if="win"
@@ -742,12 +724,15 @@ const toggleTutorialMode = () => {
     </section>
 
     <section id="modal">
-      <div class="modal-container" v-show="show == 3">
+      <div class="modal-container flex-col" v-show="show == 3">
+        <div class="header p-2 flex justify-center py-3">
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
+        </div>
         <div id="" class="min-h-screen">
           <div class="flex flex-col items-center justify-center">
-            <div class="box-wrapper mt-12">
+            <div class="box-wrapper2 mt-12">
               <div
-                class="box flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md"
+                class="box2 flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md"
               >
                 <div class="font-extrabold text-2xl text-black">
                   Congratulation <span class="text-4xl">&#127881;</span>
@@ -760,12 +745,12 @@ const toggleTutorialMode = () => {
                 >
                   <div class="bestTime text-yellow-600 flex">
                     Best Time :
-                    <p v-if="bestTime.sec != 0">
+                    <p v-if="bestTime.sec == 0">&nbsp; -- : --</p>
+                    <p v-else>
                       <span v-if="bestTime.min < 10">0</span
                       >{{ bestTime.min }} :
                       <span v-if="bestTime.sec < 10">0</span>{{ bestTime.sec }}
                     </p>
-                    <p v-if="bestTime.sec == 0">&nbsp; -- : --</p>
                   </div>
                   <div class="timeUsed text-blue-600">
                     Time Used :
@@ -793,7 +778,7 @@ const toggleTutorialMode = () => {
 
                 <div v-show="newBestTime">
                   <h3 class="font-bold text-2xl text-red-600">
-                    Your new recorded !
+                    New Best Time !!!
                   </h3>
                 </div>
               </div>
@@ -823,10 +808,13 @@ const toggleTutorialMode = () => {
 
     <section id="failPage">
       <div v-show="show == 4">
+        <div class="header p-2 flex justify-center py-3">
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
+        </div>
         <div class="flex flex-col items-center justify-center">
-          <div class="box-wrapper mt-12">
+          <div class="box-wrapper2 mt-12">
             <div
-              class="box flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md"
+              class="box2 flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md"
             >
               <div class="font-extrabold text-2xl text-red-500">
                 Try Again !!
@@ -834,7 +822,7 @@ const toggleTutorialMode = () => {
               <div
                 class="text-justify mx-16 my-5 font-sans text-xl font-medium text-gray-700"
               >
-                You've missed it
+                You've missed
                 <span class="text-black">{{ fails }}</span> times , please try
                 again.
               </div>
@@ -890,6 +878,15 @@ const toggleTutorialMode = () => {
 </template>
 
 <style scoped>
+#homePage {
+  width: 100vw;
+  height: 100vh;
+  background: url('./assets/bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
 .gamePlay {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -903,25 +900,6 @@ const toggleTutorialMode = () => {
   margin-bottom: 30px;
   max-width: 150vh;
   margin: 0 auto;
-}
-
-.tuto {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
-  align-items: center;
-
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  max-width: 150vh;
-  margin: 0 auto;
-}
-
-.tutorials {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .hanjie {
@@ -954,16 +932,11 @@ const toggleTutorialMode = () => {
   border: none;
 }
 
-.modal {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
 .modal-container {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  /* Ensures that the container takes at least the full height of the viewport */
 }
 
 .btn {
@@ -972,20 +945,34 @@ const toggleTutorialMode = () => {
 }
 
 .box-wrapper {
+  max-width: 750px;
+  min-height: 340px;
+  width: 80%;
+  margin: 5%;
+}
+
+.box-wrapper2 {
   max-width: 800px;
 }
 
 .box {
   height: max-content;
-  /* White background */
+  border-radius: 30px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.box2 {
+  height: max-content;
   border-radius: 30px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .homepagebtn {
-  width: 150px;
-  height: 45px;
+  width: 250px;
+  height: 80px;
+  font-size: 30px;
 }
+
 #hardmodebtn:hover span {
   display: none;
 }
@@ -1000,10 +987,34 @@ const toggleTutorialMode = () => {
   display: none;
 }
 
-/* Show "Easy Mode" text on hover over the button using pseudoElements */
 #easymodebtn:hover:after {
   transition: 3s;
   color: white;
   content: '5 x 5 Table';
+}
+
+.HeaderName {
+  font-family: 'Luckiest Guy', cursive;
+  letter-spacing: 3px;
+  font-size: 80px;
+}
+
+@media only screen and (max-width: 666px) {
+  .HeaderName {
+    font-size: 40px;
+    letter-spacing: 2px;
+  }
+
+  #homePage {
+    background: url('./assets/bg2.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+  .homepagebtn {
+    width: 150px;
+    height: 40px;
+    font-size: 20px;
+  }
 }
 </style>

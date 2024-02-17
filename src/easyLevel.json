@@ -338,5 +338,73 @@
         "result": "1 1"
       }
     ]
+  },{
+    "puzzle": 6,
+    "correctBlocks": [
+      "b1",
+      "d1",
+      "a2",
+      "c2",
+      "e2",
+      "a3",
+      "e3",
+      "b4",
+      "d4",
+      "c5"
+    ],
+    "headerNums": [
+      {
+        "id": "a0",
+        "result": "2"
+      },
+      {
+        "id": "bt",
+        "result": "1"
+      },
+      {
+        "id": "b0",
+        "result": "1"
+      },
+      {
+        "id": "ct",
+        "result": "1"
+      },
+      {
+        "id": "c0",
+        "result": "1"
+      },
+      {
+        "id": "dt",
+        "result": "1"
+      },
+      {
+        "id": "d0",
+        "result": "1"
+      },
+      {
+        "id": "e0",
+        "result": "2"
+      },
+      {
+        "id": "01",
+        "result": "1 1"
+      },
+      {
+        "id": "02",
+        "result": "1 1 1"
+      },
+      {
+        "id": "03",
+        "result": "1 1"
+      },
+      {
+        "id": "04",
+        "result": "1 1"
+      },
+      {
+        "id": "05",
+        "result": "1"
+      }
+    ]
   }
 ]
