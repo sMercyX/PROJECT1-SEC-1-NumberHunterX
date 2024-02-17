@@ -227,15 +227,18 @@ function startGame() {
 function timer(op) {
   if (op) {
     timerInterval = setInterval(() => {
-      timeUsed.value++
-      if (secs.value >= 59) {
-        //แปลงหน่วยวิให้เป็นหน่วยนาที
-        mins.value++
-        secs.value = 0
-        return
-      } else {
-        secs.value++
-      }
+      // timeUsed.value++
+      // if (secs.value >= 59) {
+      //   //แปลงหน่วยวิให้เป็นหน่วยนาที
+      //   mins.value++
+      //   secs.value = 0
+      //   return
+      // } else {
+      //   secs.value++
+      // }
+      let { min, sec } = calTimeToMin(++timeUsed.value)
+      mins.value = min
+      secs.value = sec
     }, 1000)
   } else {
     if (timerInterval === undefined) {
@@ -478,7 +481,7 @@ const toggleTutorialMode = () => {
                       turns green; otherwise, it
                       turns red. You can also disable clicked squares by <i class="text-pink-600">right-click</i> on
                       them.If you make a mistake,
-                      don't worry! You can <i class="text-pink-600">click again</i> to remove the filling.
+                      don't worry! You can <i class="text-pink-600">right click again</i> to remove the blank filling.
                     </div>
                   </div>
                 </div>
