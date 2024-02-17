@@ -6,7 +6,7 @@ import tableSize from './tableSize.json'
 
 let level = [...easyLevel]
 const start = ref(false)
-const hintsLeft = ref(3)
+let hintsLeft = ref(3)
 let hintable = ref(false)
 const blockStyle = 'hanjie-cell'
 const noneBorder = 'row-number'
@@ -87,7 +87,7 @@ const beforePage = () => {
 }
 const resetHint = () => {
   if (mode === 'easyMode') {
-    hintsLeft.value == 3
+    hintsLeft.value = 3
   } else if (mode === 'hardMode') {
     hintsLeft.value = 5
   }
