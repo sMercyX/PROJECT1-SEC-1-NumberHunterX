@@ -328,9 +328,7 @@ const toggleTutorialMode = (mode) => {
   <div class="gamePlay">
     <section v-show="show == 0" id="homePage">
       <div class="header p-2 flex justify-center py-3">
-        <div class="p-2 m-3 font-extrabold HeaderName HeaderName">
-          NUMBER HUNTER
-        </div>
+        <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
       </div>
       <div class="flex flex-col items-center justify-center">
         <button
@@ -361,9 +359,7 @@ const toggleTutorialMode = (mode) => {
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
         <div class="header p-2 flex justify-center py-3">
-          <div class="p-2 m-3 text-4xl font-extrabold HeaderName">
-            NUMBER HUNTER
-          </div>
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
         </div>
         <div class="min-h-screen flex flex-col items-center">
           <div
@@ -604,11 +600,9 @@ const toggleTutorialMode = (mode) => {
     </section>
 
     <section id="gamePage">
-      <div class="container px-10 py-3 m-auto w-full" v-if="show == 2">
+      <div class="container px-10 pb-3 m-auto w-full" v-if="show == 2">
         <div class="header p-2 flex justify-center py-3">
-          <div class="p-2 m-3 text-4xl font-extrabold HeaderName">
-            NUMBER HUNTER
-          </div>
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
         </div>
         <section class="flex items-center justify-between">
           <div
@@ -734,9 +728,7 @@ const toggleTutorialMode = (mode) => {
     <section id="modal">
       <div class="modal-container flex-col" v-show="show == 3">
         <div class="header p-2 flex justify-center py-3">
-          <div class="p-2 m-3 text-4xl font-extrabold HeaderName">
-            NUMBER HUNTER
-          </div>
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
         </div>
         <div id="" class="min-h-screen">
           <div class="flex flex-col items-center justify-center">
@@ -819,9 +811,7 @@ const toggleTutorialMode = (mode) => {
     <section id="failPage">
       <div v-show="show == 4">
         <div class="header p-2 flex justify-center py-3">
-          <div class="p-2 m-3 text-4xl font-extrabold HeaderName">
-            NUMBER HUNTER
-          </div>
+          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
         </div>
         <div class="flex flex-col items-center justify-center">
           <div class="box-wrapper mt-12">
