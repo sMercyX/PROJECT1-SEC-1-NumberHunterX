@@ -664,9 +664,9 @@ const toggleTutorialMode = () => {
       <div class="modal-container" v-show="show == 3">
         <div id="" class="min-h-screen">
           <div class="flex flex-col items-center justify-center">
-            <div class="box-wrapper mt-12 ">
+            <div class="box-wrapper2 mt-12 ">
               <div
-                class="box flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md">
+                class="box2 flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md">
                 <div class="font-extrabold text-2xl text-black">
                   Congratulation <span class="text-4xl">&#127881;</span>
                   <p class="font-sans font-medium text-lg mt-2">you finish the game</p>
@@ -719,8 +719,8 @@ const toggleTutorialMode = () => {
     <section id="failPage">
       <div v-show="show == 4">
         <div class="flex flex-col items-center justify-center">
-          <div class="box-wrapper mt-12 ">
-            <div class="box flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md">
+          <div class="box-wrapper2 mt-12 ">
+            <div class="box2 flex flex-col py-8 items-center justify-center text-center bg-sl shadow-lg rounded-md">
               <div class="font-extrabold text-2xl text-red-500">
                 Try Again !!
               </div>
@@ -807,7 +807,7 @@ const toggleTutorialMode = () => {
 
 .btn {
   border-radius: 999px;
-  margin-top: 3%;
+  margin-top: 2%;
 }
 
 /*new responsive*/
@@ -816,12 +816,24 @@ const toggleTutorialMode = () => {
   min-height: 340px;
   width: 80%;
   margin: 5%;    
+  /* Center the box horizontally */
+}
+
+.box-wrapper2 {
+  max-width: 800px;
 }
 
 .box {
   height: max-content;
   border-radius: 30px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.box2 {
+  height: max-content;
+  /* White background */
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .button-group{
