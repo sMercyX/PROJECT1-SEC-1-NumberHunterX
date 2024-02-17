@@ -653,6 +653,9 @@ const toggleTutorialMode = (mode) => {
 
     <section id="gamePage">
       <div class="container px-10 py-3 m-auto w-full" v-if="show == 2">
+        <div class="header p-2 flex justify-center py-3">
+          <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
+        </div>
         <section class="flex items-center justify-between">
           <div
             class="text-center align-middle shadow-md w-45 bg-base-200 p-2 py-4 font-sans font-semibold order-first"
@@ -775,7 +778,10 @@ const toggleTutorialMode = (mode) => {
     </section>
 
     <section id="modal">
-      <div class="modal-container" v-show="show == 3">
+      <div class="modal-container flex-col" v-show="show == 3">
+        <div class="header p-2 flex justify-center py-3">
+          <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
+        </div>
         <div id="" class="min-h-screen">
           <div class="flex flex-col items-center justify-center">
             <div class="box-wrapper mt-12">
@@ -856,6 +862,9 @@ const toggleTutorialMode = (mode) => {
 
     <section id="failPage">
       <div v-show="show == 4">
+        <div class="header p-2 flex justify-center py-3">
+          <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
+        </div>
         <div class="flex flex-col items-center justify-center">
           <div class="box-wrapper mt-12">
             <div
