@@ -358,17 +358,12 @@ const toggleTutorialMode = (mode) => {
     <section id="tutorialPage">
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
-        <div class="header p-2 flex justify-center py-3">
-          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
-        </div>
         <div class="min-h-screen flex flex-col items-center">
-          <div
-            class="grid grid-cols-3 grid-rows-1 gap-4 items-center justify-between"
-          >
+          <div class="items-center justify-between">
             <div></div>
-            <div class="flex justify-center">
+            <div class="flex justify-center items-center">
               <h1
-                class="font-sans text-blue-800 text-4xl font-bold flex justify-center items-center"
+                class="font-sans text-blue-800 text-4xl flex justify-center font-extrabold HeaderName"
               >
                 Tutorial
               </h1>
@@ -601,9 +596,6 @@ const toggleTutorialMode = (mode) => {
 
     <section id="gamePage">
       <div class="container px-10 pb-3 m-auto w-full" v-if="show == 2">
-        <div class="header p-2 flex justify-center py-3">
-          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
-        </div>
         <section class="flex items-center justify-between">
           <div
             class="text-center align-middle shadow-md w-45 bg-base-200 p-2 py-4 font-sans font-semibold order-first"
@@ -727,9 +719,6 @@ const toggleTutorialMode = (mode) => {
 
     <section id="modal">
       <div class="modal-container flex-col" v-show="show == 3">
-        <div class="header p-2 flex justify-center py-3">
-          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
-        </div>
         <div id="" class="min-h-screen">
           <div class="flex flex-col items-center justify-center">
             <div class="box-wrapper2 mt-12">
@@ -810,9 +799,6 @@ const toggleTutorialMode = (mode) => {
 
     <section id="failPage">
       <div v-show="show == 4">
-        <div class="header p-2 flex justify-center py-3">
-          <div class="font-extrabold HeaderName">NUMBER HUNTER</div>
-        </div>
         <div class="flex flex-col items-center justify-center">
           <div class="box-wrapper mt-12">
             <div
@@ -901,25 +887,6 @@ const toggleTutorialMode = (mode) => {
   margin-bottom: 30px;
   max-width: 150vh;
   margin: 0 auto;
-}
-
-.tuto {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
-  align-items: center;
-
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  max-width: 150vh;
-  margin: 0 auto;
-}
-
-.tutorials {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .hanjie {
