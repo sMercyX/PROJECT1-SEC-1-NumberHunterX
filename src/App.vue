@@ -48,7 +48,6 @@ const marked = []
 
 let save = ref()
 let bestTime = ref({})
-let toggleModal = ref(false)
 let tutorial = ref(0)
 let mode = "easyMode"
 let show = ref(0)
@@ -379,12 +378,12 @@ const toggleTutorialMode = () => {
 
 <template>
   <div class="gamePlay">
-    <div class="header p-2 flex justify-center py-3">
-      <div class="p-2 m-3 text-4xl font-extrabold">NUMBER HUNTER</div>
+    <div class="header p-2 flex justify-center py-3 md:items-center">
+      <div class="p-2 m-3 text-5xl font-extrabold">NUMBER HUNTER</div>
     </div>
 
     <section id="homePage">
-      <div v-show="show == 0" class="flex flex-col items-center justify-center pt-56">
+      <div v-show="show == 0" class="flex flex-col items-center justify-center pt-48">
         <button @click="ezMode" id="easymodebtn"
           class="btn  text-white w-30 mx-5 my-5 bg-green-600  hover:bg-green-700 font-extrabold text-xl font-sans">
           <span>Easy mode</span>
@@ -408,7 +407,6 @@ const toggleTutorialMode = () => {
       <!--main tutorial-->
       <div class="tutorial" v-show="show == 1">
         <div class="min-h-screen flex flex-col items-center ">
-
 
           <div class="grid grid-cols-3 grid-rows-1 gap-4 items-center justify-between">
             <div></div>
@@ -434,45 +432,53 @@ const toggleTutorialMode = () => {
             <div class="box flex flex-col py-8 ">
 
               <div class="changePage pt-11">
+
                 <div v-show="tutorial == 0" class="md:flex flex-row">
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
+                  <div class="md:w-1/2 mb-1 md:mb-0 md:mr-4 mx-3">
                     <img src="./assets/t1-1.png" class="w-full h-auto" />
+                    <img src="./assets/t1-2.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                      Along the top and left side of the grid, there are sequences
-                      of numbers. These numbers provide clues about the groups of
-                      filled-in squares in the corresponding row or column.
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
+                      You'll see a <span class="font-bold text-pink-600">number</span> along the top and left side.
+                      These numbers provide clues about the groups of filled-in squares in each row or column.
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 1" class="md:flex flex-row">
                   <!--img-->
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t1-2.png" class="w-full h-auto" />
+                  <div class="md:w-1/2 mb-1 md:mb-0 md:mr-4 mx-3 ">
+                    <img src="./assets/t2-1.png" class=" w-full h-auto" />
+                    <img src="./assets/t2-2.png" class=" w-full h-auto" />
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
                       Each number represents a consecutive group of filled squares,
-                      and the numbers are separated by at least one blank square.
+                      and the numbers are <i class="text-pink-600"> separated by at least one blank square.</i>The order
+                      of the numbers
+                      corresponds to the order of the
+                      groups in the row or column.
                     </div>
                   </div>
                 </div>
 
                 <div v-show="tutorial == 2" class="md:flex flex-row">
                   <!--img-->
-                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-1.png" class="w-full h-auto" />
+                  <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3 flex justify-center items-center">
+                    <img src="./assets/t3.png" class="h-auto " />
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                      The order of the numbers corresponds to the order of the
-                      groups in the row or column. Additionally, each game mode
-                      comes with a timeer to challenge players further.
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
+                      <h1 class="font-bold text-xl mb-2">Solving the Puzzle</h1>
+                      To fill a square, simply <i class="text-pink-600"> left-click</i> it. If the decision is correct, it
+                      turns green; otherwise, it
+                      turns red. You can also disable clicked squares by <i class="text-pink-600">right-click</i> on
+                      them.If you make a mistake,
+                      don't worry! You can <i class="text-pink-600">click again</i> to remove the filling.
                     </div>
                   </div>
                 </div>
@@ -480,12 +486,12 @@ const toggleTutorialMode = () => {
                 <div v-show="tutorial == 3" class="md:flex flex-row">
                   <!--img-->
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                    <img src="./assets/t4.png" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                      Players can test their speed-solving skills in various
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
+                      You can test your speed-solving skills in various
                       difficulty levels. The fastest completion time for each mode
                       will be recorded.
                     </div>
@@ -495,13 +501,14 @@ const toggleTutorialMode = () => {
                 <div v-show="tutorial == 4" class="md:flex flex-row">
                   <!--img-->
                   <div class="md:w-1/2 mb-4 md:mb-0 md:mr-4 mx-3">
-                    <img src="./assets/t2-2.png" class="w-full h-auto" />
+                    <img src="#" class="w-full h-auto" />
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
-                      players have access to a total of 3 hints for each level in
-                      all mode to assist them in solving challenging puzzles.
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
+                      If you need help. Clicking the <b>"Get Hint"</b> button will reveal some of the correct squares for
+                      the
+                      puzzle.
                     </div>
                   </div>
                 </div>
@@ -512,10 +519,15 @@ const toggleTutorialMode = () => {
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
                       <h1 class="text-2xl font-bold pb-3">Easy Mode</h1>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat optio, reprehenderit nobis aliquam
-                      dicta maiores eligendi id odio recusandae quo et reiciendis, laboriosam harum.
+                      In Easy Mode, the puzzles are simpler and suitable for beginners. <br><br>
+                      <ol class="list-disc font-medium">
+                        <li>The grid size is 5x5</li>
+                        <li>You have access to 3 hints per level.</li>
+                        <li>You're allowed up to 5 mistakes.
+                          If you make 5 incorrect moves, the game will reset, and you'll need to start over.</li>
+                      </ol>
                     </div>
                   </div>
                 </div>
@@ -526,10 +538,15 @@ const toggleTutorialMode = () => {
                   </div>
                   <!--text-->
                   <div class="md:w-1/2 flex flex-col items-center justify-center">
-                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6">
+                    <div class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium">
                       <h1 class="text-2xl font-bold pb-3">Hard Mode</h1>
-                      Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat optio, reprehenderit nobis aliquam
-                      dicta maiores eligendi id odio recusandae quo et reiciendis, laboriosam harum.
+                      Hard Mode offers challenging puzzles for experienced players. <br><br>
+                      <ol class="list-disc font-medium">
+                        <li>The grid size is 7x7</li>
+                        <li>You have access to 5 hints per level.</li>
+                        <li>You're allowed up to 10 mistakes.
+                          If you make 5 incorrect moves, the game will reset, and you'll need to start over.</li>
+                      </ol>
                     </div>
                   </div>
                 </div>
@@ -538,11 +555,11 @@ const toggleTutorialMode = () => {
               </div>
 
               <div class="button-group self-center  flex flex-row">
-                <button v-if="tutorial > 0" @click="beforePage" class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6">
+                <button v-if="tutorial > 0" @click="beforePage" class="btn bg-blue-400 text-white mx-4">
                   &laquo;
                 </button>
 
-                <button v-if="tutorial < 6" @click="nextPage" class="btn bg-blue-400 text-white mx-44 mb-2 m-3 px-6">
+                <button v-if="tutorial < 6" @click="nextPage" class="btn bg-blue-400 text-white mx-4">
                   &raquo;
                 </button>
               </div>
@@ -743,71 +760,7 @@ const toggleTutorialMode = () => {
 
 <style scoped>
 .gamePlay {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.pic {
-  border: rgb(209, 205, 205) solid 3px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 15px;
-  box-shadow: 5px 6px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  max-width: 150vh;
-  margin: 0 auto;
-}
-
-.tuto {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
-  align-items: center;
-
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  max-width: 150vh;
-  margin: 0 auto;
-}
-
-.tutorials {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.hanjie {
-  border-collapse: collapse;
-  margin: 20px;
-}
-
-.hanjie-cell {
-  width: 70px;
-  height: 70px;
-  border: 1px solid #000;
-  text-align: center;
-}
-
-.hanjie-cell-half {
-  width: 70px;
-  height: 30px;
-  border: 1px solid #000;
-  text-align: center;
-  padding-bottom: 10px;
-}
-
-.filled {
-  background-color: #000;
-}
-
-.col-number,
-.row-number,
-.none {
-  border: none;
-}
-
-.modal {
-  background-color: rgba(0, 0, 0, 0.5);
+  font-family: sans-serif;
 }
 
 .modal-container {
@@ -823,17 +776,25 @@ const toggleTutorialMode = () => {
   margin-top: 3%;
 }
 
+/*new responsive*/
 .box-wrapper {
-  max-width: 800px;
-  ;
-
+  max-width: 750px;
+  min-height: 340px;
+  width: 80%;
+  margin: 5%;    
 }
 
 .box {
   height: max-content;
-  /* White background */
   border-radius: 30px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.button-group{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
 }
 
 
@@ -856,5 +817,4 @@ const toggleTutorialMode = () => {
   transition: 3s;
   color: white;
   content: '5 x 5 Table';
-}
-</style>
+}</style>
