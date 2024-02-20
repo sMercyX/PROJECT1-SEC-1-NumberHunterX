@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watchEffect, watch } from 'vue'
-import easyLevel from './easyLevel.json'
-import hardLevel from './hardLevel.json'
+import easyLevel from './assets/levels/easyLevel.json'
+import hardLevel from './assets/levels/hardLevel.json'
 import tableSize from './tableSize.json'
 
 let level = [...easyLevel]
@@ -53,7 +53,7 @@ const randomLevel = () => {
     let randomIndex = Math.floor(Math.random() * level.length)
     if (randomlv.length == 0) randomlv.push(level[randomIndex])
     else if (
-      !randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle) //หาตัวที่ยังไม่ถูกสุ่ม
+      !randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle) 
     ) {
       randomlv.push(level[randomIndex])
     }
@@ -639,11 +639,18 @@ const toggleTutorialMode = (mode) => {
               <div class="">Level {{ currentLv + 1 }}</div>
             </div>
             <button
-              v-if="win"
+              v-if="win&&currentLv+1!=5"
               class="btn bg-green-500 text-white hover:bg-green-700"
               @click="nextLevel"
             >
               NEXT LEVEL
+            </button>
+            <button
+              v-if="win&&currentLv+1===5"
+              class="btn bg-green-500 text-white hover:bg-green-700"
+              @click="nextLevel"
+            >
+              END GAME
             </button>
           </div>
         </section>
