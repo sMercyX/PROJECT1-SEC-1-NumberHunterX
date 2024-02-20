@@ -52,15 +52,13 @@ const randomLevel = () => {
   while (randomlv.length < 5) {
     let randomIndex = Math.floor(Math.random() * level.length)
     if (randomlv.length == 0) randomlv.push(level[randomIndex])
-    else if (
-      !randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle) 
-    ) {
+    else if (!randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle)) {
       randomlv.push(level[randomIndex])
     }
   }
 }
 const calTimeToMin = (time) => {
-  let min = Math.floor(time / 60) 
+  let min = Math.floor(time / 60)
   let sec = time % 60
   return { min, sec }
 }
@@ -278,7 +276,9 @@ const addClickers = (event) => {
     checked.value.push(id)
 
     if (missed.value >= fails.value) {
-      failPage()
+      setTimeout(() => {
+        failPage()
+      }, 500)
     }
   }
 }
@@ -311,7 +311,14 @@ watch(checked.value, () => {
     if (!checked.value.includes(mustCheckCell)) winTemp = false
   })
   win.value = winTemp
-  if (win.value) timer(false)
+  if (win.value) {
+    timer(false)
+    if (currentLv.value + 1 === 5) {
+      setTimeout(() => {
+        nextLevel()
+      }, 500)
+    }
+  }
 })
 const toggleTutorialMode = (mode) => {
   if (mode === 'general') {
@@ -639,18 +646,12 @@ const toggleTutorialMode = (mode) => {
               <div class="">Level {{ currentLv + 1 }}</div>
             </div>
             <button
-              v-if="win&&currentLv+1!=5"
+              v-if="win"
               class="btn bg-green-500 text-white hover:bg-green-700"
               @click="nextLevel"
             >
-              NEXT LEVEL
-            </button>
-            <button
-              v-if="win&&currentLv+1===5"
-              class="btn bg-green-500 text-white hover:bg-green-700"
-              @click="nextLevel"
-            >
-              END GAME
+              <div v-if="currentLv + 1 != 5">NEXT LEVEL</div>
+              <div v-if="currentLv + 1 === 5">END GAME</div>
             </button>
           </div>
         </section>
