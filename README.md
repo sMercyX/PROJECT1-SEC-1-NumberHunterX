@@ -2,9 +2,42 @@
 First Project of Client side II
 member
 <ul>
-<li>65130500017 ญาดา เจนรุ่งโรจน์สกุล</li>
-<li>65130500021 ณัฐวรรณ คุ้มเผ่า</li>
-<li>65130500029 ธิติพงศ์ สุดสวนศรี</li>
+<li>65130500017 ญาดา เจนรุ่งโรจน์สกุล 22%<ul>
+
+- Core game function programming
+  - Genarate Block
+  - Hint System
+  - Fix Bug Missing System
+  - Timing System
+  - Next level System
+  - Random level System
+  - local storage System
+- Json Level (easy and hard)
+- Attend weekly meeting
+  
+<li>65130500021 ณัฐวรรณ คุ้มเผ่า 18%<ul>
+
+- Tutorail Page
+- Guide design
+- Block Template
+- Hint System
+- Win Page 
+- Fails Page
+- CSS
+- Attend weekly meeting
+  
+<li>65130500029 ธิติพงศ์ สุดสวนศรี 18%<ul>
+
+- Core game function programming 
+  - Timing System
+  - Next level System
+  - Fix Bug Missing System
+  - Hint System
+- Json Level (easy)
+- Tutorail Page
+- Responsive
+- Attend weekly meeting
+</ul></li>
 <li>65130500033 นภทีป์ จันทร์อินทร์ <ul>
   - function 
     - timer
