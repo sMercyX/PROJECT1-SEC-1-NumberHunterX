@@ -6,21 +6,23 @@ import tableSize from './tableSize.json'
 
 
 // game state
-let show = ref(0)
+let show = ref(0) // เก็บค่าpageต่างๆ (for v-show)
 let mode = 'easyMode' //modeที่เลือก default เป็นeasyMode
 let gameSize = ref(0) // easy(5ช่อง) =0 hard(7ช่อง) =1
 const randomlv = [] //เก็บlevelที่randomแล้ว 5 ด่าน
 let level = [...easyLevel] //เก็บarrayของlevel ปจบไว้ defaultให้เป็นeasyก่อน
 const currentLv = ref(0) //lv ที่อยู่x0[]
-const start = ref(false)
-let hintsLeft = ref(3)
-let hintable = ref(false)
-const missed = ref(0) //เก็บค่าmissed
-const win = ref(false)
-let fails = ref(0)  //เก็บค่าfails
-const checked = ref([])
-const marked = []
+const start = ref(false)  //เมื่อstart=true ให้สร้างตัวแปรตาราง และเริ่มเกม
 let save = ref()
+
+//game data
+let hintsLeft = ref(3)  // จำนวนhintที่เหลือ
+let hintable = ref(false)   
+const missed = ref(0) //เก็บค่าmissed
+const win = ref(false) 
+let fails = ref(0)  //เก็บค่าfails
+const checked = ref([]) 
+const marked = [] 
 
 // block
 let blocks = ref([])
