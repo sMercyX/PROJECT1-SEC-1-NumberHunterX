@@ -9,47 +9,6 @@ member
 <li>65130500048 พสิษธ์ อุดมพานิช</li>
 </ul>
 
-# สรุปการประชุมงานวันจันทร์ที่ 28 ม.ค.
-หลังจากการประชุมเราสรุปได้ว่า จากprototypeแรกที่ได้ลองทำมานั้นได้มีการ update idea ของตนเอง และ ได้แลกเปลี่ยนlogicที่ได้ไปทำมา เราได้มีการปรับเปลี่ยน และสิ่งที่เพิ่มมาดังนี้ 
-* มี Tutorial สำหรับสอนเล่นซึ่งจะเป็น pop up เด้งขึ้นมา
-* มีโหมดสำหรับจับเวลาการเล่น
-* มีโหมดสำหรับการจำกัดเวลาการเล่น
-* มีปุ่มHint สำหรับกดเพื่อ fiil ในช่องที่ถูกต้อง
-
-เราได้มอบหมายงานให้ทุกคนทำmini project ในรูปแบบของตนเอง เพื่อที่จะเลือกแต่ละfunction ที่ดีที่สุดจากทุกproject แล้วจึงนำมาmerge รวมเป็น main project
-
-  # ProjectSimpleJs1
-First Project of Client side II
-member
-<ul>
-<li>65130500017 ญาดา เจนรุ่งโรจน์สกุล</li>
-<li>65130500021 ณัฐวรรณ คุ้มเผ่า</li>
-<li>65130500029 ธิติพงศ์ สุดสวนศรี</li>
-<li>65130500033 นภทีป์ จันทร์อินทร์ </li>
-<li>65130500048 พสิษธ์ อุดมพานิช</li>
-</ul>
-
-Week 1 Progress:
-- [x] Proof of Concept
-- [x] Basic UX-UI design
-- [x] Base game concept
-
-Week 2 Progress:
-- [x] Basic UX-UI Implementation
-- [x] Adapting codebase to use Vue directives
-
-Week 3 Progress:
-- [x] Hinting System
-- [x] Timer
-- [x] Tutorial Modal
-- [x] Changing Level mechanic
-
-Next steps:
-- [x] Implementing Main Menu
-- [x] Full UX-UI CSS 
-- [x] Saving system using local storage
-
-
 # Features list
 ### 1.Tutorials 
 * multiple pages tutorial สามารถกดเปลี่ยนหน้า tutorial ได้
@@ -89,9 +48,12 @@ Number Hunter เป็นเกมปริศนาเชิงตรรกะ
 
 
 ## คลิปสาธิต features
+https://mailkmuttacth-my.sharepoint.com/personal/pasit_udom_kmutt_ac_th/_layouts/15/stream.aspx?id=%2Fpersonal%2Fpasit%5Fudom%5Fkmutt%5Fac%5Fth%2FDocuments%2F%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B8%97%E0%B8%B6%E0%B8%81%2FClient%20side%20project%201%2D20240217%5F233847%2D%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B8%97%E0%B8%B6%E0%B8%81%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%8A%E0%B8%B8%E0%B8%A1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview
 
 
 ## แหล่งอ้างอิง
+1. ภาพรวม https://tailwindcss.com/docs/installation
+2. ภาพรวม https://vuejs.org/guide/introduction.html
 
 
 
