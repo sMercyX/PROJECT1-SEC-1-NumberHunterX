@@ -45,9 +45,30 @@ Week 3 Progress:
 - [x] Changing Level mechanic
 
 Next steps:
-- [ ] Implementing Main Menu
-- [ ] Full UX-UI CSS 
-- [ ] Saving system using local storage
+- [x] Implementing Main Menu
+- [x] Full UX-UI CSS 
+- [x] Saving system using local storage
 
+
+# Features list
+### 1.tutorials 
+* multiple pages tutorial สามารถกดเปลี่ยนหน้า tutorial ได้
+* มีปุ่มเปลี่ยนหมวดหมู่ของ tutorial สองปุ่ม: General, Game Modes
+
+### 2.Game Play
+#### Easy mode และ Hard mode
+* เมื่อกดเริ่มเกม ระบบจะสุ่มเลือก object ด่านจาก level JSON file มา 5 level จาก level ทั้งหมดใน file แล้วนำค่ามาใส่ใน template เกม
+* ผู้เล่นสามารถคลิกซ้ายในการเลือกช่อง (check) โดยจะแสดงเป็นสีเขียวถ้าเป็นblockที่ถูกและ สีแดงถ้าเป็นblockที่ผิดแล้วไปเพิ่มค่า missed
+* ผู้เล่นสามารถกดคลิกขวาในกรณีที่ต้องการกด mark ไม่ให้กดคลิกซ้ายได้เป็นการกันช่อง คล้ายกับการตัด choice และสามารถกดคลิกขวาอีกครั้งเพื่อนำmarkออก
+* มี Hint เป็นตัวช่วย(Easy mode 3 ครั้ง และHard mode 5 ครั้ง)ในแต่ละlevel โดยเมื่อผู้เล่นกดปุ่มHint 1 ครั้ง จะ ทำการrandom block ที่ถูก และเฉลยเป็นสีเขียวในblockนั้นให้ ในกรณีที่ผู้เล่นได้ mark ช่องที่ถูกต้องและเหลือเป็น block สุดท้ายปุ่ม mark จะไม่ถูก disable แสดงถึงยังมี block ที่ยังไม่ถูกกด เมื่อเล่นจบด่านนั่นคือ block ที่ถูกถูก check จนครบปุ่มนี้ก็จะถูกปิดไป
+* มีเวลานับตั้งแต่เริ่มเล่นจนเล่นครบทั้ง 5 level
+* มี Best time ที่เป็นเวลาที่ดีที่สุดของผู้เล่นเก็บไว้ในlocal storage ถ้าผู้เล่นเล่นในEasy mode จะถูกเก็บไว้ใน Localstorage item ชื่อ “easyMode” ถ้าผู้เล่นเล่นในHard mode จะถูกเก็บไว้ใน Localstorage item ชื่อ “hardMode” และแสดงในทุก level ที่เล่นขึ้นอยู่กับ mode ที่เล่น
+* มีค่าMissในการระบุว่ากดblockที่ผิดไปกี่ครั้งแล้วตั้งแต่เริ่มเล่น โดยถ้าค่าMiss ของEasy levelเกิน5 ครั้ง และHard levelเกิน10ครั้งจะเข้าสู่ modal แพ้เกม
+
+### 3.Modal Page
+* เมื่อผู้เล่น เล่นครบทั้ง 5 level หน้า modal page จะแสดงขึ้นมา เพื่อระบุBest time และ เวลาที่ใช้ทั้งหมดในการเล่น โดยจะมีข้อความแตกต่างกันไปในแต่ละกรณีเช่น หากเวลาเล่นเร็วกว่า Best time จะแสดงความยินดีต่อผู้เล่น หรือ หากช้ากว่าหรือเท่ากับ best time จะมีข้อความบอกให้ผู้เล่นเพิ่มความเร็ว
+
+### 4.Fail page
+* เมื่อค่าMiss ของEasy levelเกิน5 ครั้ง และHard levelเกิน10ครั้ง Fail page จะแสดงขึ้นมา ให้เลือกเริ่มเล่นอีกครั้ง หรือกลับไปหน้าHome
 
 
