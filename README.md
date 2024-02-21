@@ -89,9 +89,12 @@ Number Hunter เป็นเกมปริศนาเชิงตรรกะ
 
 
 ## คลิปสาธิต features
+https://mailkmuttacth-my.sharepoint.com/:v:/g/personal/pasit_udom_kmutt_ac_th/EeQr3cyWwlBDv9Xnde2z3_IBqVZNhV2BLzyJu7GeCvx54A?e=TIZwuL
 
 
 ## แหล่งอ้างอิง
+1. ภาพรวม https://tailwindcss.com/docs/installation
+2. ภาพรวม https://vuejs.org/guide/introduction.html
 
 
 
