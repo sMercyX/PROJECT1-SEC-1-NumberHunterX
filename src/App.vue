@@ -38,7 +38,7 @@ let mins = ref(0)
 let secs = ref(0)
 let timeUsed = ref(0) //เวลาที่ใช้ทั้งหมดเป็นsec
 let timerInterval
-let bestTime = ref({}) //เก็บ
+let bestTime = ref({}) //เตรียมสำหรับเก็บ{min,sec}
 let newBestTime = ref(false) //true false  ไว้เปลี่ยนตอนTimeUse น้อยกว่า save
 
 let healthStatus = 'bg-green-400'
@@ -48,7 +48,7 @@ const genBlock = () => {
   rows = tableSize[gameSize.value].rows //tableSize[1].rows //in tablesize.json "rows": ["t", "0", "1", "2", "3", "4", "5", "6", "7"]
   columns = tableSize[gameSize.value].columns //tableSize[1].colums //in tablesize.json "columns": ["0", "a", "b", "c", "d", "e", "f", "g", "99"]
   rows.forEach((ele) => {
-    //ใส่ {row:["t", "0", "1", "2", "3", "4", "5", "6", "7"] , column: ["0", "a", "b", "c", "d", "e", "f", "g", "99"] } ใน arrayที่ชื่อว่าblocks
+    //ใส่ {row:"t" , column: ["0", "a", "b", "c", "d", "e", "f", "g", "99"] } ใน arrayที่ชื่อว่าblocks
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
