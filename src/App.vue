@@ -2,49 +2,52 @@
 import { ref, watchEffect, watch } from 'vue'
 import easyLevel from './assets/levels/easyLevel.json'
 import hardLevel from './assets/levels/hardLevel.json'
-import tableSize from './tableSize.json'
+import tableSize from './assets/levels/tableSize.json'
 
+// game state
+let show = ref(0)
+let mode = 'easyMode' //modeที่เลือก default เป็นeasyMode
+let gameSize = ref(0) // easy(5ช่อง) =0 hard(7ช่อง) =1
+const randomlv = [] //เก็บlevelที่randomแล้ว 5 ด่าน
 let level = [...easyLevel] //เก็บarrayของlevel ปจบไว้ defaultให้เป็นeasyก่อน
+const currentLv = ref(0) //lv ที่อยู่x0[]
 const start = ref(false)
 let hintsLeft = ref(3)
 let hintable = ref(false)
-//style
+const missed = ref(0) //เก็บค่าmissed
+const win = ref(false)
+let fails = ref(0) //เก็บค่าfails
+const checked = ref([])
+const marked = []
+let save = ref()
+
+// block
+let blocks = ref([])
+let rows
+let columns
+let headerNums = []
+let correctBlocks = [] //correctBlockss stores block that when click its will change to correct color
+const playCellElements = ref(null) //เก็บrefของblockแต่ละตัวที่กด
+
+// tutorial state
+let tutorial = ref(0) // เก็บvalue pageของtutorial++
+const tutorialMode = ref(1) // เก็บvalueของmodeในtutorial
+
+// time
+let mins = ref(0)
+let secs = ref(0)
+let timeUsed = ref(0) //เวลาที่ใช้ทั้งหมดเป็นsec
+let timerInterval
+let bestTime = ref({})
+let newBestTime = ref(false) //true false  ไว้เปลี่ยนตอนTimeUse น้อยกว่า save
+
+// style
 const blockStyle = 'hanjie-cell'
 const noneBorder = 'row-number'
 const halfBlock = 'hanjie-cell-half'
-
-let gameSize = ref(0) // easy(5ช่อง) =0 hard(7ช่อง) =1   //
-const missed = ref(0) //เก็บค่าmissed
-let fails = ref(0) //เก็บค่าfails
-
-//block stores row and column of table
-let blocks = ref([])
-let rows //add 2 row for show header number(t,0)
-let columns //add 2 columns for show header number(0) and clear block(99)
-
-const checked = ref([])
-const win = ref(false)
-//store min and sec
-let mins = ref(0)
-let secs = ref(0)
-
-let timeUsed = ref(0) //เวลาที่ใช้ทั้งหมดเป็นsec
-let timerInterval
-let newBestTime = ref(false) //true false //ไว้เปลี่ยนตอนTimeUse น้อยกว่า save
-const currentLv = ref(0) //lv ที่อยู่x0[]
-const marked = []
-let save = ref()
-let bestTime = ref({})
-let tutorial = ref(0)
-let mode = 'easyMode' //modeที่เลือก default เป็นeasyMode
-let show = ref(0)
-//correctBlockss stores block that when click its will change to correct color
-let correctBlocks = []
-let headerNums = []
-const randomlv = [] //เก็บlevelที่randomแล้ว 5 ด่าน
-const playCellElements = ref(null)
+const correct = 'MediumSeaGreen'
+const unCorrect = '#f87171'
 let healthStatus = 'bg-green-400'
-const tutorialMode = ref(1)
 const genBlock = () => {
   blocks.value = []
   //rows stores row name of table
@@ -97,21 +100,19 @@ const resetHint = () => {
   }
 }
 
-const getPlayCellTarget = (id) => {//เอาtargetของref playCellElement
+const getPlayCellTarget = (id) => {
+  //เอาtargetที่ถูกเก็บอยู่ในplayCellElement ผ่านการเปรียบเทียบid
   return playCellElements.value.find((cellDom) => cellDom.id === id)
 }
+
 const resetBlockStyles = () => {
-  checked.value.forEach((id) => {
-    getPlayCellTarget(id).style.backgroundColor = ''
-    getPlayCellTarget(id).textContent = ''
-  })
-  marked.forEach((id) => {
+  //reset background จากidในplayCellElements
+  playCellElements.value.forEach((id) => {
     id.style.backgroundColor = ''
-    id.textContent = ''
   })
 }
 const resetGame = () => {
-  start.value = false
+  //resetค่าที่ต้องเปลี่ยนในแต่ละlevel
   checked.value.splice(0)
   win.value = false
   clearInterval(timerInterval)
@@ -120,35 +121,35 @@ const resetGame = () => {
   hintable.value = false
 }
 const resetTime = () => {
+  //resetเวลาที่ถูกใช้
   currentLv.value = 0
   mins.value = 0
   secs.value = 0
   timeUsed.value = 0
 }
-const setBestTime = () => {
-  bestTime.value = calTimeToMin(save.value)
-}
 const getSave = () => {
   save.value = localStorage.getItem(mode)
   if (save.value === null || save.value === undefined) {
     save.value = 0
-    setBestTime()
+    bestTime.value = calTimeToMin(save.value) //ถ้าหาไม่เจอก็ให้ set bestime เป็น0
   } else {
-    save.value = JSON.parse(save.value)
-    setBestTime()
+    save.value = JSON.parse(save.value) //แปลงค่าให้เป็นjson //เพราะต้องเป็นjsonถึงจะเก็บลงlocalstorageได้
+    bestTime.value = calTimeToMin(save.value)
   }
 }
-const homePage = () => {
+const homePage = () => { 
   show.value = 0
-  tutorial.value = 0
+  
 }
 const tutorialPage = () => {
   show.value = 1
+  tutorial.value = 0 //reset tutorial ให้กลับไปหน้า0
 }
 const gamePage = () => {
   resetTime()
   resetGame()
   resetHint()
+  start.value = false
   newBestTime.value = false
   missed.value = 0
   genBlock()
@@ -265,7 +266,6 @@ const addClickers = (event) => {
     const blockColor = correctBlocks.includes(id) ? 'MediumSeaGreen' : '#f87171'
     targetBlock.style.backgroundColor = blockColor
     if (blockColor === '#f87171') {
-      targetBlock.textContent = 'x'
       missed.value++
     }
     checked.value.push(id)
