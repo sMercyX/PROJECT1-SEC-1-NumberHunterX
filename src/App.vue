@@ -88,9 +88,9 @@ const timer = (op) => {
 const resetHint = () => {
   //ถ้าmodeเป็นeasyMode hint 3 ถ้าโหมดเป็นhardmode hintเป็น 5
   if (mode === 'easyMode') {
-    hintsLeft.value = 300
+    hintsLeft.value = 3
   } else if (mode === 'hardMode') {
-    hintsLeft.value = 500
+    hintsLeft.value = 5
   }
 }
 
