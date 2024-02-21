@@ -53,9 +53,8 @@ const genBlock = () => {
   })
 }
 const randomLevel = () => {
-  randomlv.splice(0) //reset array randomlv
+  randomlv.splice(0)
   while (randomlv.length < 5) {
-    //ถ้าด่านใน array randomlv ยังไม่ครบ 5ด่าน ให้whileต่อ
     let randomIndex = Math.floor(Math.random() * level.length) //level.length ที่อยู่ในfile json
     if (!randomlv.some((lv) => lv.puzzle === level[randomIndex].puzzle)) {
       //ถ้า lv.puzzle = เลขpuzzle ของตัวที่สุ่มมา ไม่push
@@ -141,6 +140,7 @@ const gamePage = () => {
   newBestTime.value = false
   missed.value = 0
   genBlock()
+  randomLevel()
   getSave()
   show.value = 2
 }
@@ -177,7 +177,6 @@ const checkHeader = (id) => {
   return index >= 0 ? headerNums[index].result : '' //รับid ของblockมา แล้วcheck ว่าเป็นheadernumมั้ยผ่านการเปรียบเทียบid
 }
 const startGame = () => {
-  randomLevel()
   correctBlocks = randomlv[currentLv.value].correctBlocks //เอาค่าที่randomมาใส่ลงไป ตอนจะเริ่ม
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true //ทำให้ปุ่มstart หายไป และช่องกดได้
