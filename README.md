@@ -6,7 +6,22 @@ member
 <li>65130500021 ณัฐวรรณ คุ้มเผ่า</li>
 <li>65130500029 ธิติพงศ์ สุดสวนศรี</li>
 <li>65130500033 นภทีป์ จันทร์อินทร์ </li>
-<li>65130500048 พสิษธ์ อุดมพานิช</li>
+<li>65130500048 พสิษธ์ อุดมพานิช 23%<ul>
+  
+- project coordinator
+- proof of concept
+- bug fixes and correction
+- code review
+- Core game function programming 
+  - Checking block
+  - Marking block
+  - Hinting System
+  - Miss and Health bar
+  - Winning checking system
+- Attend weekly meeting
+</ul></li>
+
+
 </ul>
 
 # Features list
