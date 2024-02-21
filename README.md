@@ -38,7 +38,7 @@ member
 - Responsive
 - Attend weekly meeting
 </ul></li>
-<li>65130500033 นภทีป์ จันทร์อินทร์ <ul>
+<li>65130500033 นภทีป์ จันทร์อินทร์ 19%<ul>
   - function 
     - timer
     - start button
