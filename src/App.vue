@@ -19,7 +19,7 @@ const win = ref(false)
 let fails = ref(0) //เก็บค่าfails
 const checked = ref([])
 const marked = []
-let save = ref()
+let save = ref() //ค่าbesttimeที่เก็บไว้เป็นวินาที
 
 // block
 let blocks = ref([])
@@ -128,7 +128,7 @@ const resetTime = () => {
   timeUsed.value = 0
 }
 const getSave = () => {
-  save.value = localStorage.getItem(mode)
+  save.value = localStorage.getItem(mode) //เอาเวลาbesttimeมาตามชื่อmode และเก็บลงในตัวแปรชื่อsave
   if (save.value === null || save.value === undefined) {
     save.value = 0
     bestTime.value = calTimeToMin(save.value) //ถ้าหาไม่เจอก็ให้ set bestime เป็น0
@@ -137,15 +137,15 @@ const getSave = () => {
     bestTime.value = calTimeToMin(save.value)
   }
 }
-const homePage = () => { 
+const homePage = () => {
   show.value = 0
-  
 }
 const tutorialPage = () => {
   show.value = 1
   tutorial.value = 0 //reset tutorial ให้กลับไปหน้า0
 }
 const gamePage = () => {
+  //reset ทุกค่า //genช่อง //randomlevel //เอาbesttime ที่ถูกเก็บในlocalstorageมา
   resetTime()
   resetGame()
   resetHint()
@@ -162,7 +162,7 @@ const ezMode = () => {
   gameSize.value = 0
   fails.value = 5
   mode = 'easyMode'
-  level = [...easyLevel]
+  level = [...easyLevel] //spreadเพื่อเอามาแค่value //จะได้ไม่ใช้referenceที่เดียวกัน
   gamePage()
 }
 const hardMode = () => {
@@ -179,34 +179,34 @@ const modalPage = () => {
 const failPage = () => {
   show.value = 4
 }
-const checkHeaderStyle = (id) => {
-  if (id.includes('0')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('t')) return `${halfBlock} ${noneBorder}`
+const checkBlockStyle = (id) => {
+  if (id.includes('0') || id.includes('t')) return `${halfBlock} ${noneBorder}`
   if (id.includes('99')) return `${blockStyle} ${noneBorder}`
-  return blockStyle
+  return blockStyle //ถ้าไม่ใช่headerก็ส่งแค่blockstyleไป
 }
 
 const checkHeader = (id) => {
-  const index = headerNums.findIndex((num) => num.id === id)
-
-  return index >= 0 ? headerNums[index].result : ''
+  const index = headerNums.findIndex((block) => block.id === id)
+  return index >= 0 ? headerNums[index].result : '' //รับid ของblockมา แล้วcheck ว่าเป็นheadernumมั้ยผ่านการเปรียบเทียบid
 }
 const startGame = () => {
-  correctBlocks = randomlv[currentLv.value].correctBlocks
+  correctBlocks = randomlv[currentLv.value].correctBlocks //เอาค่าที่randomมาใส่ลงไป ตอนจะเริ่ม
   headerNums = randomlv[currentLv.value].headerNums
-  start.value = true
+  start.value = true //ทำให้ปุ่มstart หายไป และช่องกดได้
   timer(true)
-  hintable.value = true
+  hintable.value = true //ทำให้ปุ่มhintกดได้
 }
 const checkNewBestTime = () => {
+  //checkว่าเวลาที่ใช้ น้อยกว่าเวลาที่saveไว้รึป่าว
   if (save.value === 0 || timeUsed.value < save.value) {
-    newBestTime.value = true
+    newBestTime.value = true //ถ้าเวลาที่ใช้น้อยกว่าก็ newBestTime เป็นtrue //New Best Time
     save.value = timeUsed.value
-  } else newBestTime.value = false
+  } else newBestTime.value = false //ถ้าเวลาที่ใช้น้อยกว่าก็ newBestTime เป็นFalse //Be faster
 }
 const nextLevel = () => {
   currentLv.value++
   if (currentLv.value < randomlv.length) {
+    //ถ้ายังไม่ใช่level 5(สุดท้าย)
     resetBlockStyles()
     resetGame()
     resetHint()
@@ -214,7 +214,7 @@ const nextLevel = () => {
     win.value = false
   } else {
     checkNewBestTime()
-    localStorage.setItem(mode, JSON.stringify(save.value))
+    localStorage.setItem(mode, JSON.stringify(save.value)) //ใช้modeเป็นkeyในการเก็บลงstorage
     modalPage()
   }
 }
@@ -302,9 +302,8 @@ watch(checked.value, () => {
   if (win.value) {
     timer(false)
     if (currentLv.value + 1 === 5) {
-      setTimeout(() => {
-        nextLevel()
-      }, 500)
+      //ถ้าเล่นจบให้เปลี่ยนหน้าเอง
+      nextLevel()
     }
   }
 })
@@ -654,7 +653,7 @@ const toggleTutorialMode = (mode) => {
             >
               <td
                 ref="playCellElements"
-                :class="checkHeaderStyle(col + block.row)"
+                :class="checkBlockStyle(col + block.row)"
                 v-for="col in block.column"
                 :key="col + block.row"
                 :id="col + block.row"
