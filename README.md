@@ -38,15 +38,18 @@ member
 - Responsive
 - Attend weekly meeting
 </ul></li>
+
 <li>65130500033 นภทีป์ จันทร์อินทร์ 19%<ul>
-  - function 
+  
+  - Core game function programing
     - timer
     - start button
-    - next level
-    - current level
+    - manage Level
     - missed
     - fail page
+  - Attend weekly meeting 
   </ul></li>
+  
 <li>65130500048 พสิษธ์ อุดมพานิช 23%<ul>
   
 - project coordinator
