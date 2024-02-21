@@ -715,9 +715,9 @@ const toggleTutorialMode = (mode) => {
                 class="box2 flex flex-col p-12 py-8 items-center justify-center text-center bg-stone-100 shadow-lg rounded-md"
               >
                 <div class="font-extrabold text-2xl text-black">
-                  Congratulation <span class="text-4xl">&#127881;</span>
+                  Congratulations <span class="text-4xl">&#127881;</span>
                   <p class="font-sans font-medium text-lg mt-2">
-                    you finish the game
+                    You finished the game
                   </p>
                 </div>
                 <div
