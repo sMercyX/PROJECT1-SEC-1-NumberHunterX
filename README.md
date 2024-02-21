@@ -51,7 +51,7 @@ Next steps:
 
 
 # Features list
-### 1.tutorials 
+### 1.Tutorials 
 * multiple pages tutorial สามารถกดเปลี่ยนหน้า tutorial ได้
 * มีปุ่มเปลี่ยนหมวดหมู่ของ tutorial สองปุ่ม: General, Game Modes
 
