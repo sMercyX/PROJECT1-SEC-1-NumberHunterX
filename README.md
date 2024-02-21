@@ -6,6 +6,13 @@ member
 <li>65130500021 ณัฐวรรณ คุ้มเผ่า</li>
 <li>65130500029 ธิติพงศ์ สุดสวนศรี</li>
 <li>65130500033 นภทีป์ จันทร์อินทร์ </li>
+  - function 
+    - timer
+    - start button
+    - next level
+    - current level
+    - missed
+    - fail page
 <li>65130500048 พสิษธ์ อุดมพานิช 23%<ul>
   
 - project coordinator
