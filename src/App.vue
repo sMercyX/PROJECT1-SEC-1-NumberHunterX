@@ -650,8 +650,7 @@ const toggleTutorialMode = (mode) => {
               class="btn bg-green-500 text-white hover:bg-green-700"
               @click="nextLevel"
             >
-              <div v-if="currentLv + 1 != 5">NEXT LEVEL</div>
-              <div v-if="currentLv + 1 === 5">END GAME</div>
+              NEXT LEVEL
             </button>
           </div>
         </section>
