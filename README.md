@@ -38,7 +38,9 @@ member
 - Responsive
 - Attend weekly meeting
 </ul></li>
+
 <li>65130500033 นภทีป์ จันทร์อินทร์ 19%<ul>
+  
   - function 
     - timer
     - start button
@@ -47,6 +49,7 @@ member
     - missed
     - fail page
   </ul></li>
+  
 <li>65130500048 พสิษธ์ อุดมพานิช 23%<ul>
   
 - project coordinator
