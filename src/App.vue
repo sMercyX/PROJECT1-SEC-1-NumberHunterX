@@ -10,7 +10,7 @@ let mode = 'easyMode' //modeที่เลือก default เป็นeasyMod
 let gameSize = ref(0) // easy(5ช่อง) =0 hard(7ช่อง) =1
 const randomlv = [] //เก็บlevelที่randomแล้ว 5 ด่าน
 let level = [...easyLevel] //เก็บarrayของlevel ปจบไว้ defaultให้เป็นeasyก่อน
-const currentLv = ref(0) //lv ที่อยู่x0[]
+const currentLv = ref(0) //lv ที่อยู่
 const start = ref(false)
 let hintsLeft = ref(3)
 let hintable = ref(false)
@@ -38,15 +38,9 @@ let mins = ref(0)
 let secs = ref(0)
 let timeUsed = ref(0) //เวลาที่ใช้ทั้งหมดเป็นsec
 let timerInterval
-let bestTime = ref({})
+let bestTime = ref({}) //เก็บ
 let newBestTime = ref(false) //true false  ไว้เปลี่ยนตอนTimeUse น้อยกว่า save
 
-// style
-const blockStyle = 'hanjie-cell'
-const noneBorder = 'row-number'
-const halfBlock = 'hanjie-cell-half'
-const correct = 'MediumSeaGreen'
-const unCorrect = '#f87171'
 let healthStatus = 'bg-green-400'
 const genBlock = () => {
   blocks.value = []
@@ -133,7 +127,7 @@ const getSave = () => {
     save.value = 0
     bestTime.value = calTimeToMin(save.value) //ถ้าหาไม่เจอก็ให้ set bestime เป็น0
   } else {
-    save.value = JSON.parse(save.value) //แปลงค่าให้เป็นjson //เพราะต้องเป็นjsonถึงจะเก็บลงlocalstorageได้
+    save.value = JSON.parse(save.value) //แปลงค่าจากStringที่เอามาจากjsonเป็นnumberผ่าน JSON.parse
     bestTime.value = calTimeToMin(save.value)
   }
 }
@@ -180,9 +174,9 @@ const failPage = () => {
   show.value = 4
 }
 const checkBlockStyle = (id) => {
-  if (id.includes('0') || id.includes('t')) return `${halfBlock} ${noneBorder}`
-  if (id.includes('99')) return `${blockStyle} ${noneBorder}`
-  return blockStyle //ถ้าไม่ใช่headerก็ส่งแค่blockstyleไป
+  if (id.includes('0') || id.includes('t')) return `hanjie-cell-half row-number`
+  if (id.includes('99')) return `hanjie-cell row-number`
+  return 'hanjie-cell' //ถ้าไม่ใช่headerก็ส่งแค่blockstyleไป
 }
 
 const checkHeader = (id) => {
