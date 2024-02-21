@@ -93,12 +93,6 @@ const resetHint = () => {
     hintsLeft.value = 5
   }
 }
-
-const getPlayCellTarget = (id) => {
-  //เอาtargetที่ถูกเก็บอยู่ในplayCellElement ผ่านการเปรียบเทียบid
-  return playCellElements.value.find((cellDom) => cellDom.id === id)
-}
-
 const resetBlockStyles = () => {
   //reset background จากidในplayCellElements
   playCellElements.value.forEach((id) => {
@@ -147,7 +141,6 @@ const gamePage = () => {
   newBestTime.value = false
   missed.value = 0
   genBlock()
-  randomLevel()
   getSave()
   show.value = 2
 }
@@ -184,6 +177,7 @@ const checkHeader = (id) => {
   return index >= 0 ? headerNums[index].result : '' //รับid ของblockมา แล้วcheck ว่าเป็นheadernumมั้ยผ่านการเปรียบเทียบid
 }
 const startGame = () => {
+  randomLevel()
   correctBlocks = randomlv[currentLv.value].correctBlocks //เอาค่าที่randomมาใส่ลงไป ตอนจะเริ่ม
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true //ทำให้ปุ่มstart หายไป และช่องกดได้
@@ -215,8 +209,7 @@ const nextLevel = () => {
 const genHint = () => {
   let hintableBlocks = correctBlocks.filter((correctBlocks) => {
     return (
-      !checked.value.includes(correctBlocks) &&
-      !marked.map((markedBlock) => markedBlock.id).includes(correctBlocks)
+      !checked.value.includes(correctBlocks) && !marked.includes(correctBlocks)
     )
   })
   if (!hintable.value || hintableBlocks.length === 0) {
@@ -224,9 +217,9 @@ const genHint = () => {
   }
   let randomIndex = Math.floor(Math.random() * hintableBlocks.length)
   hintsLeft.value--
-  getPlayCellTarget(hintableBlocks[randomIndex]).dispatchEvent(
-    new Event('click')
-  )
+  playCellElements.value
+    .find((cellDom) => cellDom.id === hintableBlocks[randomIndex])
+    .dispatchEvent(new Event('click'))
 }
 watchEffect(() => {
   let checkedCorrect = checked.value.filter((block) => {
@@ -247,13 +240,13 @@ watchEffect(() => {
     healthStatus = 'bg-red-400'
   }
 })
-const addClickers = (event) => {
+const checkBlock = (event) => {
   if (!start.value || win.value) {
     return
   }
   let targetBlock = event.target
   let id = targetBlock.id
-  if (checked.value.includes(id) || marked.includes(targetBlock)) {
+  if (checked.value.includes(id) || marked.includes(id)) {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
@@ -269,22 +262,23 @@ const addClickers = (event) => {
     }
   }
 }
+
 const mark = (event) => {
   event.preventDefault()
   let targetBlock = event.target
   let targetBlockId = targetBlock.id
   if (!start.value || win.value || checked.value.includes(targetBlockId)) return
-  if (marked.includes(targetBlock)) {
+  if (marked.includes(targetBlockId)) {
     targetBlock.style.backgroundColor = ''
-    let unmarked = marked.findIndex((block) => block.id === targetBlock.id)
+    let unmarked = marked.findIndex((block) => block === targetBlock.id)
     marked.splice(unmarked, 1)
   } else if (
-    !marked.includes(targetBlock) &&
+    !marked.includes(targetBlockId) &&
     !targetBlockId.includes('0') &&
     !targetBlockId.includes('99') &&
     !targetBlockId.includes('t')
   ) {
-    marked.push(event.target)
+    marked.push(targetBlockId)
     targetBlock.style.backgroundColor = 'grey'
   }
 }
@@ -651,7 +645,7 @@ const toggleTutorialMode = (mode) => {
                 v-for="col in block.column"
                 :key="col + block.row"
                 :id="col + block.row"
-                @click="addClickers"
+                @click="checkBlock"
                 @click.right="mark"
               >
                 {{ checkHeader(col + block.row) }}
