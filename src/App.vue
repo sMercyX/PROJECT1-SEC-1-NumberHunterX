@@ -918,7 +918,7 @@ const toggleTutorialMode = (mode) => {
 .hanjie-cell {
   width: 70px;
   height: 70px;
-  border: 1px solid #000;
+  border: 2px solid #000;
   text-align: center;
 }
 
