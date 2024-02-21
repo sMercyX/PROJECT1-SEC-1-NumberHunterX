@@ -338,7 +338,8 @@
         "result": "1 1"
       }
     ]
-  },{
+  },
+  {
     "puzzle": 6,
     "correctBlocks": [
       "b1",

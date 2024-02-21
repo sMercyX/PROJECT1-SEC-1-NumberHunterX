@@ -4,68 +4,78 @@ import easyLevel from './assets/levels/easyLevel.json'
 import hardLevel from './assets/levels/hardLevel.json'
 import tableSize from './tableSize.json'
 
-let level = [...easyLevel]
+let level = [...easyLevel] //เก็บarrayของlevel ปจบไว้ defaultให้เป็นeasyก่อน
 const start = ref(false)
 let hintsLeft = ref(3)
 let hintable = ref(false)
+//style
 const blockStyle = 'hanjie-cell'
 const noneBorder = 'row-number'
 const halfBlock = 'hanjie-cell-half'
-const correct = 'MediumSeaGreen'
-const unCorrect = '#f87171'
-let gameSize = ref(0)
-const missed = ref(0)
-let fails = ref(0)
+
+let gameSize = ref(0) // easy(5ช่อง) =0 hard(7ช่อง) =1   //
+const missed = ref(0) //เก็บค่าmissed
+let fails = ref(0) //เก็บค่าfails
+
+//block stores row and column of table
 let blocks = ref([])
-let rows
-let columns
+let rows //add 2 row for show header number(t,0)
+let columns //add 2 columns for show header number(0) and clear block(99)
+
 const checked = ref([])
 const win = ref(false)
+//store min and sec
 let mins = ref(0)
 let secs = ref(0)
-let timeUsed = ref(0)
+
+let timeUsed = ref(0) //เวลาที่ใช้ทั้งหมดเป็นsec
 let timerInterval
-let newBestTime = ref(false)
-const currentLv = ref(0)
+let newBestTime = ref(false) //true false //ไว้เปลี่ยนตอนTimeUse น้อยกว่า save
+const currentLv = ref(0) //lv ที่อยู่x0[]
 const marked = []
 let save = ref()
 let bestTime = ref({})
 let tutorial = ref(0)
-let mode = 'easyMode'
+let mode = 'easyMode' //modeที่เลือก default เป็นeasyMode
 let show = ref(0)
+//correctBlockss stores block that when click its will change to correct color
 let correctBlocks = []
 let headerNums = []
-const randomlv = []
+const randomlv = [] //เก็บlevelที่randomแล้ว 5 ด่าน
 const playCellElements = ref(null)
 let healthStatus = 'bg-green-400'
 const tutorialMode = ref(1)
 const genBlock = () => {
   blocks.value = []
-  rows = tableSize[gameSize.value].rows
-  columns = tableSize[gameSize.value].columns
+  //rows stores row name of table
+  rows = tableSize[gameSize.value].rows //tableSize[1].rows //in tablesize.json "rows": ["t", "0", "1", "2", "3", "4", "5", "6", "7"]
+  columns = tableSize[gameSize.value].columns //tableSize[1].colums //in tablesize.json "columns": ["0", "a", "b", "c", "d", "e", "f", "g", "99"]
   rows.forEach((ele) => {
+    //ใส่ {row:["t", "0", "1", "2", "3", "4", "5", "6", "7"] , column: ["0", "a", "b", "c", "d", "e", "f", "g", "99"] } ใน arrayที่ชื่อว่าblocks
     blocks.value.push({ row: ele, column: [...columns] })
   })
 }
 const randomLevel = () => {
-  randomlv.splice(0)
+  randomlv.splice(0) //reset array randomlv
   while (randomlv.length < 5) {
-    let randomIndex = Math.floor(Math.random() * level.length)
-    if (randomlv.length == 0) randomlv.push(level[randomIndex])
-    else if (!randomlv.some((lv) => lv.puzzle == level[randomIndex].puzzle)) {
+    //ถ้าด่านใน array randomlv ยังไม่ครบ 5ด่าน ให้whileต่อ
+    let randomIndex = Math.floor(Math.random() * level.length) //level.length ที่อยู่ในfile json
+    if (!randomlv.some((lv) => lv.puzzle === level[randomIndex].puzzle)) {
+      //ถ้า lv.puzzle = เลขpuzzle ของตัวที่สุ่มมา ไม่push
       randomlv.push(level[randomIndex])
     }
   }
 }
 const calTimeToMin = (time) => {
+  //รับtimeที่เป็นวินาที
   let min = Math.floor(time / 60)
   let sec = time % 60
-  return { min, sec }
+  return { min, sec } //คำนวนแล้วreturnเป็น obj min และsec
 }
 const timer = (op) => {
   if (op) {
     timerInterval = setInterval(() => {
-      let { min, sec } = calTimeToMin(++timeUsed.value)
+      let { min, sec } = calTimeToMin(++timeUsed.value) //เรียกcalTimeToMin มาใช้แล้วdesturcture แล้วเก็บเป็นตัวแปรmin , sec
       mins.value = min
       secs.value = sec
     }, 1000)
@@ -77,27 +87,18 @@ const timer = (op) => {
     }
   }
 }
-const nextPage = () => {
-  tutorial.value++
-}
-const beforePage = () => {
-  tutorial.value--
-}
+
 const resetHint = () => {
+  //ถ้าmodeเป็นeasyMode hint 3 ถ้าโหมดเป็นhardmode hintเป็น 5
   if (mode === 'easyMode') {
-    hintsLeft.value = 3
+    hintsLeft.value = 300
   } else if (mode === 'hardMode') {
-    hintsLeft.value = 5
+    hintsLeft.value = 500
   }
 }
-const resetMiss = () => {
-  missed.value = 0
-}
-const resetNewBestTime = () => {
-  newBestTime.value = false
-}
-const getPlayCellTarget = (id) => {
-  return playCellElements.value.find((cellDom) => cellDom.id === id) //ไว้หา element ที่อยู่ใน ref:playCellElement ด้วย id แล้วส่ง event.target กลับไป
+
+const getPlayCellTarget = (id) => {//เอาtargetของref playCellElement
+  return playCellElements.value.find((cellDom) => cellDom.id === id)
 }
 const resetBlockStyles = () => {
   checked.value.forEach((id) => {
@@ -148,14 +149,15 @@ const gamePage = () => {
   resetTime()
   resetGame()
   resetHint()
-  resetNewBestTime()
-  resetMiss()
+  newBestTime.value = false
+  missed.value = 0
   genBlock()
   randomLevel()
   getSave()
   show.value = 2
 }
 const ezMode = () => {
+  //จับการคลิกที่ปุ่มeasy mode แล้ว asssign ค่าต่างๆให้
   gameSize.value = 0
   fails.value = 5
   mode = 'easyMode'
@@ -163,6 +165,7 @@ const ezMode = () => {
   gamePage()
 }
 const hardMode = () => {
+  //จับการคลิกที่ปุ่มhard mode แล้ว asssign ค่าต่างๆให้
   gameSize.value = 1
   fails.value = 10
   mode = 'hardMode'
@@ -181,16 +184,10 @@ const checkHeaderStyle = (id) => {
   if (id.includes('99')) return `${blockStyle} ${noneBorder}`
   return blockStyle
 }
-const checkTR = (id) => {
-  if (id.includes('0'))
-    return `
-  height: 30px;`
-  if (id.includes('t'))
-    return `
-  height: 30px;`
-}
+
 const checkHeader = (id) => {
   const index = headerNums.findIndex((num) => num.id === id)
+
   return index >= 0 ? headerNums[index].result : ''
 }
 const startGame = () => {
@@ -198,9 +195,7 @@ const startGame = () => {
   headerNums = randomlv[currentLv.value].headerNums
   start.value = true
   timer(true)
-  if (hintsLeft.value >= 0) {
-    hintable.value = true
-  }
+  hintable.value = true
 }
 const checkNewBestTime = () => {
   if (save.value === 0 || timeUsed.value < save.value) {
@@ -229,7 +224,7 @@ const genHint = () => {
       !marked.map((markedBlock) => markedBlock.id).includes(correctBlocks)
     )
   })
-  if (hintsLeft.value <= 0 || !hintable.value || hintableBlocks.length === 0) {
+  if (!hintable.value || hintableBlocks.length === 0) {
     return
   }
   let randomIndex = Math.floor(Math.random() * hintableBlocks.length)
@@ -267,33 +262,28 @@ const addClickers = (event) => {
     return
   }
   if (!id.includes('0') && !id.includes('99') && !id.includes('t')) {
-    const blockColor = correctBlocks.includes(id) ? correct : unCorrect
+    const blockColor = correctBlocks.includes(id) ? 'MediumSeaGreen' : '#f87171'
     targetBlock.style.backgroundColor = blockColor
-    if (blockColor === unCorrect) {
+    if (blockColor === '#f87171') {
       targetBlock.textContent = 'x'
       missed.value++
     }
     checked.value.push(id)
 
     if (missed.value >= fails.value) {
-      setTimeout(() => {
-        failPage()
-      }, 500)
+      failPage()
     }
   }
 }
 const mark = (event) => {
   event.preventDefault()
-  if (!start.value || win.value) return
   let targetBlock = event.target
   let targetBlockId = targetBlock.id
-  if (checked.value.includes(targetBlockId)) return
-  let markId
+  if (!start.value || win.value || checked.value.includes(targetBlockId)) return
   if (marked.includes(targetBlock)) {
     targetBlock.style.backgroundColor = ''
     let unmarked = marked.findIndex((block) => block.id === targetBlock.id)
     marked.splice(unmarked, 1)
-    markId = marked.map((mark) => mark.id)
   } else if (
     !marked.includes(targetBlock) &&
     !targetBlockId.includes('0') &&
@@ -301,14 +291,12 @@ const mark = (event) => {
     !targetBlockId.includes('t')
   ) {
     marked.push(event.target)
-    markId = marked.map((mark) => mark.id)
     targetBlock.style.backgroundColor = 'grey'
   }
 }
 watch(checked.value, () => {
-  let winTemp = true
-  correctBlocks.forEach((mustCheckCell) => {
-    if (!checked.value.includes(mustCheckCell)) winTemp = false
+  let winTemp = correctBlocks.every((mustCheckCell) => {
+    return checked.value.includes(mustCheckCell)
   })
   win.value = winTemp
   if (win.value) {
@@ -404,7 +392,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       You'll see a
                       <span class="font-bold text-pink-600">number</span> along
@@ -424,7 +412,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       Each number represents a consecutive group of filled
                       squares, and the numbers are
@@ -448,12 +436,12 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       <h1 class="font-bold text-xl mb-2">Solving the Puzzle</h1>
                       To fill a square, simply
                       <i class="text-pink-600"> left-click</i> it. If the
-                      decision is correct, it turns green; otherwise, it turnsÂ
+                      decision is correct, it turns green; otherwise, it turns
                       red. You can also disable clicked squares by
                       <i class="text-pink-600">right-click</i> on them.If you
                       make a mistake, don't worry! You can
@@ -473,7 +461,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       You can test your speed-solving skills in various
                       difficulty levels. The fastest completion time for each
@@ -492,7 +480,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       If you need help. Clicking the <b>"Get Hint"</b> button
                       will reveal some of the correct squares for the puzzle.
@@ -509,7 +497,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       <h1 class="text-2xl font-bold pb-3">Easy Mode</h1>
                       In Easy Mode, the puzzles are simpler and suitable for
@@ -536,7 +524,7 @@ const toggleTutorialMode = (mode) => {
                     class="md:w-1/2 flex flex-col items-center justify-center"
                   >
                     <div
-                      class="text-lg text-black text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
+                      class="text-lg text-justify mb-4 md:mb-8 p-6 font-sans font-medium"
                     >
                       <h1 class="text-2xl font-bold pb-3">Hard Mode</h1>
                       Hard Mode offers challenging puzzles for experienced
@@ -560,7 +548,7 @@ const toggleTutorialMode = (mode) => {
               >
                 <button
                   :disabled="tutorial === 0"
-                  @click="beforePage"
+                  @click="tutorial--"
                   class="btn bg-blue-400 text-white mx-4"
                 >
                   &laquo;
@@ -571,7 +559,7 @@ const toggleTutorialMode = (mode) => {
 
                 <button
                   :disabled="tutorial >= 6"
-                  @click="nextPage"
+                  @click="tutorial++"
                   class="btn bg-blue-400 text-white mx-4"
                 >
                   &raquo;
@@ -631,7 +619,7 @@ const toggleTutorialMode = (mode) => {
               v-if="!start"
               class="btn btn-outline btn-primary"
               type="button"
-              @click="startGame()"
+              @click="startGame"
             >
               <img src="./assets/play-button.png" class="h-7" />
               Start
@@ -662,7 +650,6 @@ const toggleTutorialMode = (mode) => {
               v-for="block in blocks"
               :key="block.row"
               :id="block.row"
-              :style="checkTR(block.row)"
               class="font-sans font-medium text-base"
             >
               <td
@@ -685,11 +672,11 @@ const toggleTutorialMode = (mode) => {
           <div class="hint flex flex-row order-first">
             <button
               :class="
-                hintsLeft > 0 && hintable
+                hintable
                   ? 'btn border-none bg-yellow-400 hover:bg-yellow-200 text-black m-1'
-                  : 'btn border-none bg-yellow-400 hover:bg-gray-600 cursor-not-allowed m-1'
+                  : 'btn border-none bg-gray-600 cursor-not-allowed m-1'
               "
-              :disable="hintsLeft > 0 ? false : true"
+              :disable="hintable ? false : true"
               @click="genHint"
             >
               Get hint: {{ hintsLeft }}
@@ -771,12 +758,7 @@ const toggleTutorialMode = (mode) => {
                   <button
                     class="btn bg-green-400 hover:bg-green-900 hover:text-white text-black mx-3"
                     type="button"
-                    @click="
-                      () => {
-                        gamePage()
-                        resetMiss()
-                      }
-                    "
+                    @click="gamePage()"
                   >
                     <img src="./assets/play-button.png" class="h-7" />
                     Try again
@@ -853,26 +835,14 @@ const toggleTutorialMode = (mode) => {
             </button>
             <button
               v-show="mode === 'hardMode'"
-              @click="
-                () => {
-                  gamePage()
-                  resetMiss()
-                  hardMode()
-                }
-              "
+              @click="hardMode"
               class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3"
             >
               Play again
             </button>
             <button
               v-show="mode === 'easyMode'"
-              @click="
-                () => {
-                  gamePage()
-                  resetMiss()
-                  ezMode()
-                }
-              "
+              @click="ezMode"
               class="playAgain btn bg-green-600 hover:bg-green-900 text-white mx-3"
             >
               Play again
@@ -924,7 +894,6 @@ const toggleTutorialMode = (mode) => {
 .hanjie-cell-half {
   width: 70px;
   height: 30px;
-  border: 1px solid #000;
   text-align: center;
   padding-bottom: 10px;
 }
