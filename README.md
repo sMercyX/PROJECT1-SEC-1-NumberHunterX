@@ -14,7 +14,8 @@ member
   - local storage System
 - Json Level (easy and hard)
 - Attend weekly meeting
-  
+  </ul></li>
+
 <li>65130500021 ณัฐวรรณ คุ้มเผ่า 18%<ul>
 
 - Tutorail Page
@@ -25,6 +26,7 @@ member
 - Fails Page
 - CSS
 - Attend weekly meeting
+  </ul></li>
   
 <li>65130500029 ธิติพงศ์ สุดสวนศรี 18%<ul>
 
