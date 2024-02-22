@@ -18,7 +18,7 @@ member
 
 <li>65130500021 ณัฐวรรณ คุ้มเผ่า 18%<ul>
 
-- Tutorail Page
+- Tutorail Page (content & responsive)
 - Guide design
 - Block Template
 - Hint System
